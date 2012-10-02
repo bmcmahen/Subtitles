@@ -37,8 +37,10 @@
       var buf = [ 'hello\n']
 
       _.each(subs, function(value, index){
-        buf[buf.length] = index + 1; 
-        buf[buf.length] = secondsToHms(value.startTime) + ' --> ' + secondsToHms(value.endTime);
+        var bufLength = buf.length
+        buf[bufLength] = index + 1; 
+        buf[bufLength + 1] = secondsToHms(value.startTime) + ' --> ' + secondsToHms(value.endTime);
+        buf[bufLength + 2] = value.description + '\n'
       })
 
       return buf.join('\n')
