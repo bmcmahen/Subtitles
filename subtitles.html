@@ -46,7 +46,7 @@ Loop? <input type='checkbox' id='loop-checked'
   <input type='button' value='Create New Project' id='create-new-project'/>
   <input type='button' value='Insert new Caption' id='insert-new-caption'/>
   <input type='button' value='export as SRT' id='export-subtitles'/>
-  <ul>
+  <ul id='captions'>
   {{#each caption}}
   {{> caption}}
   {{/each}}
@@ -57,7 +57,7 @@ Loop? <input type='checkbox' id='loop-checked'
   <li>
   {{startTime}} - {{endTime}} <br>
   <div class="expandingArea active">
-      <pre><span id='{{id}}'></span><br></pre>
+      <pre><span></span><br></pre>
     <textarea class='{{currentClass}}'>{{text}}</textarea>
   </div>
   <a href='#' class='delete-sub'> Delete </a>

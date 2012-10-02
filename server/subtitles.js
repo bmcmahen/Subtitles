@@ -1,8 +1,23 @@
-(function(){
+
+
+Videos = new Meteor.Collection('videos')
+Subtitles = new Meteor.Collection('subtitles')
+
+  /**
+   * PUBLISH
+   */
+  
+  Meteor.publish('subtitles', function(videoId) {
+    return Subtitles.find({ videoId: videoId }, {sort: ['startTime', 'asc']})
+  })
+
+  Meteor.publish('videos', function(){
+    return Videos.find()
+  })
 
   /**
    * Allows basic server-side routing in Meteor using connect and imports fs
-   * which allows me to write SRT files to the server. 
+   * which allows me to write SRT files to 8the server. 
    */
 
     var require = __meteor_bootstrap__.require
@@ -15,7 +30,7 @@
       .use(function(req, res, next){
 
         Fiber(function(){
-          path(req) ? res.end(subtitle) : next()
+          path(req) ? res.end('subtitle requested') : next()
         }).run(); 
 
       })
@@ -94,12 +109,10 @@
       
       export: function(currentVideo){
 
-        var subsId = Videos.findOne(currentVideo).subtitles
-
-        var subtitles = Subtitles.find({ _id: { $in : subsId }}, {sort: ['startTime', 'asc']} ).fetch()
+        var subtitles = Subtitles.find({ videoId : currentVideo } , {sort: ['startTime', 'asc']} ).fetch()
         var srt  = buildSRT(subtitles)
 
-        fs.writeFile('subs/superSub.srt', srt, function(err, file){
+        fs.writeFile('public/subtitles/testsub.srt', srt, function(err, file){
           if (err) throw err;
           console.log('it saved apparently', file)
           // Meteor.http.get('/subtitles/ + userId + / + subId')
@@ -108,5 +121,3 @@
 
     });
 
-
-})(); 
