@@ -1,0 +1,51 @@
+textarea
+  width 400px
+  display block
+  height 50px
+
+.selected
+  background #ddd
+
+ul
+  width 300px
+  
+textarea
+pre
+  overflow hidden
+  resize none
+  outline none
+  margin 0
+  padding 0
+  border none
+
+.expandingArea 
+  position relative
+  border 1px solid black
+  background #fff
+
+.expandingArea > textarea
+.expandingArea > pre
+  padding 5px
+  background transparent
+  font 400 13px/16px Helvetica, arial, sans-serif
+  white-space pre-wrap
+  word-wrap break-word
+
+.expandingArea > textarea
+  box-sizing border-box
+  width 100%
+
+.expandingArea.active > textarea
+  overflow hidden
+  position absolute
+  top 0
+  left 0
+  height 100%
+  resize none
+
+.expandingArea > pre
+  display none
+
+.expandingArea.active > pre 
+  display block
+  visibility hidden
