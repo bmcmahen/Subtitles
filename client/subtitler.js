@@ -15,7 +15,7 @@
   Session.set('startTime', null)
   Session.set('endTime', null)
 
-  Session.set('currentMovie', null)
+  Session.set('currentVideo', null)
   Session.set('currentSub', null)
 
   var videoNode, videoFile, loopTime
@@ -251,7 +251,8 @@ Template.captions.events({
 
   'click #export-subtitles' : function ( e, t ) {
     console.log('export clicked')
-    Meteor.call('export', function(error, result){
+    console.log(Session.get('currentVideo'))
+    Meteor.call('export', Session.get('currentVideo'), function(error, result){
       if (error) console.log(error)
       console.log(result)
     })
