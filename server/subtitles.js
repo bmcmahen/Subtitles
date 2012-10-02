@@ -1,7 +1,8 @@
 (function(){
 
   /**
-   * Allows basic server-side routing
+   * Allows basic server-side routing in Meteor using connect and imports fs
+   * which allows me to write SRT files to the server. 
    */
 
     var require = __meteor_bootstrap__.require
@@ -24,6 +25,13 @@
         return splitPath[1] === 'subtitles' ? 'subtitle present in url' : null
       }
 
+
+/**
+ * [buildSRT formats array of times/descriptions into SRT format]
+ * @param  {[array]} subs [fetched, sorted array of subtitle objects]
+ * @return {[string]}      [string of the array in SRT format]
+ */
+
     buildSRT = function(subs) {
 
       var buf = [ 'hello\n']
@@ -37,11 +45,12 @@
     }
 
 
-    /**
-     * [secondsToHms transforms seconds into SRT standard num string]
-     * @param  {[number]} num [number in seconds]
-     * @return {[string]}           [HH:MM:SS,SSS]
-     */
+/**
+ * [secondsToHms transforms seconds into SRT standard num string]
+ * @param  {[number]} num [number in seconds]
+ * @return {[string]}           [HH:MM:SS,SSS]
+ */
+
     secondsToHms = function(num) {
 
       // Convert seconds into hours, minutes, seconds (rounded to three decimals)
@@ -74,6 +83,13 @@
 
     Meteor.methods({
 
+      /**
+       * [export takes the current video and builds a subtitle file]
+       * @param  {[video ID]} currentVideo [id of the current video project]
+       * @return {[url]}            [return url when finished, telling the client where it can
+       *                                        GET the srt file on the server]
+       */
+      
       export: function(currentVideo){
 
         var subsId = Videos.findOne(currentVideo).subtitles
