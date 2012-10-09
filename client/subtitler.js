@@ -19,10 +19,10 @@ Subtitles = new Meteor.Collection('subtitles')
 
   Session.set('isLooping', null)
 
+  Session.set('saving', null)
+
   var videoNode, videoFile, loopTime
 
-  var firstVisibleNode = 0;
-  var lastVisibleNode = 10; 
 
 /**
  * Subscribe
@@ -59,6 +59,25 @@ Template.stats.helpers({
 
   videoPlaying: function(){
     return Session.get('videoPlaying')
+  },
+
+  saving: function() {
+    return Session.get('saving')
+  }
+})
+
+Template.body.helpers({
+  currentVideo: function(){
+    return Session.get('currentVideo')
+  }
+})
+
+Template.navigation.events({
+ 'click #create-new-project' : function( e, t ) {
+    var currentVid = Videos.insert({
+      creationDate: new Date()
+    })
+    Session.set('currentVideo', currentVid)
   }
 })
 /**

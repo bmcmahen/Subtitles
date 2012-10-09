@@ -1,0 +1,93 @@
+@import 'nib'
+
+body
+  padding-top 60px
+  height 100%
+  background-image url('/images/husk.png')
+
+video
+  width  100%
+
+textarea
+  width 400px
+  display block
+  height 50px
+
+.expandingArea textarea.selected
+  background white
+
+ul#captions
+  list-style-type none
+  padding 5px
+  & li
+    padding-top 5px
+    padding-bottom 5px
+
+p.times
+  margin 0px
+  padding 3px
+  font 12px HelveticaNeue, Helvetica, arial, sans-serif
+
+a.delete-sub
+  float right
+
+textarea
+pre
+  overflow hidden
+  resize none
+  outline none
+  margin 0
+  padding 0
+  border none
+
+.expandingArea 
+  position relative
+  background #eee
+
+.expandingArea > textarea
+.expandingArea > pre
+  padding 5px
+  background transparent
+  font 400 13px/16px Helvetica, arial, sans-serif
+  white-space pre-wrap
+  word-wrap break-word
+
+.expandingArea > textarea
+  box-sizing border-box
+  width 100%
+
+.expandingArea.active > textarea
+  overflow hidden
+  position absolute
+  top 0
+  left 0
+  height 100%
+  resize none
+
+.expandingArea > pre
+  display none
+
+.expandingArea.active > pre 
+  display block
+  visibility hidden
+
+#captions
+  height 400px
+  width 100%
+  border-radius 4px
+  background white
+  overflow auto
+
+img.logo
+  float left
+  height 35px
+  margin 5px
+
+div.tools
+  float left
+  width 100%
+  border-bottom 1px solid #ddd
+
+.navbar-inner
+  background-image linear-gradient(#999, #707070)
+  box-shadow inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.4)

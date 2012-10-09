@@ -18,9 +18,14 @@ Template.controls.events({
 
   'keyup #loop-duration-input': function (e, t) {
     var input = e.currentTarget.value
-    if (typeof input === 'number') {
-      console.log('input', input)
-      Session.set('loopDuration', e.currentTarget.value)
+
+    function isNumber(o) {
+      return ! isNaN (o-0)
+    }
+
+    if (isNumber(input) && input != '') {
+      console.log(input)
+      Session.set('loopDuration', input)
     }
   }
 

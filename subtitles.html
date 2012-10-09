@@ -3,21 +3,51 @@
 </head>
 
 <body>
-  <table>
-    <tr>
-      <td>
-        {{> stats}}
-        {{> video}}
-      </td>
-      <td>
-        {{> captions}}
-      </td>
+  <div class='navbar navbar-fixed-top'>
+    <div class='navbar-inner'>
+      <div class='container-fluid'>
+      <img class='logo' src='/images/logo.png'/>
+      <ul class='nav pull-right'>
+        {{> navigation}}
+      </ul>
+    </div>
+  </div>
+  </div>
+  <div id='main' class='container-fluid'>
+    <div class='row-fluid'>
+      {{> body}}
+        </div>
+  </div>
 </body>
 
+<template name='navigation'>
+   <li><a href='#' id='create-new-project'>New Project</a></li>
+        <li class='active'><a href='#'>Library</a></li>
+        <li class='divider-vertical'> </li>
+        <li><a href='#'>User</a></li>
+</template>
+
+<template name='body'>
+    {{#if currentVideo}}
+      <div class='span5'>
+        {{> stats}}
+        {{> video}}
+      </div>
+      <div class='span7'>
+        {{> captions}}
+      </div>
+    {{else}}
+      <div class='span12'>
+        <input type='text' id='project-name' class='newproject'/>
+        <input type='submit' class='btn'/>
+      </div>
+    {{/if}}
+</template>
+
 <template name="video">
-  <input accept="video/*" type='file' name='video-input' id='video-input'/>
+  <input accept="video/*" type='file'  class='btn' name='video-input' id='video-input'/>
   <br>
-  <video height='200px' id='video-display' controls></video>
+  <video id='video-display' controls></video>
   <br>
  {{> controls}}
 </template>
@@ -28,6 +58,7 @@
     <li> Start Time, End Time: {{startTime}} - {{endTime}} </li>
     <li> Looping? {{looping}} </li>
     <li> Video Playing? {{videoPlaying}} </li>
+    <li> Saving? {{saving}} </li>
   </ul>
 
 </template>
@@ -43,9 +74,10 @@ Loop? <input type='checkbox' id='loop-checked'
 </template>
 
 <template name='captions'>
-  <input type='button' value='Create New Project' id='create-new-project'/>
-  <input type='button' value='Insert new Caption' id='insert-new-caption'/>
-  <input type='button' value='export as SRT' id='export-subtitles'/>
+  <div class='tools'>
+  <input type='button' class='btn' value='Insert Caption' id='insert-new-caption'/>
+  <input type='button' class='btn' value='Export' id='export-subtitles'/>
+  </div>
   <ul id='captions'>
   {{#each caption}}
   {{> caption}}
@@ -55,11 +87,13 @@ Loop? <input type='checkbox' id='loop-checked'
 
 <template name='caption'>
   <li>
-  {{startTime}} - {{endTime}} <br>
+  <p class='times'>
+   {{startTime}} - {{endTime}} 
+  </span>  
+  <a href='#' class='delete-sub'> Delete </a>
   <div class="expandingArea active">
       <pre><span></span><br></pre>
-    <textarea class='{{currentClass}}'>{{text}}</textarea>
+    <textarea id='{{_id}}'>{{text}}</textarea>
   </div>
-  <a href='#' class='delete-sub'> Delete </a>
   </li>
 </template>

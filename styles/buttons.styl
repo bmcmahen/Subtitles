@@ -1,0 +1,76 @@
+@import 'nib'
+
+button.btn
+input[type='button'].btn
+  font-size 11px
+  padding 5px 13px 5px 13px
+  margin 5px
+  margin-left 0px
+  float left
+  text-shadow 1px 1px 0px rgba(255,255,255,0.4)
+  cursor pointer
+  border-radius 3px
+  border 1px solid #ccc
+  background #eee
+  background-image linear-gradient(#fff, #D6D6D6)
+  color #444
+  box-shadow 0 1px 1px rgba(0, 0, 0, 0.05), inset 0 1px 0px white  
+  background-size 1px 40px
+  transition background 0.3s
+
+  &:hover
+    background-position 20px
+
+div.btn-group
+  padding 0px
+  display inline-block
+  margin 5px
+  float right
+
+  & button.btn
+    border-radius 0px
+    margin 0px
+    margin-left -1px
+
+    &:first-child
+      border-top-left-radius 3px
+      border-bottom-left-radius 3px
+      margin-left 0px
+
+  & button.active
+    box-shadow inset 0px 5px 10px rgba(0,0,0,0.10)
+    background rgba(0,0,0,0.15)
+    color rgba(0,0,0,0.60)
+
+  &:after
+    clear both
+
+  & input
+    margin 0
+
+fieldset > .btn:last-child
+.btn-group > .btn:last-child
+.btn-group > .dropdown-toggle
+  border-top-right-radius 3px !important
+  border-bottom-right-radius 3px !important
+
+input
+  padding 4px
+  border 0px
+  border-radius 3px
+  margin 6px
+
+  &[type='text']
+    width: 150px
+
+  &[type='button']
+    width default
+
+fieldset
+  margin 0px
+  padding 0px
+  border 0px
+
+legend
+  display inline
+  max-width 15px

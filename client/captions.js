@@ -11,13 +11,6 @@ Template.captions.helpers({
 
 Template.captions.events({
 
-  'click #create-new-project' : function( e, t ) {
-    var currentVid = Videos.insert({
-      creationDate: new Date()
-    })
-    Session.set('currentVideo', currentVid)
-  },
-
   'click #insert-new-caption' : function ( e, t ) {
     // This should be made more flexible. Potentially allow the user to type
     // until they want to skip to the next one, and then enter an 'endTime'
@@ -54,6 +47,14 @@ Template.caption.helpers({
   }
 })
 
+updateForm = function(t){
+
+   Subtitles.update(t.data._id, {$set : {text : t.find('textarea').value}}, function(err){
+          if (!err) Session.set('saving', 'All Changes Saved')
+          else Sessionset('saving', 'Error Saving.')
+        })
+}
+
 Template.caption.events({
 
   'focus textarea' : function(e, t){
@@ -65,10 +66,12 @@ Template.caption.events({
 
   'keydown textarea' : function(e, t){
 
+
     // if return key is pressed within textarea, interpret as creating a new
     // subtitle, directly after the current one. 
     if (e.which === 13) {
 
+      // To DO: if current textarea is blank, remove it, and insert new one
       var newStart = this.endTime + 0.01
         , newEnd = newStart + Session.get('loopDuration')
 
@@ -83,15 +86,36 @@ Template.caption.events({
       Session.set('currentTime', newStart)
       Session.set('currentSub', sub)
 
+
+      if (e.currentTarget.value === '') {
+        Subtitles.remove(t.data._id)
+      } 
+
       return false
     }
+  },
 
+  'input textarea' : function( e , t){
     var area = e.currentTarget
-      , span = t.find('span')
+      ,  span = t.find('span')
+
       span.textContent = area.value
+
+
+        // Save the user input after 3 seconds of inactivity typing
+        Session.set('saving', 'Saving...')
+        myTimer.clear()
+        myTimer.set(function() {
+        
+        updateForm(t);  
+      });
+
+
   },
 
   'click .delete-sub' : function( e, t) {
+    // var textarea = t.find('textarea');
+    // console.log(textarea)
     Subtitles.remove({ _id: this._id })
   }
 
@@ -104,8 +128,7 @@ Template.caption.rendered = function(){
   span.textContent = area.value
 
   if (Session.equals('currentSub', this.data._id))  {
-    console.log(this, area)
-    area.focus()
+    area.focus(); 
   }
 }
 
