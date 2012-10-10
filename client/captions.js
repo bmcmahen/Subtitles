@@ -21,7 +21,6 @@ Template.captions.events({
       var currentTime = Session.get('currentTime')
         , endTime = currentTime + Session.get('loopDuration')
 
-
       var newSub = Subtitles.insert({
         startTime : currentTime,
         endTime : endTime,
@@ -42,13 +41,13 @@ Template.captions.events({
 
 // Each individual Caption node
 Template.caption.helpers({
+
   currentClass: function(){
     return Session.equals('currentSub', this._id) ?  'selected' : ''
   }
 })
 
 updateForm = function(t){
-
    Subtitles.update(t.data._id, {$set : {text : t.find('textarea').value}}, function(err){
           if (!err) Session.set('saving', 'All Changes Saved')
           else Sessionset('saving', 'Error Saving.')
@@ -67,12 +66,60 @@ Template.caption.events({
   'keydown textarea' : function(e, t){
 
 
+    //cmd + p
+    if (e.which === 80 && e.metaKey) {
+      var endTime = Session.get('endTime')
+      // This should probably be on a timer, like auto-save
+      Subtitles.update({_id: this._id}, {$set: {endTime: endTime + 0.5}})
+      Session.set('endTime', endTime + 0.5)
+
+      // sync video 2 seconds before new endTime 
+      if (typeof videoNode != 'undefined') {
+        videoNode.currentTime = endTime - 1;
+      }
+      return false
+    }
+
+    //cmd + o
+    if (e.which === 79 && e.metaKey){
+      var endTime = Session.get('endTime')
+
+      if (endTime > Session.get('startTime')) {
+        // This should probably be on a timer, too
+        Subtitles.update({_id : this._id}, {$set: {endTime: endTime - 0.5}})
+        Session.set('endTime', endTime - 0.5)
+
+        if (typeof videoNode != 'undefined') {
+          videoNode.currentTime = endTime - 1.5;          
+        }
+      }
+      return false
+    }
+
+      // cmd + i
+    if (e.which === 73 && e.metaKey) {
+      var startTime = Session.get('startTime')
+
+      Subtitles.update({_id: this._id}, {$set: {startTime: startTime + 0.5}})
+      Session.set('startTime', startTime + 0.5)
+      return false
+    }
+
+    if (e.which === 85 && e.metaKey ) {
+      var startTime = Session.get('startTime')
+
+      Subtitles.update({_id: this._id}, {$set: {startTime: startTime - 0.5}})
+      Session.set('startTime', startTime - 0.5)
+      return false
+    }
+
+
+
     // if return key is pressed within textarea, interpret as creating a new
     // subtitle, directly after the current one. 
     if (e.which === 13) {
 
-      // To DO: if current textarea is blank, remove it, and insert new one
-      var newStart = this.endTime + 0.01
+      var newStart = this.endTime + 0.001
         , newEnd = newStart + Session.get('loopDuration')
 
       var sub = Subtitles.insert({
@@ -86,47 +133,42 @@ Template.caption.events({
       Session.set('currentTime', newStart)
       Session.set('currentSub', sub)
 
-
-      if (e.currentTarget.value === '') {
-        Subtitles.remove(t.data._id)
-      } 
+      // if empty when hitting return, remove that caption
+      if (e.currentTarget.value === '') Subtitles.remove(t.data._id)
 
       return false
     }
   },
 
   'input textarea' : function( e , t){
+    // expand input area as user types
     var area = e.currentTarget
       ,  span = t.find('span')
 
       span.textContent = area.value
 
-
-        // Save the user input after 3 seconds of inactivity typing
-        Session.set('saving', 'Saving...')
-        myTimer.clear()
-        myTimer.set(function() {
-        
+      // Save the user input after 3 seconds of inactivity typing
+      Session.set('saving', 'Saving...')
+      myTimer.clear()
+      myTimer.set(function() {   
         updateForm(t);  
-      });
-
-
+     });
   },
 
   'click .delete-sub' : function( e, t) {
-    // var textarea = t.find('textarea');
-    // console.log(textarea)
     Subtitles.remove({ _id: this._id })
   }
 
 })
 
 Template.caption.rendered = function(){
+  // set input height to height of text content upon first render
   var area = this.find('textarea')
     , span = this.find('span')
 
   span.textContent = area.value
 
+  // focus on current subtitle
   if (Session.equals('currentSub', this.data._id))  {
     area.focus(); 
   }
