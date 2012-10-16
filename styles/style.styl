@@ -1,9 +1,18 @@
 @import 'nib'
 
 body
-  padding-top 60px
+  padding-top 80px
   height 100%
   background-image url('/images/husk.png')
+
+hr
+  margin 3px
+  margin-left 10px
+  height 1px
+  margin-right 10px
+  background-color #ddd
+  color #ddd
+  border 1px solid #bbb
 
 video
   width  100%
@@ -18,18 +27,30 @@ textarea
 
 ul#captions
   list-style-type none
-  padding 5px
+  padding 0px
   & li
     padding-top 5px
     padding-bottom 5px
+    opacity 1
+    transform-style preserve-3d
+    transition-property  opacity
+    transition-duration 0.2s
+    &.deleted
+      opacity 0
 
-p.times
+div.times
   margin 0px
-  padding 3px
+  text-align right
+  padding 6px
+  display inline-block
+  vertical-align top
+  width 170px
+  overflow hidden
   font 12px HelveticaNeue, Helvetica, arial, sans-serif
 
 a.delete-sub
-  float right
+  display inline-block
+  vertical-align top
 
 textarea
 pre
@@ -42,7 +63,9 @@ pre
 
 .expandingArea 
   position relative
-  background #eee
+  display inline-block
+  background whiteSmoke
+  width 490px
 
 .expandingArea > textarea
 .expandingArea > pre
@@ -72,22 +95,59 @@ pre
   visibility hidden
 
 #captions
-  height 400px
+  position static
+  top 140px
   width 100%
-  border-radius 4px
-  background white
   overflow auto
+
+#video-column
+  position fixed
+  top 80px
+  width 400px
+  left 50px
+  bottom 50px
+
+#caption-column
+  position fixed
+  top 80px
+  left 450px
+  right 50px
+  bottom 50px
+
+.caption
+  position relative
+  & a.delete
+    absolute top right
+    opacity 0.3
+    pointer-events none
+  &:hover a.delete
+    opacity 1
+    pointer-events auto
 
 img.logo
   float left
-  height 35px
+  height 30px
   margin 5px
 
 div.tools
   float left
   width 100%
-  border-bottom 1px solid #ddd
+  background rgba(255, 245, 245, 0.35)
+  padding 0
+  border 1px solid white
+  border-radius 4px
+
+  & div.float-left
+    float left
+
+  & div.float-right
+    float right
 
 .navbar-inner
-  background-image linear-gradient(#999, #707070)
-  box-shadow inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.4)
+  background-image linear-gradient(#f7f7f7, #edecf0)
+  border-bottom 1px solid white
+  // background-color #707070
+  box-shadow 1px 1px 5px rgba(0, 0, 0, 0.15)
+  & a
+    font 12px HelveticaNeue, Helvetica, arial, sans-serif
+    padding 5px 20px 5px 20px

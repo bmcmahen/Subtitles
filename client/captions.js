@@ -156,7 +156,11 @@ Template.caption.events({
   },
 
   'click .delete-sub' : function( e, t) {
-    Subtitles.remove({ _id: this._id })
+    var self = this;
+    t.find('li').classList.add('deleted');
+    Meteor.setTimeout(function () {
+      Subtitles.remove({ _id: self._id })
+    }, 200); 
   }
 
 })

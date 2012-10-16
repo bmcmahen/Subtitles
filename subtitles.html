@@ -6,15 +6,15 @@
   <div class='navbar navbar-fixed-top'>
     <div class='navbar-inner'>
       <div class='container-fluid'>
-      <img class='logo' src='/images/logo.png'/>
+      <img class='logo' src='/images/logo_dark.png'/>
       <ul class='nav pull-right'>
         {{> navigation}}
       </ul>
     </div>
   </div>
   </div>
-  <div id='main' class='container-fluid'>
-    <div class='row-fluid'>
+  <div id='main' class='container'>
+    <div class='row'>
       {{> body}}
         </div>
   </div>
@@ -24,16 +24,24 @@
    <li><a href='#' id='create-new-project'>New Project</a></li>
         <li class='active'><a href='#'>Library</a></li>
         <li class='divider-vertical'> </li>
-        <li><a href='#'>User</a></li>
+        <li class='dropdown'>
+          <a href='#' class='dropdown-toggle' data-toggle='dropdown'>Ben McMahen <b class='caret'></b></a>
+          <ul class='dropdown-menu' role='dropdown' aria-labelledby='dropdownMenu' >
+            <li><a href='#' tabindex='-1'>Settings... </a></li>
+            <li class='divider'></li>
+            <li><a href='#' tabindex='-1'>Logout... </a></li>
+          </ul>
+        </li>
 </template>
 
 <template name='body'>
     {{#if currentVideo}}
-      <div class='span5'>
-        {{> stats}}
+
+      <div id='video-column'>
         {{> video}}
+       {{> stats}}
       </div>
-      <div class='span7'>
+      <div id='caption-column'>
         {{> captions}}
       </div>
     {{else}}
@@ -75,8 +83,13 @@ Loop? <input type='checkbox' id='loop-checked'
 
 <template name='captions'>
   <div class='tools'>
-  <input type='button' class='btn' value='Insert Caption' id='insert-new-caption'/>
+    <div class='float-left'>
+  <input type='text' placeholder='Search Captions'/>
+    </div>
+    <div class='float-right'>
+        <input type='button' class='btn' value='Insert Caption' id='insert-new-caption'/>
   <input type='button' class='btn' value='Export' id='export-subtitles'/>
+</div>
   </div>
   <ul id='captions'>
   {{#each caption}}
@@ -86,14 +99,17 @@ Loop? <input type='checkbox' id='loop-checked'
 </template>
 
 <template name='caption'>
-  <li>
-  <p class='times'>
-   {{startTime}} - {{endTime}} 
-  </span>  
-  <a href='#' class='delete-sub'> Delete </a>
+  <li class='caption'>
+    <div class='times'>
+      {{#with formatTime this}}
+        {{start}} - {{end}} 
+      {{/with}}
+    </div>
   <div class="expandingArea active">
       <pre><span></span><br></pre>
     <textarea id='{{_id}}'>{{text}}</textarea>
   </div>
+  <a class='delete' href='#' class='delete-sub'> Delete </a>
+
   </li>
 </template>
