@@ -28,6 +28,7 @@ textarea
 ul#captions
   list-style-type none
   padding 0px
+  padding-top 5px
   & li
     padding-top 5px
     padding-bottom 5px
@@ -65,7 +66,7 @@ pre
   position relative
   display inline-block
   background whiteSmoke
-  width 490px
+  width 325px
 
 .expandingArea > textarea
 .expandingArea > pre
@@ -116,13 +117,13 @@ pre
 
 .caption
   position relative
-  & a.delete
-    absolute top right
+  & a
+    display inline-block
+  & i
+    margin 4px
     opacity 0.3
-    pointer-events none
-  &:hover a.delete
+  &:hover i
     opacity 1
-    pointer-events auto
 
 img.logo
   float left
@@ -132,10 +133,11 @@ img.logo
 div.tools
   float left
   width 100%
-  background rgba(255, 245, 245, 0.35)
-  padding 0
   border 1px solid white
-  border-radius 4px
+  // background rgba(255, 245, 245, 0.35)
+  // background-image linear-gradient(top, rgba(136, 136, 136, 0.57) 0%, rgba(136, 136, 136, 0) 100%)
+  padding 0
+  border-radius 3px
 
   & div.float-left
     float left

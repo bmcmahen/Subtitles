@@ -21,7 +21,8 @@ Subtitles = new Meteor.Collection('subtitles')
 
   Session.set('saving', null)
 
-  var videoNode, videoFile, loopTime
+  // XXX too many global variables -- get namespacing going
+  var videoNode, videoFile, loopTime, videoTimeDrag, videoTimeBar, videoProgressBar
 
 
 /**
@@ -72,6 +73,44 @@ Template.body.helpers({
   }
 })
 
+// XXX should be a better (meteor friendly) way to bind to document
+Template.body.rendered = function(){
+
+  $('.progressBar').mousedown(function (e) {
+    videoTimeDrag = true;
+    updateBar(e.pageX);
+  })
+
+  $(document).mouseup(function (e) {
+    if (videoTimeDrag) {
+      videoTimeDrag = false;
+      updateBar(e.pageX);
+    }
+  })
+
+  $(document).mousemove(function (e) {
+    if (videoTimeDrag) updateBar(e.pageX);
+  })
+
+  videoTimeBar = document.getElementById('timeBar');
+  videoProgressBar = $('.progressBar')
+
+}
+
+// XXX should be rerwritten without jquery
+updateBar = function(x) {
+  var progress = videoProgressBar;
+  var maxDuration = videoNode.duration;
+  var position = x - progress.offset().left;  // click position
+  var percentage = 100 * position / progress.width(); 
+  if (percentage > 100) percentage = 100;
+  if (percentage < 0) percentage = 0; 
+
+  videoTimeBar.style.width = percentage + '%';
+  var currentTime = maxDuration * percentage / 100; 
+  videoNode.currentTime = currentTime; 
+}
+
 Template.navigation.events({
  'click #create-new-project' : function( e, t ) {
     var currentVid = Videos.insert({
@@ -106,8 +145,17 @@ Template.video.events({
 
   'timeupdate #video-display': function(e, t){
 
+    // Sync the progress Bar
+    var currentPos = videoNode.currentTime
+      , maxDuration = videoNode.duration
+      , percentage = 100 * currentPos / maxDuration;
+
+      if (!videoTimeDrag)
+        videoTimeBar.style.width = percentage + '%';
+
+    // Determine if looping should occur on Time Update
     var looping = Session.get('looping')
-      , playing = Session.get('videoPlaying')
+      , playing = Session.get('videoPlaying');
 
     Session.set('currentTime', videoNode.currentTime)
 
@@ -122,6 +170,7 @@ Template.video.events({
         videoNode.currentTime = Session.get('startTime')
       }
     } 
+
   },
 
   'loadeddata #video-display':function(e,t){
@@ -179,6 +228,7 @@ var syncTextareas = function(){
 
       var currentTime = Session.get('currentTime')
 
+      console.log('hello?', currentTime)
       if (currentTime >= endTime || currentTime <= startTime) {
         var sub = Subtitles.findOne({startTime: {$lte : currentTime}, endTime: {$gte: currentTime}})
         if (sub) {

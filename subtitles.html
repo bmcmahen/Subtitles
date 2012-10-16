@@ -37,11 +37,11 @@
 <template name='body'>
     {{#if currentVideo}}
 
-      <div id='video-column'>
+      <div class='span5'>
         {{> video}}
-       {{> stats}}
+        {{> stats}}
       </div>
-      <div id='caption-column'>
+      <div class='span7'>
         {{> captions}}
       </div>
     {{else}}
@@ -53,11 +53,21 @@
 </template>
 
 <template name="video">
+  <div class='row'>
+    <div class='span5'>
   <input accept="video/*" type='file'  class='btn' name='video-input' id='video-input'/>
-  <br>
+    </div>
+  </div>
+  <div class='row'>
+    <div class='span5'>
   <video id='video-display' controls></video>
-  <br>
- {{> controls}}
+    </div>
+  </div>
+  <div class='row'>
+    <div class='span5'>
+      {{> controls}}
+    </div>
+  </div>
 </template>
 
 <template name='stats'>
@@ -72,12 +82,16 @@
 </template>
 
 <template name='controls'>
+  <div class='progressBar'>
+  <div id='timeBar'></div>
+</div>
 Loop? <input type='checkbox' id='loop-checked' 
     {{#if looping}}
       checked
     {{/if}}
     />
 <input type='text' id='loop-duration-input' placeholder='loop duration' value='{{loopDuration}}'/>
+
 
 </template>
 
@@ -109,7 +123,9 @@ Loop? <input type='checkbox' id='loop-checked'
       <pre><span></span><br></pre>
     <textarea id='{{_id}}'>{{text}}</textarea>
   </div>
-  <a class='delete' href='#' class='delete-sub'> Delete </a>
+  <a href='#' class='delete-sub'>
+  <i class='icon-trash'></i>
+</a>
 
   </li>
 </template>
