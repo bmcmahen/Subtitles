@@ -1110,8 +1110,6 @@ border-right: 1px solid #E6E6E6;
 .navbar .nav li.dropdown.active > .dropdown-toggle,
 .navbar .nav li.dropdown.open.active > .dropdown-toggle {
   background-color: #E4E4E4;
-  background-image: -webkit-linear-gradient(top, #0088cc, #0077b3);
-  color: white;
 }
 .navbar .nav li.dropdown > .dropdown-toggle .caret {
   border-top-color: #777777;

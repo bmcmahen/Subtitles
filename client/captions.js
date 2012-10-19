@@ -2,12 +2,23 @@
  * CAPTIONS
  */
 
+// XXX Jquery to Scroll to anchor within Div, which should be tranlsated to vanilla js
+// $('#captions').scrollTop($('#' + _id ).offset().top);
+// 
+
+
+
 // Caption Wrapper
 Template.captions.helpers({
   caption : function(){
     return Subtitles.find( {} , { sort: ['startTime', 'asc' ]} )  
   }
 })
+
+Template.captions.rendered = function() {
+  var captionList = this.find('#captions');
+  captionList.style.height = (window.innerHeight - 170) + 'px'
+}
 
 Template.captions.events({
 

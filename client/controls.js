@@ -24,7 +24,6 @@ Template.controls.events({
     }
 
     if (isNumber(input) && input != '') {
-      console.log(input)
       Session.set('loopDuration', input)
     }
   }

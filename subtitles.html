@@ -13,10 +13,9 @@
     </div>
   </div>
   </div>
+    {{> map}}
   <div id='main' class='container'>
-    <div class='row'>
       {{> body}}
-        </div>
   </div>
 </body>
 
@@ -36,20 +35,35 @@
 
 <template name='body'>
     {{#if currentVideo}}
-
-      <div class='span5'>
-        {{> video}}
-        {{> stats}}
+      <div class='row'>
+        <div class='span5'>
+          {{> video}}
+          {{> stats}}
+        </div>
+        <div class='span7'>
+          {{> captions}}
+        </div>
       </div>
-      <div class='span7'>
-        {{> captions}}
-      </div>
-    {{else}}
-      <div class='span12'>
-        <input type='text' id='project-name' class='newproject'/>
-        <input type='submit' class='btn'/>
-      </div>
+      {{else}}
+        <div class='span12'>
+          <input type='text' id='project-name' class='newproject'/>
+          <input type='submit' class='btn'/>
+        </div>
     {{/if}}
+</template>
+
+<template name='map'>
+  {{#constant}}
+    <svg id='video-map' width='100%' height='120'>    
+      <g class='map-wrap' transform = 'translate(40,20)'>
+            <rect class='map-background'></rect>
+            <g class='caption-spans'></g>
+            <g class='time-labels'></g>
+            <g class='tick-bars'></g>
+        </g>
+
+    </svg>
+  {{/constant}}
 </template>
 
 <template name="video">
@@ -60,7 +74,7 @@
   </div>
   <div class='row'>
     <div class='span5'>
-  <video id='video-display' controls></video>
+  <video id='video-display'></video>
     </div>
   </div>
   <div class='row'>
@@ -78,7 +92,6 @@
     <li> Video Playing? {{videoPlaying}} </li>
     <li> Saving? {{saving}} </li>
   </ul>
-
 </template>
 
 <template name='controls'>
@@ -91,29 +104,31 @@ Loop? <input type='checkbox' id='loop-checked'
     {{/if}}
     />
 <input type='text' id='loop-duration-input' placeholder='loop duration' value='{{loopDuration}}'/>
-
-
 </template>
 
 <template name='captions'>
-  <div class='tools'>
-    <div class='float-left'>
-  <input type='text' placeholder='Search Captions'/>
-    </div>
-    <div class='float-right'>
+  <div class='row'>
+    <div class='span7'>
+      <hr>
+        <input type='text' placeholder='Search Captions'/>
         <input type='button' class='btn' value='Insert Caption' id='insert-new-caption'/>
-  <input type='button' class='btn' value='Export' id='export-subtitles'/>
-</div>
+        <input type='button' class='btn' value='Export' id='export-subtitles'/>
+      <hr>
+    </div>
   </div>
-  <ul id='captions'>
-  {{#each caption}}
-  {{> caption}}
-  {{/each}}
-  </ul>
+<div class='row'>
+  <div class='span7'>
+    <ul id='captions'>
+    {{#each caption}}
+    {{> caption}}
+    {{/each}}
+    </ul>
+  </div>
+</div>
 </template>
 
 <template name='caption'>
-  <li class='caption'>
+  <li class='caption' name='{{_id}}'>
     <div class='times'>
       {{#with formatTime this}}
         {{start}} - {{end}} 

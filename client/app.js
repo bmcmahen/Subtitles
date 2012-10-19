@@ -26,7 +26,7 @@ Subtitles = new Meteor.Collection('subtitles')
 
 
 /**
- * Subscribe
+ * Subscriptions
  */
 
 Meteor.subscribe('videos')
@@ -73,7 +73,7 @@ Template.body.helpers({
   }
 })
 
-// XXX should be a better (meteor friendly) way to bind to document
+// XXX should be a better (meteor friendly) way to bind to document, without jquery
 Template.body.rendered = function(){
 
   $('.progressBar').mousedown(function (e) {
@@ -85,6 +85,7 @@ Template.body.rendered = function(){
     if (videoTimeDrag) {
       videoTimeDrag = false;
       updateBar(e.pageX);
+      Session.set('currentTime', videoNode.currentTime)
     }
   })
 
@@ -99,14 +100,29 @@ Template.body.rendered = function(){
 
 // XXX should be rerwritten without jquery
 updateBar = function(x) {
+
+  // XXX think of a better way to do this, such that dragging feels immediate
+  // and then if there is lag, it's lag of the video updating. Is this a better idea?
+  // maybe use x position and give absolute positioning to slider at that x position.
+  // also consider a 'slider position' Session variable. Set that, and then embed styles in
+  // the template. When Session variable is updated (which it would on drag) then it would be
+  // rerendered. For efficiency, only the small slider element should be rerendered. 
+  // 
+  // jquery UI slider sets 'left : 52%'
   var progress = videoProgressBar;
   var maxDuration = videoNode.duration;
   var position = x - progress.offset().left;  // click position
-  var percentage = 100 * position / progress.width(); 
+  // var previousPosition = position || null; 
+  // if (position != previousPosition) 
+    var percentage = 100 * position / progress.width(); 
+
   if (percentage > 100) percentage = 100;
   if (percentage < 0) percentage = 0; 
 
-  videoTimeBar.style.width = percentage + '%';
+  console.log(percentage + '%');
+
+  videoTimeBar.style.left = percentage + '%';
+  console.log(videoTimeBar)
   var currentTime = maxDuration * percentage / 100; 
   videoNode.currentTime = currentTime; 
 }
@@ -145,31 +161,39 @@ Template.video.events({
 
   'timeupdate #video-display': function(e, t){
 
+    console.log('timeupdate firing');
+
     // Sync the progress Bar
-    var currentPos = videoNode.currentTime
-      , maxDuration = videoNode.duration
-      , percentage = 100 * currentPos / maxDuration;
 
-      if (!videoTimeDrag)
-        videoTimeBar.style.width = percentage + '%';
+    // XXX its a little too much for the browser to handle if 'currentTime' is set, triggering reactive
+    // functions. What will need to happen is currentTime should be set once dragging _ends_. 
+      if (!videoTimeDrag) {
+            var currentPos = videoNode.currentTime
+            , maxDuration = videoNode.duration
+            , percentage = 100 * currentPos / maxDuration;
+                videoTimeBar.style.left = percentage + '%';
 
-    // Determine if looping should occur on Time Update
-    var looping = Session.get('looping')
-      , playing = Session.get('videoPlaying');
+          // Determine if looping should occur on Time Update
+          var looping = Session.get('looping')
+            , playing = Session.get('videoPlaying');
 
-    Session.set('currentTime', videoNode.currentTime)
+          Session.set('currentTime', videoNode.currentTime)
 
-    // loop the video, if looping true and if currently playing
-    // this logic should go into reactive function for efficiency
-    if (looping && playing) {
-      if (!Session.get('endTime')) {
-        var endtime = Session.get('startTime') + Session.get('loopDuration')
-        Session.set('endTime', endtime)
+          // loop the video, if looping true and if currently playing
+          // this logic should go into reactive function for efficiency
+          if (looping && playing) {
+            if (!Session.get('endTime')) {
+              var endtime = Session.get('startTime') + Session.get('loopDuration')
+              Session.set('endTime', endtime)
+            }
+            if (videoNode.currentTime > Session.get('endTime')){
+              videoNode.currentTime = Session.get('startTime')
+            }
+          } 
       }
-      if (videoNode.currentTime > Session.get('endTime')){
-        videoNode.currentTime = Session.get('startTime')
-      }
-    } 
+
+
+
 
   },
 
@@ -179,6 +203,7 @@ Template.video.events({
   },
 
   'seeking #video-display': function(e,t){
+    console.log('seeking')
   },
 
   'playing #video-display': function(e,t){
