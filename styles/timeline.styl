@@ -1,0 +1,28 @@
+
+#videoSpan
+  margin-bottom 5px
+  margin-top 5px
+  overflow visible
+
+text
+  font-size 10px
+
+g.caption-spans rect
+  transition-property fill
+  transition-duration 0.2s
+  shape-rendering crispEdges
+
+g.caption-spans rect:hover
+  fill rgba(255,255,255,1)
+  cursor pointer
+
+line#current-position
+  stroke-width 4px
+  stroke #000
+  shape-rendering crispEdges
+
+  &:hover
+    cursor pointer
+
+marker#head
+  cursor pointer

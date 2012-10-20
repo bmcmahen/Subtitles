@@ -22,7 +22,7 @@ Subtitles = new Meteor.Collection('subtitles')
   Session.set('saving', null)
 
   // XXX too many global variables -- get namespacing going
-  var videoNode, videoFile, loopTime, videoTimeDrag, videoTimeBar, videoProgressBar
+  var videoNode, videoFile, loopTime, draggingCursor = false;
 
 
 /**
@@ -73,59 +73,6 @@ Template.body.helpers({
   }
 })
 
-// XXX should be a better (meteor friendly) way to bind to document, without jquery
-Template.body.rendered = function(){
-
-  $('.progressBar').mousedown(function (e) {
-    videoTimeDrag = true;
-    updateBar(e.pageX);
-  })
-
-  $(document).mouseup(function (e) {
-    if (videoTimeDrag) {
-      videoTimeDrag = false;
-      updateBar(e.pageX);
-      Session.set('currentTime', videoNode.currentTime)
-    }
-  })
-
-  $(document).mousemove(function (e) {
-    if (videoTimeDrag) updateBar(e.pageX);
-  })
-
-  videoTimeBar = document.getElementById('timeBar');
-  videoProgressBar = $('.progressBar')
-
-}
-
-// XXX should be rerwritten without jquery
-updateBar = function(x) {
-
-  // XXX think of a better way to do this, such that dragging feels immediate
-  // and then if there is lag, it's lag of the video updating. Is this a better idea?
-  // maybe use x position and give absolute positioning to slider at that x position.
-  // also consider a 'slider position' Session variable. Set that, and then embed styles in
-  // the template. When Session variable is updated (which it would on drag) then it would be
-  // rerendered. For efficiency, only the small slider element should be rerendered. 
-  // 
-  // jquery UI slider sets 'left : 52%'
-  var progress = videoProgressBar;
-  var maxDuration = videoNode.duration;
-  var position = x - progress.offset().left;  // click position
-  // var previousPosition = position || null; 
-  // if (position != previousPosition) 
-    var percentage = 100 * position / progress.width(); 
-
-  if (percentage > 100) percentage = 100;
-  if (percentage < 0) percentage = 0; 
-
-  console.log(percentage + '%');
-
-  videoTimeBar.style.left = percentage + '%';
-  console.log(videoTimeBar)
-  var currentTime = maxDuration * percentage / 100; 
-  videoNode.currentTime = currentTime; 
-}
 
 Template.navigation.events({
  'click #create-new-project' : function( e, t ) {
@@ -161,17 +108,11 @@ Template.video.events({
 
   'timeupdate #video-display': function(e, t){
 
-    console.log('timeupdate firing');
-
-    // Sync the progress Bar
+    // Sync the timeline Bar
 
     // XXX its a little too much for the browser to handle if 'currentTime' is set, triggering reactive
     // functions. What will need to happen is currentTime should be set once dragging _ends_. 
-      if (!videoTimeDrag) {
-            var currentPos = videoNode.currentTime
-            , maxDuration = videoNode.duration
-            , percentage = 100 * currentPos / maxDuration;
-                videoTimeBar.style.left = percentage + '%';
+      if (!draggingCursor) {
 
           // Determine if looping should occur on Time Update
           var looping = Session.get('looping')
@@ -191,10 +132,6 @@ Template.video.events({
             }
           } 
       }
-
-
-
-
   },
 
   'loadeddata #video-display':function(e,t){
@@ -253,13 +190,12 @@ var syncTextareas = function(){
 
       var currentTime = Session.get('currentTime')
 
-      console.log('hello?', currentTime)
       if (currentTime >= endTime || currentTime <= startTime) {
         var sub = Subtitles.findOne({startTime: {$lte : currentTime}, endTime: {$gte: currentTime}})
         if (sub) {
           Session.set('currentSub', sub._id)
-          Session.set('startTime', sub.startTime)
-          Session.set('endTime', sub.endTime)
+          // Session.set('startTime', sub.startTime)
+          // Session.set('endTime', sub.endTime)
           console.log('SUB', sub)        
        } 
       }

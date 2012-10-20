@@ -2,12 +2,6 @@
  * CAPTIONS
  */
 
-// XXX Jquery to Scroll to anchor within Div, which should be tranlsated to vanilla js
-// $('#captions').scrollTop($('#' + _id ).offset().top);
-// 
-
-
-
 // Caption Wrapper
 Template.captions.helpers({
   caption : function(){
@@ -16,8 +10,21 @@ Template.captions.helpers({
 })
 
 Template.captions.rendered = function() {
-  var captionList = this.find('#captions');
-  captionList.style.height = (window.innerHeight - 170) + 'px'
+  var self = this; 
+  var captionList = self.find('#captions');
+  captionList.style.height = (window.innerHeight - 250) + 'px'
+
+// Reactive function to focus on relevant caption during playback
+  self.node = self.find('#captions');
+
+  if (! self.handle) {
+    self.handle = Meteor.autorun(function () {
+      var currentSub = Session.get('currentSub');
+      if (currentSub)
+        self.find('#' + currentSub).focus(); 
+    })
+  }
+
 }
 
 Template.captions.events({
@@ -71,11 +78,14 @@ Template.caption.events({
     var self = this
     Session.set('startTime', self.startTime)
     Session.set('endTime', self.endTime)
+    Session.set('currentTime', self.startTime)
     Session.set('currentSub', self._id)
   },
 
   'keydown textarea' : function(e, t){
 
+    // XXX Interpret cmd + delete on empty as 'delete this caption' and refocus
+    // on the former.
 
     //cmd + p
     if (e.which === 80 && e.metaKey) {
@@ -188,4 +198,5 @@ Template.caption.rendered = function(){
     area.focus(); 
   }
 }
+
 
