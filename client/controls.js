@@ -16,6 +16,16 @@ Template.controls.events({
     // }
   },
 
+  'click #play-video' : function (e, t) {
+    if (videoNode.paused) {
+      videoNode.play()
+      e.currentTarget.classList.add('paused')
+    } else {
+      videoNode.pause()
+      e.currentTarget.classList.remove('paused')
+    }
+  },
+
   'keyup #loop-duration-input': function (e, t) {
     var input = e.currentTarget.value
 

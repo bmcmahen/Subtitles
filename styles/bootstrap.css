@@ -834,7 +834,7 @@ a:hover {
 .navbar .brand {
   float: left;
   display: block;
-  padding: 10px 20px 10px;
+  padding: 10px 20px 6px;
   margin-left: -20px;
   font-size: 20px;
   font-weight: 200;
@@ -995,7 +995,8 @@ border-right: 1px solid #E6E6E6;
 .navbar .nav > li > a {
   float: none;
   padding: 14px 15px 12px;
-  color: #0088cc;
+  color: rgba(84, 86, 87, 1);
+  /*color: #0088cc;*/
   text-decoration: none;
   /*text-shadow: 0 1px 0 #000000;*/
 }

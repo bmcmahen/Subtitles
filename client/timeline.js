@@ -1,7 +1,9 @@
+// XXX To do: draggingCursor shouldn't be global variable.
+
 Template.map.events({
 
   'click .timelineEvent' : function(e, t) {
-    var id = e.currentTarget.id;
+    var id = e.currentTarget.getAttribute('data-id');
     Session.set('currentSub', id);
     var currentSub = Subtitles.findOne(id);
     Session.set('startTime', currentSub.startTime)
@@ -10,13 +12,8 @@ Template.map.events({
   },
 
   'mousedown #current-position' : function (e, t) {
-    var self = this; 
-    draggingCursor = true; 
+    Subtitler.draggingCursor = true; 
     return false
-
-    // establish that i'm in dragging mode, which means i need to track mouse
-    // movement.  Can this be done through d3? 
-    console.log(this, e, t)
   }
 })
 
@@ -26,68 +23,97 @@ Template.map.rendered = function () {
   self.marker = self.find('#current-position')
   self.timelineWrapper = self.find('.map-wrap')
 
-  var videoDuration = 600; // this needs to be set dynamically
+  var videoDuration = 600; // XXX this needs to be set dynamically
   var timelineWidth = self.node.clientWidth - 80;
   var multiplyBy = timelineWidth / videoDuration;
   var divideBy = videoDuration / timelineWidth;
 
 
-  // Draw timeline frame, labels, background, etc.
+  // Draw Timeline 
   var x = d3.scale.linear()
     .domain([0, videoDuration])
     .range(['0px', self.node.clientWidth - 80]);
 
-  d3.select(self.node).select('rect.map-background')
-    .attr('x', 0)
-    .attr('y', 10)
-    .attr('width', timelineWidth)
-    .attr('height', 10)
-    .style('fill', '#B0B8D6')
+  d3.select(self.node).select('line.timeline-background')
+    .attr('x1', 0)
+    .attr('x2', timelineWidth)
+    .attr('y1', 0)
 
+  // Draw Click Zone
+  d3.select(self.node).select('rect.timeline-click-zone')
+    .attr('width', timelineWidth)
+
+  // Draw Time-Interval Lines
   d3.select(self.node).select('.tick-bars').selectAll('line')
     .data(x.ticks(7))
     .enter().append('line')
+      .attr('class', 'tick-bar')
       .attr('x1', x)
       .attr('x2', x)
-      .attr('y1', 0)
-      .attr('y2', 30)
-      .style('stroke', '#fff')
-      .style('stroke-linecap', 'round')
-      .style('stroke-width', '2')
+      .attr('y1', 1)
+      .attr('y2', -50)
 
+// Draw Time-Interval Line Labels
   d3.select(self.node).select('.time-labels').selectAll('.rule')
     .data(x.ticks(7))
     .enter().append('text')
     .attr('class', 'rule')
     .attr('x', x)
-    .attr('y', 50)
+    .attr('y', -55)
     .attr('dy', -3)
     .attr('text-anchor', 'middle')
     .text(function(d){
-      return secondsToHms(d)
+      return secondsToHms(d, { format : 'short' } )
     });
 
   // Reactively draw or redraw captions as they are added or removed
   if (! self.handle) {
 
+  // Height scale
+  var yScale = d3.scale.linear()
+    .domain([0, 4])
+    .range([10, 55]);
+
+
     self.handle = Meteor.autorun(function () {
-      var current = Session.get('currentSub');
-      var currentSub = Subtitles.findOne(current);
+
+      var currentSubId = Session.get('currentSub')
+        , currentSub = Subtitles.findOne(currentSubId);
+
+      // Determine the ratio of words to seconds
+      // 140 words / minute (BBC Recommendation) is 2.3
+      // 180 / minute, 3, is sometime acceptable
+      var getRatio = function(cap) {
+        var dataLength = typeof cap.text === 'undefined' ? 11 : cap.text.split(' ').length
+          , duration = cap.endTime - cap.startTime;
+        
+        return dataLength / duration;
+      }
+
 
       // need function for drawing each caption span
       var drawSubs = function (caption) {
-        caption.attr('id', function (cap) { return cap._id; })
-          .attr('fill', 'rgba(255,255,255,0.5)')
-          .attr('stroke', '#999')
+        caption
+          .attr('data-id', function (cap) { return cap._id; })
           .attr('class', 'timelineEvent')
-          .attr('x', function (cap) { return cap.startTime * multiplyBy; })
-          .attr('y', 2.5)
-          .attr('width', function (cap) { 
-            var endPosition = cap.endTime * multiplyBy;
-            var startPosition = cap.startTime * multiplyBy;
-            return endPosition - startPosition;
+          .attr('fill', function (cap) { 
+            // Provide colour warnings if too fast rate / second
+            var rate = getRatio(cap);
+            if (rate <= 2.3)
+              return 'rgb(254, 226, 255)';
+            else if (rate > 2.3 && rate < 3.1)
+              return '#fbb450'; // warning
+            else
+              return '#ea8787'; // danger
           })
-          .attr('height', 25);
+          .attr('x', function (cap) { return x(cap.startTime); })
+          .attr('y', function (cap) { return '-' + yScale(getRatio(cap)); })
+          .attr('width', function (cap) { 
+            return x(cap.endTime) - x(cap.startTime)
+          })
+          .attr('height', function (cap) {
+            return yScale(getRatio(cap)); 
+          });
       };
 
       var captions = d3.select(self.node).select('.caption-spans').selectAll('rect')
@@ -102,43 +128,63 @@ Template.map.rendered = function () {
 // Reactively draw playback position during play
 if (! self.handle2) {
 
-  if (! draggingCursor) {
+  if (! Subtitler.draggingCursor) {
     self.handle2 = Meteor.autorun(function () {
       var currentTime = Session.get('currentTime');
       var xAxis = currentTime * multiplyBy; 
 
-      d3.select(self.marker).attr('x1', xAxis).attr('x2', xAxis)
+      d3.select(self.marker).transition().duration(250).attr('x1', xAxis).attr('x2', xAxis)
     })
   }
 }
 
-  // setup dragging event handlers which Meteor doesn't deal with very well. 
-  // these should be unbinded upon the template being destroyed. 
-  // does d3 have a similar 'off' to jquery?
-  // XXX potentially use reactivity here, instead of updating directly. It depends
-  // on the efficiency of it. My guess is that this is more efficient than
-  // using Session.set('currentTime') but I could be wrong.
-      d3.select(window).on('mousemove', function(e, d) {
-        if (!draggingCursor) return;
-        var xPosition = d3.mouse(self.timelineWrapper)[0];
+// Timeline event handlers in d3 which don't work well with native Meteor
+  var setMarkerPostion = function(options) {
+    var options = options || false; 
+    var xPosition = d3.mouse(self.timelineWrapper)[0];
 
         if (xPosition >= 0 && xPosition <= timelineWidth) {
-          d3.select(self.marker).attr('x1', xPosition).attr('x2', xPosition);
-          var val = xPosition * divideBy;
 
-          if (typeof videoNode != 'undefined') videoNode.currentTime = val; 
+          // Don't animate while dragging
+          if (options.animate)
+            d3.select(self.marker).transition().duration(250).attr('x1', xPosition).attr('x2', xPosition);
+          else
+            d3.select(self.marker).attr('x1', xPosition).attr('x2', xPosition);
+
+          var val = xPosition * divideBy;
+          if (typeof videoNode != 'undefined')
+            videoNode.currentTime = val; 
         }
+  };
+
+      // If dragging the cursor during mouse movement, set position of marker.
+      d3.select(window).on('mousemove', function(e, d) {
+
+        if (! Subtitler.draggingCursor) 
+          return;
+        setMarkerPostion();
       });
 
+      // If releasing mouse while dragging cursor, set marker position and disable
+      // dragging (draggingCursor = false)
       d3.select(window).on('mouseup', function(){
-        if (draggingCursor) {
-          draggingCursor = false;
+
+        if (Subtitler.draggingCursor) {
+          Subtitler.draggingCursor = false;
           var x = d3.select(self.marker).attr('x1');
+
           if (x >= 0 && x <= timelineWidth) {
             Session.set('currentTime', x * divideBy);
           }
         } 
       });
 
+      d3.select(self.node).select('.timeline-click-zone').on('click', function(){
+        setMarkerPostion({animate : true});
+      });
+};
 
-}
+Template.map.destroyed = function () {
+  this.handle && this.handle.stop();
+  this.handle2 && this.handle2.stop(); 
+};

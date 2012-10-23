@@ -12,7 +12,7 @@ Template.captions.helpers({
 Template.captions.rendered = function() {
   var self = this; 
   var captionList = self.find('#captions');
-  captionList.style.height = (window.innerHeight - 250) + 'px'
+  captionList.style.height = (window.innerHeight - 200) + 'px'
 
 // Reactive function to focus on relevant caption during playback
   self.node = self.find('#captions');
@@ -42,7 +42,8 @@ Template.captions.events({
       var newSub = Subtitles.insert({
         startTime : currentTime,
         endTime : endTime,
-        videoId : Session.get('currentVideo')
+        videoId : Session.get('currentVideo'),
+        saved : true
       })
 
    }
@@ -63,13 +64,41 @@ Template.caption.helpers({
   currentClass: function(){
     return Session.equals('currentSub', this._id) ?  'selected' : ''
   }
+
 })
 
 updateForm = function(t){
-   Subtitles.update(t.data._id, {$set : {text : t.find('textarea').value}}, function(err){
-          if (!err) Session.set('saving', 'All Changes Saved')
-          else Sessionset('saving', 'Error Saving.')
-        })
+  // ensure that it doesn't try and save when element has been
+  // removed.
+
+  // console.log(t);
+
+  // if (_.isArray(t)) {
+  //   _.each(t, function(cap, i) {
+  //     console.log(cap);
+  //   })
+  // }
+
+  var subsToSave = Subtitles.find({ saved : false }).fetch(); 
+
+  _.each(subsToSave, function(sub) {
+    var content = document.getElementById(sub._id)
+    Subtitles.update(sub._id, {$set : {text : content.value, saved : true }}, function(err){
+      if (!err) 
+        Session.set('saving', 'All Changes Saved.')
+      else
+        Session.set('saving', 'Error Saving.')
+    })
+  })
+
+  
+  // var doc = document.getElementById(t.data._id)
+  // if (typeof doc != 'undefined' && doc != null){
+  //   Subtitles.update(t.data._id, {$set : {text : t.find('textarea').value}}, function(err){
+  //     if (!err) Session.set('saving', 'All Changes Saved')
+  //     else Sessionset('saving', 'Error Saving.')
+  //   }) 
+  // } 
 }
 
 Template.caption.events({
@@ -84,10 +113,27 @@ Template.caption.events({
 
   'keydown textarea' : function(e, t){
 
-    // XXX Interpret cmd + delete on empty as 'delete this caption' and refocus
-    // on the former.
+    // XXX Turn this into a Switch statement?
 
-    //cmd + p
+    // delete + empty? : return to end of previous, delete current.
+    if (e.which === 8) {
+      var textNode = e.currentTarget;
+      if (textNode.value === '') {
+        Subtitles.remove(t.data._id)
+
+        // There should be a better way to do this!
+        var textareas = document.getElementsByTagName('textarea')
+          , totalAreas = textareas.length
+
+        var toFocus = textareas[totalAreas - 2];
+        if (typeof toFocus != 'undefined') {
+          textareas[totalAreas - 2].focus();
+          return false 
+        }
+      }
+    }
+
+    //cmd + p : lengthen end time
     if (e.which === 80 && e.metaKey) {
       var endTime = Session.get('endTime')
       // This should probably be on a timer, like auto-save
@@ -101,7 +147,7 @@ Template.caption.events({
       return false
     }
 
-    //cmd + o
+    //cmd + o : shorten end time
     if (e.which === 79 && e.metaKey){
       var endTime = Session.get('endTime')
 
@@ -117,7 +163,16 @@ Template.caption.events({
       return false
     }
 
-      // cmd + i
+    // cmd + return/enter : insert newline
+    
+    if (e.which === 13 && e.metaKey) {
+      var currentInput = e.currentTarget.value
+      e.currentTarget.value = currentInput + '\n'
+      t.find('span').textContent = e.currentTarget.value
+      return false
+    }
+
+    // cmd + i : lengthen beginning time
     if (e.which === 73 && e.metaKey) {
       var startTime = Session.get('startTime')
 
@@ -126,6 +181,7 @@ Template.caption.events({
       return false
     }
 
+    // cmd + u : shorten beginning time
     if (e.which === 85 && e.metaKey ) {
       var startTime = Session.get('startTime')
 
@@ -135,18 +191,18 @@ Template.caption.events({
     }
 
 
-
     // if return key is pressed within textarea, interpret as creating a new
     // subtitle, directly after the current one. 
     if (e.which === 13) {
 
-      var newStart = this.endTime + 0.001
+      var newStart = this.endTime + 0.01
         , newEnd = newStart + Session.get('loopDuration')
 
       var sub = Subtitles.insert({
         startTime : newStart,
         endTime : newEnd,
-        videoId : Session.get('currentVideo')
+        videoId : Session.get('currentVideo'),
+        saved : true
       })
 
       Session.set('startTime', newStart)
@@ -155,8 +211,14 @@ Template.caption.events({
       Session.set('currentSub', sub)
 
       // if empty when hitting return, remove that caption
+      // if not empty, then save it.
       if (e.currentTarget.value === '') Subtitles.remove(t.data._id)
-
+      else {
+        Subtitles.update(t.data._id, {$set : {text : e.currentTarget.value, saved : true }}, function(err){
+          if (!err) Session.set('saving', 'All Changes Saved.')
+          else Session.set('saving', 'Error Saving.')
+        })
+      }
       return false
     }
   },
@@ -171,14 +233,18 @@ Template.caption.events({
       // Save the user input after 3 seconds of inactivity typing
       Session.set('saving', 'Saving...')
       myTimer.clear()
+
+      if (t.data.saved === true)
+        Subtitles.update(t.data._id, {$set : { saved : false }})
+
       myTimer.set(function() {   
-        updateForm(t);  
+        updateForm();  
      });
   },
 
   'click .delete-sub' : function( e, t) {
     var self = this;
-    t.find('li').classList.add('deleted');
+    t.find('tr').classList.add('deleted');
     Meteor.setTimeout(function () {
       Subtitles.remove({ _id: self._id })
     }, 200); 

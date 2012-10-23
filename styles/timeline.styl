@@ -1,28 +1,43 @@
+@import 'nib'
 
-#videoSpan
-  margin-bottom 5px
-  margin-top 5px
-  overflow visible
+div.timeline-wrapper
+  border-bottom 1px solid white
+  box-shadow inset 0 -1px 1px rgba(0,0,0,0.20)
+  margin-top 10px
+  margin-bottom 10px
 
 text
+  fill #888
   font-size 10px
 
 g.caption-spans rect
-  transition-property fill
-  transition-duration 0.2s
   shape-rendering crispEdges
+  // fill rgba(142, 255, 246, 0.77)
+  //fill rgb(254, 226, 255)
+  stroke rgb(173, 172, 172)
 
 g.caption-spans rect:hover
-  fill rgba(255,255,255,1)
+  fill rgb(58, 223, 210)
   cursor pointer
 
+line.timeline-background
+  // stroke rgb(171, 175, 209)
+  stroke rgb(173, 173, 173)
+  stroke-width 1
+  shape-rendering crispEdges
+
+rect.timeline-click-zone
+  fill rgba(0,0,0,0)
+
+line.tick-bar
+  shape-rendering crispEdges
+  stroke rgb(173, 173, 173)
+  stroke-width 1
+
 line#current-position
-  stroke-width 4px
-  stroke #000
+  stroke-width 2px
+  stroke rgb(0, 0, 0)
   shape-rendering crispEdges
 
   &:hover
     cursor pointer
-
-marker#head
-  cursor pointer

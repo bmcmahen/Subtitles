@@ -1,3 +1,5 @@
+// Global Namespace of Subtitler
+Subtitler = {};
 
 Videos = new Meteor.Collection('videos')
 
@@ -22,7 +24,7 @@ Subtitles = new Meteor.Collection('subtitles')
   Session.set('saving', null)
 
   // XXX too many global variables -- get namespacing going
-  var videoNode, videoFile, loopTime, draggingCursor = false;
+  var videoNode, videoFile, loopTime;
 
 
 /**
@@ -112,7 +114,7 @@ Template.video.events({
 
     // XXX its a little too much for the browser to handle if 'currentTime' is set, triggering reactive
     // functions. What will need to happen is currentTime should be set once dragging _ends_. 
-      if (!draggingCursor) {
+      if (!Subtitler.draggingCursor) {
 
           // Determine if looping should occur on Time Update
           var looping = Session.get('looping')

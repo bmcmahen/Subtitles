@@ -1,7 +1,7 @@
 @import 'nib'
 
 body
-  padding-top 50px
+  padding-top 30px
   height 100%
   background-image url('/images/husk.png')
 
@@ -25,41 +25,67 @@ textarea
 .expandingArea textarea.selected
   background white
 
-ul#captions
-  list-style-type none
-  padding 0px
-  float left
+#captions
+  overflow-y auto
+
+table.captions
+  padding 0
   margin 0
-  height 100px
-  overflow auto
-  & li
+  overflow-y scroll
+  width 100%
+  border-spacing 0
+
+  & tbody
+    width 100%
+
+  & tr
     margin 2px 0px
     opacity 1
-    background rgba(245, 245, 245, 0.52)
     transition-property  opacity
     transition-duration 0.2s
+    background rgba(245, 245, 245, 0.85)
+
     &:first-child
       margin 0px
+
     &:hover .expandingArea
       border-left 1px dotted #BBB
       border-right 1px dotted #bbb
+
     &.deleted
       opacity 0
 
+    & td
+      border-bottom 2px solid rgb(226, 223, 223)
 
-div.times
-  margin 0px
+    & td.left-fixed-width
+      width 140px
+
+    & td.right-fixed-width
+      width 30px
+
+td.delete-sub
+  vertical-align top
+
+td.times
   text-align right
-  padding 7px 5px
-  display inline-block
   vertical-align top
-  width 130px
-  overflow hidden
-  font 12px HelveticaNeue, Helvetica, arial, sans-serif
+  font 12px HelveticaNeue, Helvetica, sans-serif
 
-a.delete-sub
-  display inline-block
-  vertical-align top
+  & p
+    padding 0
+    margin 5px
+    margin-top 8px
+
+.caption
+  position relative
+  & a
+    display inline-block
+  & i
+    margin 6px 10px
+    opacity 0.3
+  &:hover i
+    opacity 1
 
 textarea
 pre
@@ -73,12 +99,12 @@ pre
 .expandingArea 
   position relative
   display inline-block
+  width 100%
   border 1px solid transparent
-  width 360px
 
 .expandingArea > textarea
 .expandingArea > pre
-  padding 5px
+  padding 6px
   background transparent
   font 400 13px/16px Helvetica, arial, sans-serif
   white-space pre-wrap
@@ -103,35 +129,7 @@ pre
   display block
   visibility hidden
 
-#captions
-  position static
-  top 140px
-  width 100%
-  overflow auto
 
-#video-column
-  position fixed
-  top 80px
-  width 400px
-  left 50px
-  bottom 50px
-
-#caption-column
-  position fixed
-  top 80px
-  left 450px
-  right 50px
-  bottom 50px
-
-.caption
-  position relative
-  & a
-    display inline-block
-  & i
-    margin 6px
-    opacity 0.3
-  &:hover i
-    opacity 1
 
 .video-map-caption:hover
   cursor pointer
@@ -145,8 +143,8 @@ img.logo
   background-image linear-gradient(#f7f7f7, #E9E9E9)
   border-bottom 1px solid white
   // background-color #707070
-  box-shadow 1px 1px 5px rgba(0, 0, 0, 0.15)
+  box-shadow 1px 1px 4px rgba(0, 0, 0, 0.25)
   & a
-    font 12px HelveticaNeue, Helvetica, arial, sans-serif
+    font 13px HelveticaNeue, Helvetica, arial, sans-serif
+    color #666
     padding 5px 20px 5px 20px
-

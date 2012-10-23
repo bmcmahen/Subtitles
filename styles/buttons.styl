@@ -22,6 +22,17 @@ input[type='button'].btn
   &:hover
     background-position 20px
 
+  &.green
+  &.blue
+    box-shadow 0 1px 1px rgba(0, 0, 0, 0.39), inset 0 1px 0px rgba(255, 255, 255, 0.34)
+    border 1px solid #AAA
+
+  &.green
+    background-image linear-gradient(#62C462, #61A351)
+
+  &.blue
+    background-image linear-gradient(#E4F6FF, #607EB4)
+
 div.btn-group
   padding 0px
   display inline-block
@@ -69,10 +80,53 @@ input
     width default
 
 fieldset
-  margin 0px
-  padding 0px
-  border 0px
+  margin-top 7px
+  padding 1px 5px
+  border none
+  border-radius 3px
+  vertical-align top
+  font-size 11px
+  display inline-block
+  background rgba(180, 180, 180, 0.36)
+
+  & span
+    font-size 12px
+    margin 2px 4px
+    display inline-block
+
+  & input
+    margin 2px
 
 legend
   display inline
   max-width 15px
+
+input[type='checkbox']
+  margin 0px
+
+input[type='range']
+  width 80px
+  vertical-align top
+  margin-top 15px
+
+a#play-video
+  border-radius 30px
+  width 35px
+  height 35px
+  position relative
+  background-image url('/images/controls/play_dark.png')
+  background-repeat no-repeat
+  display inline-block
+  border 1px solid white
+  background-position -5px -2px
+  cursor pointer
+  box-shadow 0 1px 1px rgba(0, 0, 0, 0.05), inset 0 1px 0px white  
+  border 1px solid #999
+  border-bottom 1px solid #888
+
+  &.paused
+    background-position -39px -2px
+
+#export-subtitles
+  float right
+  margin-right 0px
