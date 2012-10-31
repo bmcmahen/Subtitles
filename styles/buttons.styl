@@ -1,12 +1,13 @@
 @import 'nib'
 
-button.btn
+
+button
 input[type='button'].btn
+input[type='submit'].btn
   font-size 11px
   padding 5px 13px 5px 13px
   margin 5px
   margin-left 0px
-  float left
   text-shadow 1px 1px 0px rgba(255,255,255,0.4)
   cursor pointer
   border-radius 3px
@@ -19,19 +20,56 @@ input[type='button'].btn
   background-size 1px 40px
   transition background 0.3s
 
+  &.large
+    padding 7px 14px 7px 14px
+
+  &.wide
+    width 100%
+
+  &.pull-right
+    float right
+
+  &.pull-left
+    float left
+
   &:hover
     background-position 20px
 
   &.green
+  &.ok
+  &.pink
   &.blue
-    box-shadow 0 1px 1px rgba(0, 0, 0, 0.39), inset 0 1px 0px rgba(255, 255, 255, 0.34)
+    box-shadow 0 1px 1px rgba(0, 0, 0, 0.10), inset 0 1px 0px rgba(255, 255, 255, 0.34)
     border 1px solid #AAA
 
   &.green
-    background-image linear-gradient(#62C462, #61A351)
+    background-image linear-gradient(#D8FFD0, #60E67B)
 
   &.blue
-    background-image linear-gradient(#E4F6FF, #607EB4)
+    background-image linear-gradient(#ECEAFF, #A49DFF)
+
+  &.pink
+    background-image linear-gradient(#FCEAFF, #F39DFF)
+
+  &.red
+  &.ok
+    background-image linear-gradient(#FFD0D0, #E66060)
+
+.close
+  float right
+  font-size 20px
+  font-weight bold
+  line-height 20px
+  color black
+  text-shadow 0 1px 0 white
+  opacity 0.2
+
+button.close
+  padding 0
+  cursor pointer
+  background transparent
+  border 0
+  -webkit-appearance none
 
 div.btn-group
   padding 0px
@@ -72,9 +110,17 @@ input
   margin 6px
 
   &[type='text']
+  &[type='password']
     width: 190px
     padding: 4px
     font-size: 12px
+    box-shadow rgba(34, 34, 34, 0.1) -1px -1px
+
+    &.large
+      padding 6px
+
+    &.wide
+      width 100%
 
   &[type='button']
     width default
@@ -109,24 +155,84 @@ input[type='range']
   vertical-align top
   margin-top 15px
 
-a#play-video
-  border-radius 30px
-  width 35px
-  height 35px
-  position relative
-  background-image url('/images/controls/play_dark.png')
+a.video-controls
   background-repeat no-repeat
   display inline-block
-  border 1px solid white
-  background-position -5px -2px
   cursor pointer
   box-shadow 0 1px 1px rgba(0, 0, 0, 0.05), inset 0 1px 0px white  
   border 1px solid #999
   border-bottom 1px solid #888
 
-  &.paused
-    background-position -39px -2px
+  &#play-video
+    border-radius 30px
+    width 35px
+    height 35px
+    background-image url('/images/controls/play_dark.png')
+    background-position -5px -2px
+   
+    &.paused
+      background-position -39px -2px
+
+  &#skip-to-end
+    width 30px
+    height 30px
+    border-radius 30px
+    background-image url('/images/controls/skip_to_end.png')
+    background-position -1px 0px
+    margin-bottom 2px
+
+    &:hover
+      background-position -28px 0px
+
+  &#skip-to-beginning
+    width 30px
+    height 30px
+    border-radius 30px
+    background-image url('/images/controls/skip_to_beginning.png')
+    background-position -32px 0px
+    margin-bottom 2px
+
+    &:hover
+      background-position -5px 0px
+
 
 #export-subtitles
   float right
   margin-right 0px
+
+.controls
+  margin-top 15px
+  text-align center
+
+// .intro hr
+//   width 220px
+
+// .login-errors
+//   position absolute
+//   top 10px
+//   left 230px
+//   width 100px
+//   text-align center
+//   opacity 0
+//   transform scale3d(0.001, 0.001, 1)
+//   z-index 1
+//   background rgba(60, 60, 60, 0.85)
+//   border 2px solid white
+//   color white
+//   font-size 11px
+//   border-radius 5px
+//   padding 10px
+//   box-shadow 1px 1px 15px rgba(0, 0, 0, 0.45)
+//   pointer-events none
+//   transition-property opacity, -webkit-transform
+//   transition-duration 0.2s
+
+
+//   &.visible
+//     opacity 0.8
+//     transform scale3d(1,1,1)
+//     transform-style preserve-3d
+//     backface-visibility hidden
+
+// input#reset-email-field
+//   border 1px solid #aaa

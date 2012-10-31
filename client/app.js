@@ -6,25 +6,78 @@ Videos = new Meteor.Collection('videos')
 Subtitles = new Meteor.Collection('subtitles')
 
 
-  // Session variables, reactive
-  
-  Session.set('looping', true)
-  Session.set('loopDuration', 5)
-  Session.set('videoPlaying', false)
-  Session.set('currentTime', 0)
+// Router
 
-  Session.set('startTime', null)
-  Session.set('endTime', null)
+var myRouter = Backbone.Router.extend({
+  routes : {
+    '': 'home',
+    'reset-password' : 'resetPassword',
+    'reset-password/:id' : 'newPassword',
+    'library' : 'library',
+    'project/:id' : 'project'
+  },
 
-  Session.set('currentVideo', null)
-  Session.set('currentSub', null)
+  home : function() {
+    Session.set('currentView', 'first');
+  },
 
-  Session.set('isLooping', null)
+  resetPassword : function() {
+    console.log('reset pass');
+    Session.set('currentView', 'password')
+  },
 
-  Session.set('saving', null)
+  newPassword : function(id) {
+    console.log('newpw');
+    Session.set('currentView', 'password');
+    Session.set('resetPassword', id);
+  },
 
-  // XXX too many global variables -- get namespacing going
-  var videoNode, videoFile, loopTime;
+  library : function() {
+    if (Meteor.user()) {
+      Session.set('currentView', 'second');
+    } else {
+      Session.set('currentView', 'first');
+      Router.navigate('');
+    }
+  },
+
+  project : function(id) {
+    // also need to test if the user owns this particular
+    // project!
+
+      Session.set('currentView', 'third');
+      Session.set('currentVideo', id);
+  }
+});
+
+Router = new myRouter;
+
+Meteor.startup(function () {
+  Backbone.history.start({ pushState : true });
+});
+
+
+// Session variables, reactive
+
+Session.set('looping', true)
+Session.set('loopDuration', 5)
+Session.set('playbackRate', 1)
+Session.set('videoPlaying', false)
+Session.set('currentTime', null)
+
+Session.set('startTime', 0)
+Session.set('endTime', null)
+
+Session.set('currentVideo', null)
+Session.set('currentSub', null)
+
+Session.set('isLooping', null)
+
+Session.set('saving', null)
+
+Session.set('videoURL', null)
+
+Session.set('currentView', 'first');
 
 
 /**
@@ -40,109 +93,95 @@ Meteor.autosubscribe(function () {
 })
 
 /**
- * Stats (for Dev purposes)
+ * Main view
  */
 
-Template.stats.helpers({
-  currentTime: function(){
-    return Session.get('currentTime')
-  },
-
-  startTime: function(){
-    return Session.get('startTime')
-  },
-
-  endTime: function(){
-    return Session.get('endTime')
-  },
-
-  looping: function(){
-    return Session.get('looping')
-  },
-
-  videoPlaying: function(){
-    return Session.get('videoPlaying')
-  },
-
-  saving: function() {
-    return Session.get('saving')
-  }
-})
 
 Template.body.helpers({
-  currentVideo: function(){
-    return Session.get('currentVideo')
+  currentView: function(){
+    return Session.get('currentView');
   }
 })
 
-
-Template.navigation.events({
- 'click #create-new-project' : function( e, t ) {
-    var currentVid = Videos.insert({
-      creationDate: new Date()
-    })
-    Session.set('currentVideo', currentVid)
-  }
-})
+Template.body.preserve['.intro', '.library', '.app']
 
 
 /**
  * video
  */
+  
+Subtitler.syncCaptions = function(time, options) {
+
+  var options = options || {}; 
+  options.silence = options.silent || false; 
+
+  var binarySearch = function(array, currentTime) {
+
+    var low = 0;
+    var high = array.length - 1;
+    var i;
+
+    while (low <= high) {
+      i = Math.floor((low + high) / 2);
+
+      if (array[i].startTime <= currentTime) {
+
+        if (array[i].endTime >= currentTime ){
+          // this is the one
+          return array[i]._id; 
+
+        } else {
+          low = i + 1;
+        }
+      }
+
+      else {
+        high = i - 1;
+      }
+    } 
+
+    return null;
+  }
+
+
+// Only run the search if its not playing on the same caption.
+
+if (time > Session.get('endTime') || time < Session.get('startTime')) {
+  var result = Subtitles.findOne({startTime: {$lte : time}, endTime: {$gte: time}})
+  if (result) {
+    if (options.silent)
+      Session.set('silentFocus', true)
+    document.getElementById(result._id).focus(); 
+    Session.set('currentSub', result)
+  }
+}
+
+}
 
 Template.video.events({
 
-  'change #video-input': function(event, template) {
-
-    var URL = window.URL || window.webkitURL
-
-    videoFile = event.currentTarget.files[0]
-    videoNode = document.getElementById('video-display')
-
-    var type = videoFile.type
-      , fileURL = URL.createObjectURL(videoFile)
-
-      videoNode.src = fileURL
-
-
-
-  },
-
   'timeupdate #video-display': function(e, t){
 
-    // Sync the timeline Bar
+    console.log(t.node.currentTime)
 
-    // XXX its a little too much for the browser to handle if 'currentTime' is set, triggering reactive
-    // functions. What will need to happen is currentTime should be set once dragging _ends_. 
-      if (!Subtitler.draggingCursor) {
+    // if dragging, dont run the below logic. It slows things down.     
+    if (Subtitler.draggingCursor)
+      return
 
-          // Determine if looping should occur on Time Update
-          var looping = Session.get('looping')
-            , playing = Session.get('videoPlaying');
+    // Updates timeline cursor position
+    Session.set('currentTime', t.node.currentTime)
 
-          Session.set('currentTime', videoNode.currentTime)
-
-          // loop the video, if looping true and if currently playing
-          // this logic should go into reactive function for efficiency
-          if (looping && playing) {
-            if (!Session.get('endTime')) {
-              var endtime = Session.get('startTime') + Session.get('loopDuration')
-              Session.set('endTime', endtime)
-            }
-            if (videoNode.currentTime > Session.get('endTime')){
-              videoNode.currentTime = Session.get('startTime')
-            }
-          } 
+    // loop the video, if looping true and if currently playing
+    // this logic should go into reactive function for efficiency
+    if (! Session.get('endTime')) {
+      Session.set('endTime', t.node.currentTime + Session.get('loopDuration'))
+      Session.set('startTime', t.node.currentTime)
+    } 
+    else if (Session.get('looping') && Session.get('videoPlaying')) {
+      if (t.node.currentTime > Session.get('endTime')){
+        t.node.currentTime = Session.get('startTime')
       }
-  },
-
-  'loadeddata #video-display':function(e,t){
-    syncVideo()
-    syncTextareas()
-  },
-
-  'seeking #video-display': function(e,t){
-    console.log('seeking')
+    }
   },
 
   'playing #video-display': function(e,t){
@@ -154,54 +193,40 @@ Template.video.events({
   }
 })
 
+Template.video.helpers({
+  fileURL : function() {
+    return Session.get('videoURL');
+  }
+})
 
-/**
- * REACTIVE
- * [syncVideo automatically syncs video currentTime to 'startTime' session var]
- * @return {[none]} 
- */
-var syncVideo = function () {
-  var update = function () {
-    var ctx = new Meteor.deps.Context();  // invalidation context
-    ctx.onInvalidate(update);             // rerun update() on invalidation
-    ctx.run(function () {
-      var startTime = Session.get("startTime")
-      if (videoNode && startTime != null)
-        videoNode.currentTime = startTime
-    });
-  };
-  update();
-};
+Template.video.rendered = function() {
+  var self = this;
+  self.node = self.find('#video-display');
+  Subtitler.videoNode = self.node; 
 
-// as the video plays, highlight position of corresponding caption
-var syncTextareas = function(){
-
-  var update = function() {
-
-    var ctx = new Meteor.deps.Context()
-      , startTime = Session.get('startTime')
-      , endTime = Session.get('endTime')
-
-      var round = function(int) {
-        return Math.round(int * 1000) / 1000
-      }
-
-    ctx.onInvalidate(update)
-
-    ctx.run(function(){
-
-      var currentTime = Session.get('currentTime')
-
-      if (currentTime >= endTime || currentTime <= startTime) {
-        var sub = Subtitles.findOne({startTime: {$lte : currentTime}, endTime: {$gte: currentTime}})
-        if (sub) {
-          Session.set('currentSub', sub._id)
-          // Session.set('startTime', sub.startTime)
-          // Session.set('endTime', sub.endTime)
-          console.log('SUB', sub)        
-       } 
-      }
+  // update play status of video when 'videoPlaying' changes
+  if (! self.handlePlayback) {
+    self.handle = Meteor.autorun(function () {
+      var playStatus = Session.get('videoPlaying')
+      playStatus ? self.node.play() : self.node.pause(); 
     })
   }
-  update()
+
+  // update video playback rate when 'playbackRate' changes
+  if (! self.handlePlaybackRate) {
+    self.handlePlaybackRate = Meteor.autorun(function () {
+      self.node.playbackRate = Session.get('playbackRate');
+    })
+  }
+
 }
+
+Template.video.destroyed = function () {
+  var self = this; 
+  self.handlePlayback && self.handlePlayback.stop();
+  self.handlePlaybackRate && self.handlePlaybackRate.stop(); 
+  self.handleVideoSync && self.handleVideoSync.stop();
+  self.handleCaptionSync && self.handleCaptionSync.stop(); 
+}
+
+

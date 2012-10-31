@@ -1,41 +1,33 @@
 /**
- * Controls
+ * Video Playback Controls
  */
 
 Template.controls.events({
 
   'click #loop-checked': function(e,t){
-    e.currentTarget.checked ? Session.set('looping', true) : Session.set('looping', false)
-    // set startTime & endTime to null
-    // if (e.currentTarget.checked) {
-    //   Session.set( 'startTime', null )
-    //   Session.set( 'endTime', null )
-    // } else {
-    //   Session.set('startTime', Session.get('currentTime'))
-    //   Session.set('endTime', Session.get('currentTime') + Session.get('loopDuration'))
-    // }
+    e.currentTarget.checked ? 
+      Session.set('looping', true) : Session.set('looping', false)
+  },
+
+  'change #loop-duration' : function (e, t) {
+    Session.set('loopDuration', Number(e.currentTarget.value))
+  },
+
+  'click #skip-to-beginning' : function (e, t) {
+    t.node.currentTime = 0;
+  },
+
+  'click #skip-to-end' : function (e, t) {
+    t.node.currentTime = t.node.duration;
   },
 
   'click #play-video' : function (e, t) {
-    if (videoNode.paused) {
-      videoNode.play()
-      e.currentTarget.classList.add('paused')
-    } else {
-      videoNode.pause()
-      e.currentTarget.classList.remove('paused')
-    }
+    Session.get('videoPlaying') ?
+      Session.set('videoPlaying', false) : Session.set('videoPlaying', true)
   },
 
-  'keyup #loop-duration-input': function (e, t) {
-    var input = e.currentTarget.value
-
-    function isNumber(o) {
-      return ! isNaN (o-0)
-    }
-
-    if (isNumber(input) && input != '') {
-      Session.set('loopDuration', input)
-    }
+  'change #playback-rate' : function (e, t) {
+    Session.set('playbackRate', e.currentTarget.value)
   }
 
 })
@@ -48,6 +40,23 @@ Template.controls.helpers({
 
   loopDuration: function(){
     return Session.get('loopDuration')
-  }
+  },
 
+  playing: function() {
+    if (Session.get('videoPlaying'))
+      return 'paused'
+  }
 })
+
+Template.controls.rendered = function() {
+  var self = this;
+  var loop = self.find('#loop-duration');
+  loop.value = Session.get('loopDuration');
+
+  var pRate = self.find('#playback-rate');
+  pRate.value = Session.get('playbackRate');
+
+  var vid = document.getElementById('video-display');
+  self.node = vid; 
+
+}

@@ -1,0 +1,84 @@
+@import 'nib'
+
+ul.file-list
+  height 400px
+  overflow auto
+  list-style-type none
+  margin 0px
+  padding 0px
+  box-shadow rgba(34, 34, 34, 0.15) -1px -1px
+  border-radius 5px
+
+  & li
+    border-bottom 1px dotted rgba(211, 207, 207, 0.33)
+    float left
+    width 100%
+
+    &:hover a.delete-project
+      opacity 1
+
+    &:hover
+      background #E8F7FF
+
+    &.selected .select-video-file
+      display block
+
+table.file-list
+  & tr
+    transition height 0.3s
+
+  & td.name
+    width 100%
+
+  & div.video-select
+    width 150px
+    display none
+
+  & .selected .video-select
+    display block
+
+  & input
+    height 0
+    width 0
+    margin 0
+    padding 0
+    opacity 0
+    pointer-events none
+
+  & .select-video-file
+    width 100%
+    margin 5px
+
+  & a
+    color #8F8ACC
+    font-size 13px
+    -webkit-font-smoothing antialiased
+    font-weight 500
+    display block
+    padding 6px
+    width 100%
+
+    &.delete-project
+      border-left 1px dotted rgba(211, 207, 207, 0.33)
+      opacity 0.5
+      width 15px
+
+    &:hover
+      text-decoration none
+
+.projects
+  min-height 350px
+
+form#new-project
+  & input[type='text']
+    margin-left 0px
+    width 232px
+  & input[type='submit']
+    margin-right 0px
+
+input#video-file
+  display block
+  height 0
+  width 0
+  margin 0
+  padding 0

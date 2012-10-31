@@ -1,0 +1,53 @@
+<!-- library -->
+
+<template name='library'>
+    <div class='container'>
+      <div class='row'>
+        <div class='span5 offset1'>
+            {{#if currentUser}}
+          <h2> Create a new Project </h2>
+          <div class='wrapper'>
+            <div id='dropzone' class='dropzone'>
+              <p> Click to select a video file </p>
+            </div>
+            <form id='new-project'>
+              <input type='file' id='video-file'/>
+              <input type='text' id='project-name' class='newproject large' placeholder='Project Name'/>
+              <input type='submit' class='btn green large' id='create-project' value='Create Project' />
+            </form>
+          </div>
+            {{/if}}
+
+        </div>
+        <div class='span5'>
+          <h2> Select an Existing Project </h2>
+          {{#if currentUser}}
+          <div class='wrapper-inset projects'>
+            <table class='captions file-list'>
+              {{#each project}}
+                {{> projectList}}
+              {{/each}}
+            </table>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+</template>
+
+<template name='projectList'>
+  <tr class='caption {{clicked}}'>
+    <!-- include name, creation date -->
+    <td class='name'>
+      <a href='#' class='project-name'>{{name}}</a>
+       <div class='video-select'>
+      <button class='btn select-video-file'> Select Video File... </button>
+       <input type='file' class='video-select' value='Select Video File'/>
+    </div>
+    </td>
+    <td class='delete-sub right-fixed-width'>
+      <i class='icon-trash'></i>
+    </td>
+  </tr>
+
+</template>

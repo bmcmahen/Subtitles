@@ -7,3 +7,7 @@ stylus
 preserve-inputs
 insecure
 d3
+accounts-base
+accounts-password
+email
+backbone

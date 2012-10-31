@@ -1,0 +1,121 @@
+@import 'nib'
+@import '../styles/bootstrap/variables'
+
+// main page transitions
+// 
+
+.intro
+.library
+.app
+  position fixed
+  transition opacity 0.5s ease-in
+  width 100%
+
+.intro
+  top 10%
+  left 0
+
+.library
+  top 20%
+  left 110%
+  opacity 0
+
+.app
+  top 0
+  left 110%
+  opacity 0
+
+.first
+
+  & .intro
+    left 0
+    opacity 1
+
+.second
+
+  & .library
+    left 0
+    opacity 1
+
+  & .intro
+    left -100%
+    opacity 0
+
+  & .app
+    left 110%
+    opacity 0
+
+.third
+  
+  & .app
+    left 0
+    opacity 1
+
+  & .library, .intro
+    left -110%
+    opacity 0
+
+// intro page forms view
+
+.intro-form-wrapper
+  position relative
+
+.intro-form
+  transition 0.2s opacity ease-out, 0.2s top ease-out
+
+  & form
+    float left
+  
+  & input[type='submit']
+    margin 3px 0
+
+  & input[type='text']
+  & input[type='password']
+    margin 4px 0
+    width 272px
+
+    &#login-password
+      width 195px
+
+  &.login
+    absolute top left
+
+    & a
+      padding-top 8px
+      padding-left 2px
+      font-size 10px
+      display block
+      clear both
+      color #888
+
+  &.register
+    absolute top 150px left 0px
+
+  &.password-form
+    absolute top 130px left 0px
+    transition 0.2s opacity ease-out, 0.2s -webkit-transform ease-out
+    pointer-events none
+    opacity 0
+    transform scale3d(0.001, 0.001, 1)
+    z-index 1
+
+  & .wrapper
+    float left
+
+div.password
+  
+  & .password-form
+    display block
+    transform scale3d(1, 1, 1)
+    pointer-events auto
+    opacity 1
+
+  & .register
+    opacity 0.3
+    absolute top 270px left 0px
+    pointer-events none
+
+  & .login
+    absolute top -40px left 0px
+    opacity 0.3
+    pointer-events none

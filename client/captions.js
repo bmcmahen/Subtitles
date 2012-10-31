@@ -2,6 +2,14 @@
  * CAPTIONS
  */
 
+// Load video
+
+Template.application.helpers({
+  currentVideo : function(){
+    return Session.get('currentVideo');
+  }
+})
+
 // Caption Wrapper
 Template.captions.helpers({
   caption : function(){
@@ -12,20 +20,10 @@ Template.captions.helpers({
 Template.captions.rendered = function() {
   var self = this; 
   var captionList = self.find('#captions');
-  captionList.style.height = (window.innerHeight - 200) + 'px'
-
-// Reactive function to focus on relevant caption during playback
-  self.node = self.find('#captions');
-
-  if (! self.handle) {
-    self.handle = Meteor.autorun(function () {
-      var currentSub = Session.get('currentSub');
-      if (currentSub)
-        self.find('#' + currentSub).focus(); 
-    })
-  }
-
+  captionList.style.height = (window.innerHeight - 210) + 'px'
 }
+
+
 
 Template.captions.events({
 
@@ -67,17 +65,7 @@ Template.caption.helpers({
 
 })
 
-updateForm = function(t){
-  // ensure that it doesn't try and save when element has been
-  // removed.
-
-  // console.log(t);
-
-  // if (_.isArray(t)) {
-  //   _.each(t, function(cap, i) {
-  //     console.log(cap);
-  //   })
-  // }
+var updateForm = function(t){
 
   var subsToSave = Subtitles.find({ saved : false }).fetch(); 
 
@@ -90,28 +78,36 @@ updateForm = function(t){
         Session.set('saving', 'Error Saving.')
     })
   })
-
-  
-  // var doc = document.getElementById(t.data._id)
-  // if (typeof doc != 'undefined' && doc != null){
-  //   Subtitles.update(t.data._id, {$set : {text : t.find('textarea').value}}, function(err){
-  //     if (!err) Session.set('saving', 'All Changes Saved')
-  //     else Sessionset('saving', 'Error Saving.')
-  //   }) 
-  // } 
 }
 
 Template.caption.events({
 
   'focus textarea' : function(e, t){
-    var self = this
+
+    var self = this;
     Session.set('startTime', self.startTime)
     Session.set('endTime', self.endTime)
-    Session.set('currentTime', self.startTime)
     Session.set('currentSub', self._id)
+
+    //XXX This is a bit of a hack
+    if (Session.get('silentFocus')) {
+
+      Session.set('silentFocus', false);
+
+      if (Session.get('videoPlaying')) {
+        return false
+      }
+
+      return;
+    };
+
+    if (Session.get('videoURL'))
+      Subtitler.videoNode.currentTime = self.startTime; 
   },
 
   'keydown textarea' : function(e, t){
+
+    var self = this; 
 
     // XXX Turn this into a Switch statement?
 
@@ -195,7 +191,23 @@ Template.caption.events({
     // subtitle, directly after the current one. 
     if (e.which === 13) {
 
-      var newStart = this.endTime + 0.01
+      // If a subtitle already exists afterwards, focus on that one
+      // instead of creating another. 
+      // Threshold is for 1 second after.
+      
+      var followingCaption = Subtitles.findOne({ 
+        startTime :{ $gt : self.endTime, $lt : self.endTime + 1} 
+      })
+
+      if (followingCaption) {
+        Session.set('startTime', followingCaption.startTime)
+        Session.set('endTime', followingCaption.endTime)
+        Session.set('currentTime', followingCaption.startTime)
+        Session.set('currentSub', followingCaption._id)
+        return false
+      }
+
+      var newStart = self.endTime + 0.01
         , newEnd = newStart + Session.get('loopDuration')
 
       var sub = Subtitles.insert({

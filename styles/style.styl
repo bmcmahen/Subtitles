@@ -1,9 +1,39 @@
 @import 'nib'
 
 body
-  padding-top 30px
+  padding-top 28px
+  font 12px 'Helvetica Neue', Helvetica, arial, sans-serif
   height 100%
-  background-image url('/images/husk.png')
+  background-image url('/images/backgrounds/fabric_plaid_blue_light.png')
+
+a
+  text-decoration none
+
+a:hover
+  text-decoration underline
+
+h1
+  font 900 50px 'Helvetica Neue', Helvetica, arial, sans-serif
+  color #333
+  margin-bottom 0px
+  line-height 45px
+
+h2
+  font 100 16px Helvetica, arial, sans-serif
+  margin 8px 0px
+  padding: 10px
+  display: inline-block
+  border-radius: 5px
+  background: rgba(255, 255, 255, 0.5)
+
+light
+  color #888
+
+h3
+  font 100 18px Helvetica, arial, sans-serif
+  margin 6px 2px
+  color #999
+  text-shadow 1px 1px 1px white
 
 hr
   height 0px
@@ -17,6 +47,25 @@ hr
 video
   width  100%
 
+.wrapper
+  background rgba(255,255,255,0.60)
+  padding 10px
+  background linear-gradient(#FAFAFA, #DDD)
+  box-shadow 0 1px 15px rgba(0, 0, 0, 0.15), inset 0 1px 0px white
+  border: 1px solid #CCC
+  border-bottom 1px solid #bbb
+  border-radius 5px
+
+.wrapper-inset
+  box-shadow inset 1px 1px 2px #CACACA
+  border-radius 5px
+  padding-left 2px
+  padding-top 2px
+  background white
+
+.wrapper-video
+  background-image linear-gradient(#eee, #ddd)
+
 textarea
   width 400px
   display block
@@ -25,8 +74,37 @@ textarea
 .expandingArea textarea.selected
   background white
 
+.video-dropzone
+  border-radius 5px
+  line-height 0
+
+.dropzone
+  min-height 170px
+  background rgba(255,255,255,0.8)
+  background-image linear-gradient(#fff, #C7C7C7)
+  box-shadow inset 1px 1px 2px #CACACA
+  text-align center
+  border-radius 5px
+  color #999
+  line-height 0
+  margin-bottom 5px
+
+  &:hover
+    cursor pointer
+
+  & p
+    display inline-block
+    margin-top 80px
+
+.dropzone.occupied
+  padding-top 0px
+
 #captions
   overflow-y auto
+  background white
+  padding 3px
+  box-shadow inset 2px 2px 2px rgba(0, 0, 0, 0.23)
+  border-radius 5px
 
 table.captions
   padding 0
@@ -43,20 +121,24 @@ table.captions
     opacity 1
     transition-property  opacity
     transition-duration 0.2s
-    background rgba(245, 245, 245, 0.85)
+
+    &.selected
+      background #EAEAF5
+      background-image linear-gradient(white, #EAEAF5)
 
     &:first-child
       margin 0px
 
     &:hover .expandingArea
-      border-left 1px dotted #BBB
-      border-right 1px dotted #bbb
+      border-left 1px dotted #eee
+      border-right 1px dotted #eee
 
     &.deleted
       opacity 0
 
     & td
-      border-bottom 2px solid rgb(226, 223, 223)
+      border-bottom 1px dotted #eee
+      margin-top -1px
 
     & td.left-fixed-width
       width 140px
@@ -66,6 +148,9 @@ table.captions
 
 td.delete-sub
   vertical-align top
+
+  &:hover
+    cursor pointer
 
 td.times
   text-align right
@@ -106,7 +191,6 @@ pre
 .expandingArea > pre
   padding 6px
   background transparent
-  font 400 13px/16px Helvetica, arial, sans-serif
   white-space pre-wrap
   word-wrap break-word
 
@@ -129,22 +213,15 @@ pre
   display block
   visibility hidden
 
+#dialog
+  box-shadow 4px 4px 15px rgba(0, 0, 0, .3);
 
+.toolbar
+  margin-bottom 3px
 
-.video-map-caption:hover
-  cursor pointer
+img#loader
+  margin 13px 20px 13px
+  display none
 
-img.logo
-  float left
-  height 30px
-  margin 5px22
-
-.navbar-inner
-  background-image linear-gradient(#f7f7f7, #E9E9E9)
-  border-bottom 1px solid white
-  // background-color #707070
-  box-shadow 1px 1px 4px rgba(0, 0, 0, 0.25)
-  & a
-    font 13px HelveticaNeue, Helvetica, arial, sans-serif
-    color #666
-    padding 5px 20px 5px 20px
+  &.visible
+    display block
