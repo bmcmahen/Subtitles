@@ -4,7 +4,7 @@ body
   padding-top 28px
   font 12px 'Helvetica Neue', Helvetica, arial, sans-serif
   height 100%
-  background-image url('/images/backgrounds/fabric_plaid_blue_light.png')
+  background-image url('/images/backgrounds/body-bg.jpg')
 
 a
   text-decoration none
@@ -19,12 +19,13 @@ h1
   line-height 45px
 
 h2
-  font 100 16px Helvetica, arial, sans-serif
-  margin 8px 0px
-  padding: 10px
+  font 200 18px 'Helvetica Neue', Helvetica, arial, sans-serif
+  margin 10px 0px
+  padding: 7px 12px
+  color #5a5a5a
   display: inline-block
   border-radius: 5px
-  background: rgba(255, 255, 255, 0.5)
+  background: rgba(255, 255, 255, 0.75)
 
 light
   color #888
@@ -44,6 +45,10 @@ hr
   border-right 0px
   margin 3px 0px 3px 0px
 
+  &.simple
+    box-shadow none
+    border-top 1px solid #eee
+
 video
   width  100%
 
@@ -57,11 +62,12 @@ video
   border-radius 5px
 
 .wrapper-inset
-  box-shadow inset 1px 1px 2px #CACACA
+  box-shadow inset 1px 1px 0px #CACACA
   border-radius 5px
-  padding-left 2px
-  padding-top 2px
+  padding-left 1px
+  padding-top 1px
   background white
+  border 1px solid #e5e5e5
 
 .wrapper-video
   background-image linear-gradient(#eee, #ddd)
@@ -80,17 +86,17 @@ textarea
 
 .dropzone
   min-height 170px
-  background rgba(255,255,255,0.8)
-  background-image linear-gradient(#fff, #C7C7C7)
+  background white
   box-shadow inset 1px 1px 2px #CACACA
   text-align center
   border-radius 5px
   color #999
   line-height 0
-  margin-bottom 5px
+  margin-bottom 8px
 
   &:hover
     cursor pointer
+    background #F8F5FF
 
   & p
     display inline-block
@@ -103,7 +109,7 @@ textarea
   overflow-y auto
   background white
   padding 3px
-  box-shadow inset 2px 2px 2px rgba(0, 0, 0, 0.23)
+  box-shadow inset 2px 2px 2px rgba(0, 0, 0, 0.15)
   border-radius 5px
 
 table.captions
@@ -138,7 +144,6 @@ table.captions
 
     & td
       border-bottom 1px dotted #eee
-      margin-top -1px
 
     & td.left-fixed-width
       width 140px
@@ -152,6 +157,12 @@ td.delete-sub
   &:hover
     cursor pointer
 
+td.maintext
+  padding 0px
+
+  &:hover
+    cursor text
+
 td.times
   text-align right
   vertical-align top
@@ -162,12 +173,34 @@ td.times
     margin 5px
     margin-top 8px
 
+td.start-captioning
+  border none !important
+  padding 30px
+  text-align center
+
+  & a
+    width 100%
+    display block
+    padding-top 20px
+    padding-bottom 20px
+    background #FAFAFC
+    border-radius 5px
+    font 600 20px 'Helvetica Neue', Helvetica, arial, sans-serif
+    border 2px dashed #B4B4B4
+    color #C7C7C7
+    border-bottom 2px dashed #B4B4B4 !important
+    text-align center
+
+    &:hover
+      background #f5f5f5
+      text-decoration none
+
 .caption
   position relative
+  line-height: 20px
   & a
     display inline-block
   & i
-    margin 6px 10px
     opacity 0.3
   &:hover i
     opacity 1
@@ -178,7 +211,7 @@ pre
   resize none
   outline none
   margin 0
-  padding 0
+  padding 8px
   border none
 
 .expandingArea 
@@ -189,10 +222,10 @@ pre
 
 .expandingArea > textarea
 .expandingArea > pre
-  padding 6px
   background transparent
   white-space pre-wrap
   word-wrap break-word
+  font 12px "Helvetica Neue", Helvetica, arial, sans-serif
 
 .expandingArea > textarea
   box-sizing border-box
@@ -219,9 +252,15 @@ pre
 .toolbar
   margin-bottom 3px
 
+  & span
+    display: inline-block
+    padding: 12px
+    padding-bottom: 0px
+
 img#loader
   margin 13px 20px 13px
   display none
 
   &.visible
     display block
+

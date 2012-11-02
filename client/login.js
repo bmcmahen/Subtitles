@@ -162,11 +162,13 @@ Template.passwordRecovery.events({
             Session.set('currentView', 'second');
             Router.navigate('library');
           }
-                  loader.classList.remove('visible');
+          loader.classList.remove('visible');
         })
       }
     return false; 
     }
-})
+});
+
+Template.intro.preserve(['#intro-login-form', '#intro-password-form', '#intro-register-form'])
 
 })();

@@ -1,101 +1,13 @@
 hello
 
 1
-00:00:00.0 --> 00:00:05.0
-undefined
+00:00:05.0 --> 00:00:10.0
+In February 2010, the Community-University Research Alliance program
 
 2
-00:00:05.0 --> 00:00:10.0
-undefined
+00:00:10.0 --> 00:00:15.0
+funded a five year project, "Living Archives on Eugenics in Western Canada."
 
 3
-00:00:10.0 --> 00:00:15.0
-undefined
-
-4
 00:00:15.0 --> 00:00:20.0
-undefined
-
-5
-00:00:30.0 --> 00:00:35.0
-undefined
-
-6
-00:00:35.0 --> 00:00:40.0
-undefined
-
-7
-00:00:45.0 --> 00:00:50.0
-undefined
-
-8
-00:00:50.0 --> 00:00:55.0
-undefined
-
-9
-00:00:55.0 --> 00:01:00.0
-undefined
-
-10
-00:01:05.0 --> 00:01:10.0
-undefined
-
-11
-00:01:20.0 --> 00:01:25.0
-undefined
-
-12
-00:01:25.0 --> 00:01:30.0
-undefined
-
-13
-00:01:30.0 --> 00:01:35.0
-undefined
-
-14
-00:01:35.0 --> 00:01:40.0
-undefined
-
-15
-00:01:45.0 --> 00:01:50.0
-undefined
-
-16
-00:01:55.0 --> 00:02:00.0
-undefined
-
-17
-00:02:10.0 --> 00:02:15.0
-undefined
-
-18
-00:02:20.0 --> 00:02:25.0
-undefined
-
-19
-00:02:30.0 --> 00:02:35.0
-undefined
-
-20
-00:02:35.0 --> 00:02:40.0
-undefined
-
-21
-00:02:40.0 --> 00:02:45.0
-undefined
-
-22
-00:02:45.0 --> 00:02:50.0
-undefined
-
-23
-00:02:50.0 --> 00:02:55.0
-undefined
-
-24
-00:03:00.0 --> 00:03:05.0
-undefined
-
-25
-00:03:05.0 --> 00:03:10.0
 undefined

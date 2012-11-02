@@ -11,8 +11,8 @@ Template.map.events({
     Session.set('endTime', currentSub.endTime)
     Session.set('currentTime', currentSub.startTime)
 
-    if (t.videoNode.currentTime)
-      t.videoNode.currentTime = currentSub.startTime;
+    if (Subtitler.videoNode && Subtitler.videoNode.currentTime)
+      Subtitler.videoNode.currentTime = currentSub.startTime;
     
     document.getElementById(id).focus(); 
     return false
@@ -26,8 +26,6 @@ Template.map.events({
 
 // D3 Goodness. 
 Template.map.rendered = function () {
-
-  this.videoNode = document.getElementById('video-display');
 
   var vid = Videos.findOne(Session.get('currentVideo'));
 
@@ -115,11 +113,19 @@ Template.map.rendered = function () {
         };
 
         var captions = d3.select(self.node).select('.caption-spans').selectAll('rect')
-          .data(Subtitles.find().fetch(), function (sub) { return sub._id; })
+          .data(Subtitles.find()
+          .fetch(), function (sub) {
+            return sub._id; 
+          })
 
         drawSubs(captions.enter().append('rect'));
         drawSubs(captions.transition().duration(400));
-        captions.exit().transition().duration(400).style('opacity', 0).remove(); 
+        captions
+          .exit()
+          .transition()
+          .duration(400)
+          .style('opacity', 0)
+          .remove(); 
       })
     }
 
@@ -128,28 +134,40 @@ Template.map.rendered = function () {
 
     if (! Subtitler.draggingCursor) {
       self.handle2 = Meteor.autorun(function () {
-        var currentTime = Session.get('currentTime');
-        var xAxis = x(currentTime); 
+        var currentTime = Session.get('currentTime')
+          , xAxis = x(currentTime); 
 
-        d3.select(self.marker).transition().duration(200).attr('x1', xAxis).attr('x2', xAxis)
+        d3.select(self.marker)
+          .transition()
+          .duration(200)
+          .attr('x1', xAxis)
+          .attr('x2', xAxis)
       })
     }
   }
 
   // Timeline event handlers in d3 which don't work well with native Meteor
     var setMarkerPostion = function(options) {
-      var options = options || false; 
-      var xPosition = d3.mouse(self.timelineWrapper)[0];
+      var options = options || false 
+        , xPosition = d3.mouse(self.timelineWrapper)[0];
 
           if (xPosition >= 0 && xPosition <= timelineWidth) {
 
             // Don't animate while dragging
             if (options.animate)
-              d3.select(self.marker).transition().duration(200).attr('x1', xPosition).attr('x2', xPosition);
+              d3.select(self.marker)
+                .transition()
+                .duration(200)
+                .attr('x1', xPosition)
+                .attr('x2', xPosition);
             else
-              d3.select(self.marker).attr('x1', xPosition).attr('x2', xPosition);
+              d3.select(self.marker)
+                .attr('x1', xPosition)
+                .attr('x2', xPosition);
 
-            Subtitler.videoNode.currentTime = xPosition * divideBy;
+            if (Subtitler.videoNode)
+              Subtitler.videoNode.currentTime = xPosition * divideBy;
+            
             Session.set('startTime', null)
             Session.set('endTime', null)
 
@@ -184,7 +202,6 @@ Template.map.rendered = function () {
         });
 
         d3.select(self.node).select('.timeline-click-zone').on('click', function(){
-          console.log('am i running?')
           setMarkerPostion({animate : true, sync : true });
         });
 

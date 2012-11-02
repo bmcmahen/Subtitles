@@ -27,6 +27,9 @@ table.file-list
   & tr
     transition height 0.3s
 
+    &:hover
+      background #f5f5f5
+
   & td.name
     width 100%
 
@@ -50,12 +53,12 @@ table.file-list
     margin 5px
 
   & a
-    color #8F8ACC
-    font-size 13px
-    -webkit-font-smoothing antialiased
-    font-weight 500
+    color #0088cc
+    font-size 14px
+    line-height 20px
+    text-shadow 0 1px 0 rgba(255, 255, 255, 0.5)
     display block
-    padding 6px
+    padding 8px 14px
     width 100%
 
     &.delete-project
@@ -66,19 +69,74 @@ table.file-list
     &:hover
       text-decoration none
 
+.carousel input
+  height 0
+  width 0
+  margin 0
+  padding 0
+  opacity 0
+  pointer-events none
+
+.select-video-file
+  padding-left 20px
+  padding-top 10px
+  padding-right 25px
+
+  & a
+    width 100%
+    padding-top 30px
+    padding-bottom 30px
+    display block
+    background #FAFAFC
+    border-radius 5px
+    font 400 12px 'Helvetica Neue', Helvetica, arial, sans-serif
+    border 2px dashed #B4b4b4
+    color #999
+    text-align center
+
+    &:hover
+      background whiteSmoke
+      text-decoration none
+      cursor pointer
+
 .projects
   min-height 350px
 
 form#new-project
   & input[type='text']
     margin-left 0px
-    width 232px
+    margin 0px
+    border-top-right-radius: 0px
+    border-bottom-right-radius: 0px
+    width: 242px
+    border-bottom 1px solid #ccc
   & input[type='submit']
     margin-right 0px
+    margin 0px
+    border-top-left-radius  0px
+    border-bottom-left-radius 0px
+    border 1px solid #ccc
+    border-left 0px
 
 input#video-file
   display block
   height 0
   width 0
   margin 0
-  padding 0
+
+button.delete-sub
+  margin 0px
+  margin-top 15px
+
+button.go-back
+  margin 5px
+  margin-bottom 1px
+
+#myCarousel
+  height 400px
+
+  & .carousel-inner
+    height 400px
+
+#drop
+  min-height 100px

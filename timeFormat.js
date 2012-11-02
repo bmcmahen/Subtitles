@@ -6,9 +6,9 @@ secondsToHms = function(num, options) {
   })
 
   // Convert seconds into hours, minutes, seconds (rounded to three decimals)
-  var h = Math.floor(num / 3600);
-  var m = Math.floor(num % 3600 / 60);
-  var s = (num % 2600 % 60).toFixed(1);
+  var h = Math.floor(num / 3600)
+    , m = Math.floor(num % 3600 / 60)
+    , s = (num % 2600 % 60).toFixed(1);
 
 
   // function to build proper hour, minute, second strings
@@ -36,8 +36,8 @@ secondsToHms = function(num, options) {
 
   // Construct numbers intro formatted strings
   var hourString = timeStrings(h)
-  var minuteString = timeStrings(m)
-  var  seconds = timeStrings(s, true)
+    , minuteString = timeStrings(m)
+    , seconds = timeStrings(s, true)
 
   return hourString + minuteString + seconds
 }

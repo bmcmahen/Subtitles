@@ -3,6 +3,57 @@
 Videos = new Meteor.Collection('videos')
 Subtitles = new Meteor.Collection('subtitles')
 
+/**
+ * Permissions
+ */
+
+// XXX both should have shared functions, since permissions are the same
+// Basically, only owners of the documents are allowed to write
+Videos.allow({
+
+  insert : function(userId, doc) {
+    console.log(userId, doc);
+    return (userId && doc.user === userId);
+  },
+
+  update : function(id, docs) {
+     return _.all(docs, function(doc) {
+      return doc.user === id
+     })
+  },
+
+  remove : function(id, docs) {
+    return _.all(docs, function(doc) {
+      return doc.user === id
+    })
+  },
+
+  fetch: ['user']
+})
+
+Subtitles.allow({
+
+  insert : function(userId, doc) {
+    return (userId && doc.user === userId);
+  },
+
+  update : function(id, docs) {
+     return _.all(docs, function(doc) {
+      return doc.user === id
+     })
+  },
+
+  remove : function(id, docs) {
+    return _.all(docs, function(doc) {
+      return doc.user === id
+    })
+  },
+
+  fetch: ['user']
+
+})
+
+
   /**
    * PUBLISH
    */
@@ -11,8 +62,8 @@ Subtitles = new Meteor.Collection('subtitles')
     return Subtitles.find({ videoId: videoId }, {sort: ['startTime', 'asc']})
   })
 
-  Meteor.publish('videos', function(){
-    return Videos.find()
+  Meteor.publish('videos', function(userId){
+    return Videos.find({ user: userId })
   })
 
   /**
@@ -40,6 +91,7 @@ Subtitles = new Meteor.Collection('subtitles')
         return splitPath[1] === 'subtitles' ? 'subtitle present in url' : null
       }
 
+      // XXX check to ensure that UserId == logged in user
 
 /**
  * [buildSRT formats array of times/descriptions into SRT format]
@@ -55,7 +107,7 @@ Subtitles = new Meteor.Collection('subtitles')
         var bufLength = buf.length
         buf[bufLength] = index + 1; 
         buf[bufLength + 1] = secondsToHms(value.startTime) + ' --> ' + secondsToHms(value.endTime);
-        buf[bufLength + 2] = value.description + '\n'
+        buf[bufLength + 2] = value.text + '\n'
       })
 
       return buf.join('\n')
@@ -112,10 +164,14 @@ Subtitles = new Meteor.Collection('subtitles')
         var subtitles = Subtitles.find({ videoId : currentVideo } , {sort: ['startTime', 'asc']} ).fetch()
         var srt  = buildSRT(subtitles)
 
-        fs.writeFile('public/subtitles/testsub.srt', srt, function(err, file){
+        var path = 'public/subtitles/' + Meteor.userId() + '/' + subtitles.name + '.srt';
+
+        // it should write to /public/subtitles/userId/projectName.srt
+        // and then return this link on the callback, which will then
+        // create a link - which will then allow user to download file
+        fs.writeFile(path, srt, function(err, file){
           if (err) throw err;
-          console.log('it saved apparently', file)
-          // Meteor.http.get('/subtitles/ + userId + / + subId')
+          return path
         })
       }
 

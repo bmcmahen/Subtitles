@@ -10,6 +10,8 @@ Template.navigation.events({
     Meteor.logout(); 
     Session.set('currentView', 'first');
     Session.set('currentVideo', null);
+    Session.set('videoURL', null);
+    Subtitler.videoNode = null; 
     Router.navigate('');
     return false; 
   },
@@ -17,6 +19,8 @@ Template.navigation.events({
   'click .view-library' : function() {
     Session.set('currentVideo', null);
     Session.set('currentView', 'second');
+    Session.set('videoURL', null);
+    Subtitler.videoNode = null; 
     Router.navigate('library');
     return false;
   }

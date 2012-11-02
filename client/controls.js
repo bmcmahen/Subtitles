@@ -2,11 +2,14 @@
  * Video Playback Controls
  */
 
+
 Template.controls.events({
 
   'click #loop-checked': function(e,t){
     e.currentTarget.checked ? 
       Session.set('looping', true) : Session.set('looping', false)
+
+    return false
   },
 
   'change #loop-duration' : function (e, t) {
@@ -14,20 +17,23 @@ Template.controls.events({
   },
 
   'click #skip-to-beginning' : function (e, t) {
-    t.node.currentTime = 0;
+    Subtitler.videoNode.currentTime = 0;
   },
 
   'click #skip-to-end' : function (e, t) {
-    t.node.currentTime = t.node.duration;
+    Subtitler.videoNode.currentTime = Subtitler.videoNode.duration;
+
   },
 
   'click #play-video' : function (e, t) {
-    Session.get('videoPlaying') ?
-      Session.set('videoPlaying', false) : Session.set('videoPlaying', true)
+    var node = Subtitler.videoNode;
+    Session.get('videoPlaying') ? 
+      node.pause() : node.play(); 
   },
 
   'change #playback-rate' : function (e, t) {
     Session.set('playbackRate', e.currentTarget.value)
+    Subtitler.videoNode.playbackRate = e.currentTarget.value
   }
 
 })
@@ -35,6 +41,7 @@ Template.controls.events({
 Template.controls.helpers({
 
   looping: function(){
+    console.log('looping', Session.get('looping'));
     return Session.get('looping')
   },
 

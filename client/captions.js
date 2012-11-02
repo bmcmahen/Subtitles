@@ -3,34 +3,75 @@
  */
 
 // Load video
-
 Template.application.helpers({
   currentVideo : function(){
     return Session.get('currentVideo');
   }
-})
+});
 
 // Caption Wrapper
-Template.captions.helpers({
+Template.captionList.helpers({
   caption : function(){
     return Subtitles.find( {} , { sort: ['startTime', 'asc' ]} )  
   }
+});
+
+// "BEGIN CAPTIONING" button
+Template.beginProcess.helpers({
+  new : function() {
+    var count = Subtitles.find({}).count();
+    if (count === 0) 
+      return true
+  }
 })
 
+var setSessions = function(start, end, time, sub) {
+  Session.set('startTime', start)
+  Session.set('endTime', end)
+  Session.set('currentTime', time)
+  Session.set('currentSub', sub)
+}
+
+Template.beginProcess.events({
+  
+  'click .start-captioning a' : function () {
+    var newSub = Subtitles.insert({
+      startTime : 0,
+      endTime : Session.get('loopDuration'),
+      videoId : Session.get('currentVideo'),
+      saved : true,
+      user : Meteor.userId()
+    });
+
+    setSessions(0, Session.get('loopDuration'), 0, newSub)
+
+    Subtitler.videoNode.play(); 
+  }
+})
+
+// Set height of Div to maximum screen size
 Template.captions.rendered = function() {
-  var self = this; 
-  var captionList = self.find('#captions');
+  var captionList = this.find('#captions');
   captionList.style.height = (window.innerHeight - 210) + 'px'
 }
 
+// Helper to set cursor at the end of a textarea's content
+function moveCaretToEnd(el) {
+    if (typeof el.selectionStart == "number") {
+        el.selectionStart = el.selectionEnd = el.value.length;
+    } else if (typeof el.createTextRange != "undefined") {
+        el.focus();
+        var range = el.createTextRange();
+        range.collapse(false);
+        range.select();
+    }
+}
 
+Template.captions.preserve(['.captions']);
 
 Template.captions.events({
 
   'click #insert-new-caption' : function ( e, t ) {
-    // This should be made more flexible. Potentially allow the user to type
-    // until they want to skip to the next one, and then enter an 'endTime'
-    // Currently just made for looping option. 
     
     if (Session.get('currentVideo')) {
     
@@ -41,7 +82,8 @@ Template.captions.events({
         startTime : currentTime,
         endTime : endTime,
         videoId : Session.get('currentVideo'),
-        saved : true
+        saved : true,
+        user : Meteor.userId()
       })
 
    }
@@ -58,17 +100,13 @@ Template.captions.events({
 
 // Each individual Caption node
 Template.caption.helpers({
-
   currentClass: function(){
     return Session.equals('currentSub', this._id) ?  'selected' : ''
   }
-
 })
 
 var updateForm = function(t){
-
   var subsToSave = Subtitles.find({ saved : false }).fetch(); 
-
   _.each(subsToSave, function(sub) {
     var content = document.getElementById(sub._id)
     Subtitles.update(sub._id, {$set : {text : content.value, saved : true }}, function(err){
@@ -87,7 +125,6 @@ Template.caption.events({
     var self = this;
     Session.set('startTime', self.startTime)
     Session.set('endTime', self.endTime)
-    Session.set('currentSub', self._id)
 
     //XXX This is a bit of a hack
     if (Session.get('silentFocus')) {
@@ -101,148 +138,165 @@ Template.caption.events({
       return;
     };
 
-    if (Session.get('videoURL'))
-      Subtitler.videoNode.currentTime = self.startTime; 
+    if (Subtitler.videoNode)
+      Subtitler.videoNode.currentTime =  self.startTime; 
   },
 
   'keydown textarea' : function(e, t){
 
-    var self = this; 
+    var key = e.which
+      , self = this; 
 
-    // XXX Turn this into a Switch statement?
+    switch(key) {
 
-    // delete + empty? : return to end of previous, delete current.
-    if (e.which === 8) {
-      var textNode = e.currentTarget;
-      if (textNode.value === '') {
-        Subtitles.remove(t.data._id)
+      // Return key
+      case 13:
 
-        // There should be a better way to do this!
-        var textareas = document.getElementsByTagName('textarea')
-          , totalAreas = textareas.length
+        // If a subtitle already exists afterwards, focus on that one
+        // instead of creating another. 
+        // Threshold is for 1 second after.
+        var target = e.currentTarget
+          , next = Subtitles.findOne({ 
+            startTime :{ $gt : self.endTime, $lt : self.endTime + 1} 
+          })
 
-        var toFocus = textareas[totalAreas - 2];
-        if (typeof toFocus != 'undefined') {
-          textareas[totalAreas - 2].focus();
-          return false 
+        if (next) {
+          setSessions(next.startTime, next.endTime, next.startTime, next._id)
+          document.getElementById(next._id).focus()
+          return false
         }
-      }
-    }
 
-    //cmd + p : lengthen end time
-    if (e.which === 80 && e.metaKey) {
-      var endTime = Session.get('endTime')
-      // This should probably be on a timer, like auto-save
-      Subtitles.update({_id: this._id}, {$set: {endTime: endTime + 0.5}})
-      Session.set('endTime', endTime + 0.5)
+        var newStart = self.endTime + 0.01
+          , newEnd = newStart + Session.get('loopDuration')
+          , sub = Subtitles.insert({
+              startTime : newStart,
+              endTime : newEnd,
+              videoId : Session.get('currentVideo'),
+              saved : true,
+              user : Meteor.userId()
+            })
 
-      // sync video 2 seconds before new endTime 
-      if (typeof videoNode != 'undefined') {
-        videoNode.currentTime = endTime - 1;
-      }
-      return false
-    }
+        setSessions(newStart, newEnd, newStart, sub)
 
-    //cmd + o : shorten end time
-    if (e.which === 79 && e.metaKey){
-      var endTime = Session.get('endTime')
 
-      if (endTime > Session.get('startTime')) {
-        // This should probably be on a timer, too
-        Subtitles.update({_id : this._id}, {$set: {endTime: endTime - 0.5}})
-        Session.set('endTime', endTime - 0.5)
-
-        if (typeof videoNode != 'undefined') {
-          videoNode.currentTime = endTime - 1.5;          
+        // Empty? Remove. Else, save.
+        if (target.value === '') 
+          Subtitles.remove(t.data._id)
+        else {
+          Subtitles.update(t.data._id, {
+            $set : {
+              text : target.value, 
+              saved : true 
+            }}, function(err){
+              if (!err) 
+                Session.set('saving', 'All Changes Saved.')
+              else 
+                Session.set('saving', 'Error Saving.')
+          })
         }
-      }
-      return false
-    }
 
-    // cmd + return/enter : insert newline
-    
-    if (e.which === 13 && e.metaKey) {
-      var currentInput = e.currentTarget.value
-      e.currentTarget.value = currentInput + '\n'
-      t.find('span').textContent = e.currentTarget.value
-      return false
-    }
-
-    // cmd + i : lengthen beginning time
-    if (e.which === 73 && e.metaKey) {
-      var startTime = Session.get('startTime')
-
-      Subtitles.update({_id: this._id}, {$set: {startTime: startTime + 0.5}})
-      Session.set('startTime', startTime + 0.5)
-      return false
-    }
-
-    // cmd + u : shorten beginning time
-    if (e.which === 85 && e.metaKey ) {
-      var startTime = Session.get('startTime')
-
-      Subtitles.update({_id: this._id}, {$set: {startTime: startTime - 0.5}})
-      Session.set('startTime', startTime - 0.5)
-      return false
-    }
-
-
-    // if return key is pressed within textarea, interpret as creating a new
-    // subtitle, directly after the current one. 
-    if (e.which === 13) {
-
-      // If a subtitle already exists afterwards, focus on that one
-      // instead of creating another. 
-      // Threshold is for 1 second after.
-      
-      var followingCaption = Subtitles.findOne({ 
-        startTime :{ $gt : self.endTime, $lt : self.endTime + 1} 
-      })
-
-      if (followingCaption) {
-        Session.set('startTime', followingCaption.startTime)
-        Session.set('endTime', followingCaption.endTime)
-        Session.set('currentTime', followingCaption.startTime)
-        Session.set('currentSub', followingCaption._id)
         return false
-      }
 
-      var newStart = self.endTime + 0.01
-        , newEnd = newStart + Session.get('loopDuration')
+      // Delete & Empty : Delete current, return to end of previous.
+      case 8:
 
-      var sub = Subtitles.insert({
-        startTime : newStart,
-        endTime : newEnd,
-        videoId : Session.get('currentVideo'),
-        saved : true
-      })
+        if (e.currentTarget.value === '') {
 
-      Session.set('startTime', newStart)
-      Session.set('endTime', newEnd)
-      Session.set('currentTime', newStart)
-      Session.set('currentSub', sub)
+          var textareas = document.querySelectorAll('textarea.caption-text')
+            , index = $('#' + t.data._id).closest('tr').index()
+          
+          Subtitles.remove(t.data._id, function(err){
+            if (! err)
+              Session.set('saving','All Changes Saved.')
+          })
 
-      // if empty when hitting return, remove that caption
-      // if not empty, then save it.
-      if (e.currentTarget.value === '') Subtitles.remove(t.data._id)
-      else {
-        Subtitles.update(t.data._id, {$set : {text : e.currentTarget.value, saved : true }}, function(err){
-          if (!err) Session.set('saving', 'All Changes Saved.')
-          else Session.set('saving', 'Error Saving.')
-        })
-      }
-      return false
+          if (index > 0) {
+            moveCaretToEnd(textareas[index -1])
+            return false
+          }
+        }
+
     }
+
+    if (e.metaKey) {
+
+      switch(key) {
+        // Cmd P : Lengthen end time
+        case 80:
+          var endTime = Session.get('endTime')
+          // This should probably be on a timer, like auto-save
+          Subtitles.update({_id: this._id}, {$set: {endTime: endTime + 0.5}})
+          Session.set('endTime', endTime + 0.5)
+
+          // sync video 1 seconds before new endTime
+          var node = Subtitler.videoNode; 
+          if (node && node.currentTime) {
+            node.currentTime = endTime - 1;
+          }
+
+          return false;
+    
+        // Cmd O : shorten end time
+        case 79:
+          var endTime = Session.get('endTime')
+
+          if (endTime > Session.get('startTime')) {
+            // This should probably be on a timer, too
+            Subtitles.update({_id : this._id}, {$set: {endTime: endTime - 0.5}})
+            Session.set('endTime', endTime - 0.5)
+
+            var node = Subtitler.videoNode;
+            if (node && node.currentTime) {
+              node.currentTime = endTime - 1.5;          
+            }
+          }
+          return false;
+
+        // cmd + i : lengthen beginning time
+        case 73:
+          var startTime = Session.get('startTime')
+
+          Subtitles.update({_id: this._id}, {$set: {startTime: startTime + 0.5}})
+          Session.set('startTime', startTime + 0.5)
+
+          var node = Subtitler.videoNode;
+          if (node)
+            node.currentTime = startTime + 0.5
+
+          return false;
+
+        // cmd + u : shorten beginning time
+        case 85:
+          var startTime = Session.get('startTime')
+
+          Subtitles.update({_id: this._id}, {$set: {startTime: startTime - 0.5}})
+          Session.set('startTime', startTime - 0.5)
+
+          var node = Subtitler.videoNode;
+          if (node)
+            node.currentTime = startTime - 0.5;
+
+          return false
+  
+        // cmd + return/enter : insert newline 
+        case 13:
+
+          var target = e.currentTarget
+            , val = target.value
+
+          target.value = val + '\n'
+          t.find('span').textContent = target.value
+          return false
+      }
+    }; // end If MetaKey
+
   },
 
   'input textarea' : function( e , t){
-    // expand input area as user types
-    var area = e.currentTarget
-      ,  span = t.find('span')
 
-      span.textContent = area.value
+      t.span.textContent = t.area.value
 
-      // Save the user input after 3 seconds of inactivity typing
+      // Save user input after 3 seconds of not typing
       Session.set('saving', 'Saving...')
       myTimer.clear()
 
@@ -266,10 +320,14 @@ Template.caption.events({
 
 Template.caption.rendered = function(){
   // set input height to height of text content upon first render
-  var area = this.find('textarea')
+  var self = this
+    , area = this.find('textarea')
     , span = this.find('span')
 
   span.textContent = area.value
+
+  self.area = area
+  self.span = span
 
   // focus on current subtitle
   if (Session.equals('currentSub', this.data._id))  {
@@ -277,4 +335,8 @@ Template.caption.rendered = function(){
   }
 }
 
-
+Template.saving.helpers({
+  saveState: function(){
+    return Session.get('saving');
+  }
+})

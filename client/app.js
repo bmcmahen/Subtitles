@@ -84,7 +84,12 @@ Session.set('currentView', 'first');
  * Subscriptions
  */
 
-Meteor.subscribe('videos')
+
+Meteor.autosubscribe(function() {
+  var currentUser = Meteor.user(); 
+  if (currentUser)
+    Meteor.subscribe('videos', currentUser._id)
+})
 
 Meteor.autosubscribe(function () {
   var selectedVideo = Session.get('currentVideo')
@@ -160,26 +165,31 @@ if (time > Session.get('endTime') || time < Session.get('startTime')) {
 
 Template.video.events({
 
+  'loadedmetadata #video-display' : function(e, t) {
+    Subtitler.videoNode = e.currentTarget;
+  },
+
   'timeupdate #video-display': function(e, t){
 
-    console.log(t.node.currentTime)
+    var node = Subtitler.videoNode; 
 
     // if dragging, dont run the below logic. It slows things down.     
     if (Subtitler.draggingCursor)
       return
 
     // Updates timeline cursor position
-    Session.set('currentTime', t.node.currentTime)
+    Session.set('currentTime', node.currentTime)
 
     // loop the video, if looping true and if currently playing
     // this logic should go into reactive function for efficiency
-    if (! Session.get('endTime')) {
-      Session.set('endTime', t.node.currentTime + Session.get('loopDuration'))
-      Session.set('startTime', t.node.currentTime)
+    var end = Session.get('endTime')
+    if (! end) {
+      Session.set('endTime', node.currentTime + Session.get('loopDuration'))
+      Session.set('startTime', node.currentTime)
     } 
     else if (Session.get('looping') && Session.get('videoPlaying')) {
-      if (t.node.currentTime > Session.get('endTime')){
-        t.node.currentTime = Session.get('startTime')
+      if (node.currentTime > end){
+        node.currentTime = Session.get('startTime')
       }
     }
   },
@@ -191,42 +201,11 @@ Template.video.events({
   'pause, ended, error #video-display': function(e,t){
     Session.set('videoPlaying', false)
   }
-})
+
+});
 
 Template.video.helpers({
   fileURL : function() {
     return Session.get('videoURL');
   }
-})
-
-Template.video.rendered = function() {
-  var self = this;
-  self.node = self.find('#video-display');
-  Subtitler.videoNode = self.node; 
-
-  // update play status of video when 'videoPlaying' changes
-  if (! self.handlePlayback) {
-    self.handle = Meteor.autorun(function () {
-      var playStatus = Session.get('videoPlaying')
-      playStatus ? self.node.play() : self.node.pause(); 
-    })
-  }
-
-  // update video playback rate when 'playbackRate' changes
-  if (! self.handlePlaybackRate) {
-    self.handlePlaybackRate = Meteor.autorun(function () {
-      self.node.playbackRate = Session.get('playbackRate');
-    })
-  }
-
-}
-
-Template.video.destroyed = function () {
-  var self = this; 
-  self.handlePlayback && self.handlePlayback.stop();
-  self.handlePlaybackRate && self.handlePlaybackRate.stop(); 
-  self.handleVideoSync && self.handleVideoSync.stop();
-  self.handleCaptionSync && self.handleCaptionSync.stop(); 
-}
-
-
+});

@@ -1,7 +1,6 @@
 (function(){
 
 // Select new Project Flow
-
 var selectProject = function() {
   console.log(this);
   Session.set('videoURL', null);
@@ -10,7 +9,6 @@ var selectProject = function() {
 
 
 // Determines which formats this browser can play. 
-
 var supportedFormats = function(){
   var mpeg4
     , h264
@@ -37,8 +35,8 @@ var supportedFormats = function(){
   return compatibleTypes;
 };
 
-// Determines if supplied video-type is compatible with browser.
-
+// Determines if supplied video-type is 
+// compatible with browser.
 var canPlayVideo = function(type) {
  var types = supportedFormats(); 
   if (_.contains(types, type))
@@ -47,13 +45,14 @@ var canPlayVideo = function(type) {
     return false
 };
 
-// Creates a Video URL and alerts the user if file type is not supported.
-
+// Creates a Video URL and alerts the user 
+// if file type is not supported.
 var createVideoURL = function(file) {
   var URL = window.URL || window.webkitURL;
 
   if (! URL) {
-    Session.set('displayMessage', 'Error Loading File & Your web browser does not support loading local files.');
+    Session.set('displayMessage', 
+      'Error Loading File & Your web browser does not support loading local files.');
     return false
   }
 
@@ -64,7 +63,10 @@ var createVideoURL = function(file) {
     return fileURL
   else {
     var supportedString = supportedFormats().join(', '); 
-    new ui.Dialog({ title: 'Unsupported Video Format' , message:  'Please select a video file encoded in a supported format. Your browser supports ' + supportedString + '.' })
+    new ui.Dialog({ 
+      title: 'Unsupported Video Format', 
+      message:  'Please select a video file encoded in a supported format. Your browser supports ' + supportedString + '.' 
+    })
       .show()
       .effect('scale')
       .closable(); 
@@ -73,36 +75,50 @@ var createVideoURL = function(file) {
   return false
 };
 
+/**
+ * [embedVideo takes a supplied template and video file and embeds it into the #dropzone id]
+ * @param  {[object]} t   [template data]
+ * @param  {[file]} vid [presumably a video file]
+ */
+
+var embedVideo = function(t, vid) {
+  var projectName = t.find('#project-name')
+    , fileURL = createVideoURL(vid);
+
+  if (projectName.value === '') 
+    projectName.value = vid.name;
+
+  if (fileURL) { 
+
+    t.fileURL = fileURL;
+
+    var dropzone = document.getElementById('dropzone')
+      , vidDom = document.createElement('video');
+
+    $(dropzone).html(vidDom);
+
+    vidDom.src = fileURL;
+  }
+}
+
+Template.library.rendered = function(){
+  $('#myCarousel').carousel('pause'); 
+}
+
 
 Template.library.events({
-  'change #video-file' : function(e, t) {
-    var self = t
-      , videoFile = e.currentTarget.files[0];
 
-    var fileURL = createVideoURL(videoFile);
+  'change #video-file, drop #dropzone' : function(e, t) {
+    e.preventDefault(); 
+    var files = e.currentTarget.files || e.dataTransfer.files
+      , file = files[0]
 
-    if (fileURL) {
-
-      self.fileURL = fileURL; 
-
-      // replace contents of dropzone with video
-      var dropzone = self.find('#dropzone')
-        , vid = document.createElement('video');
-
-       while(dropzone.hasChildNodes()) {
-          dropzone.removeChild(dropzone.lastChild);
-        }
-        dropzone.appendChild(vid);
-
-      
-      vid.src = fileURL; 
-      self.videoNode = vid; 
-
-    }
+    embedVideo(t, file);
   },
 
-  'loadedmetadata video' : function(e, t) {
-    t.videoNode.currentTime = t.videoNode.duration / 3; 
+  'loadedmetadata #dropzone video' : function(e, t) {
+    e.currentTarget.currentTime = e.currentTarget.duration / 3; 
+    this.videoNode = e.currentTarget;
   },
 
   'click #create-project' : function(e, t) {
@@ -112,8 +128,10 @@ Template.library.events({
       return false
     }
 
-    var duration = self.videoNode.duration;
-    var name = t.find('#project-name').value;
+    console.log(self)
+
+    var duration = t.find('#dropzone video').duration
+      , name = t.find('#project-name').value;
 
     if (!name || name === '') {
       Session.set('displayMessage', 'Error Creating Project & Please provide a project name.');
@@ -133,17 +151,56 @@ Template.library.events({
     return false
   },
 
-
   'click .dropzone' : function(e, t) {
     $('#video-file').trigger('click');
   },
 
-  'click .file-list a.project-name' : function(e, t) {
-    selectProject.call(this);
+  'click a.project-name' : function(e, t) {
+    var self = this; 
+    var i = $(e.currentTarget).closest('li').index();
+    $('#myCarousel').carousel(i + 1);
+
+     Meteor.setTimeout(function () {
+      selectProject.call(self);
+    }, 1000); 
+
     return false;
+  }
+})
+
+Template.library.helpers({
+  project : function(){
+    return Videos.find({});
+  }
+});
+
+Template.projectSubmenu.events({
+
+  'change .video-select, drop .select-video-file' : function(e, t) {
+
+    e.preventDefault();
+
+    var fileList = e.currentTarget.files || e.dataTransfer.files
+      , file = fileList[0]
+      , url = createVideoURL(file);
+
+    if (url) {
+      Session.set('videoURL', url);
+      Session.set('currentView', 'third');
+      Router.navigate('project/' + Session.get('currentVideo'));
+    }
+
   },
 
-  'click .file-list td.delete-project' : function(e, t) {
+  'click .select-video-file .select' : function(e, t) {
+
+    var vid = t.find('input.video-select');
+    $(vid).trigger('click');
+
+  },
+
+  'click button.delete-sub' : function(e, t) {
+
     var self = this; 
     new ui.Confirmation(
       { title: 'Delete Project',
@@ -155,50 +212,17 @@ Template.library.events({
           if (ok) {
             Videos.remove(self._id);
             Session.set('displayMessage', 'Project Deleted & ' + self.name + ' deleted.');
+            $('#myCarousel').carousel(0);
           } 
         });
     return false; 
-  }
-})
-
-Template.library.helpers({
-  project : function(){
-    return Videos.find({});
-  }
-});
-
-Template.projectList.helpers({
-  clicked : function() {
-    if (Session.equals('currentVideo', this._id))
-      return 'selected'
-  }
-});
-
-Template.projectList.preserve(['.select-video-file']);
-
-Template.projectList.events({
-
-  'change .video-select' : function(e, t) {
-    if (e.currentTarget.files) {
-      var file = e.currentTarget.files[0];
-      if (file) {
-        var URL = createVideoURL(file);
-        if (URL) {
-          Session.set('videoURL', URL);
-          Session.set('currentView', 'third');
-          Router.navigate('project/' + Session.get('currentVideo'));
-        }
-      }
-    }
   },
 
-  // because you can't really style file inputs
-  'click .select-video-file' : function(e, t) {
-    var vid = t.find('input.video-select');
-    $(vid).trigger('click');
+  'click button.go-back' : function(e, t) {
+    $('#myCarousel').carousel(0);
   }
 
-})
+});
 
 
 })();

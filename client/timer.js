@@ -2,6 +2,8 @@
  * Timer for saving
  */
 
+// XXX Universal Variable!
+
 var myTimer = function(){
   var timer;
 
