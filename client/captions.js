@@ -2,6 +2,8 @@
  * CAPTIONS
  */
 
+(function(){
+
 // Load video
 Template.application.helpers({
   currentVideo : function(){
@@ -52,19 +54,23 @@ Template.beginProcess.events({
 // Set height of Div to maximum screen size
 Template.captions.rendered = function() {
   var captionList = this.find('#captions');
-  captionList.style.height = (window.innerHeight - 210) + 'px'
+  var setCaptionHeight = function(){
+    captionList.style.height = (window.innerHeight - 210) + 'px'   
+  }
+  setCaptionHeight(); 
+
+  $(window).on('resize', function() {
+    setCaptionHeight(); 
+  });
 }
+
 
 // Helper to set cursor at the end of a textarea's content
 function moveCaretToEnd(el) {
-    if (typeof el.selectionStart == "number") {
-        el.selectionStart = el.selectionEnd = el.value.length;
-    } else if (typeof el.createTextRange != "undefined") {
-        el.focus();
-        var range = el.createTextRange();
-        range.collapse(false);
-        range.select();
-    }
+     var value =  $(el).val(); //store the value of the element
+        $(el).focus().val("");
+        $(el).focus().val(value);
+        $(el).unbind();
 }
 
 Template.captions.preserve(['.captions']);
@@ -90,10 +96,39 @@ Template.captions.events({
   },
 
   'click #export-subtitles' : function ( e, t ) {
-    Meteor.call('export', Session.get('currentVideo'), function(error, result){
-      if (error) console.log(error)
-      console.log(result)
-    })
+    var subtitles = Subtitles.find({}).fetch()
+      , file = new Subtitler.Exports(subtitles, {format : 'srt'})
+
+    file.toSRT();
+    file.saveAs(); 
+
+  },
+
+  'click #import-subtitles' : function (e, t) {
+      $('#import-subtitles-file').trigger('click');
+  },
+
+  'change #import-subtitles-file' : function (e, t) {
+    var file = e.currentTarget.files[0]
+      , imported = new Subtitler.Imports(file);
+
+    if (imported.type === 'srt') {
+      imported.readAsText(function(){
+        imported.parseSRT();
+        imported.insertSubs(); 
+      })
+    } else {
+      Session.set('displayMessage', 'File Type not Supported & At this time, only SRT files are supported.');
+    }
+
+  },
+
+  'click #hints' : function(e, t) {
+    var offset = $(e.currentTarget).offset();
+    var $tip = $(t.find('.popover'));
+    $tip.css('left', offset.left - ($tip.width() / 2) + ($(e.currentTarget).width() / 2)  + 'px');
+    $tip.css('top', offset.top + $(e.currentTarget).height() + 20 + 'px');
+    $tip.toggleClass('in');
   }
 })
 
@@ -151,6 +186,9 @@ Template.caption.events({
 
       // Return key
       case 13:
+
+        if (e.metaKey)
+          break; 
 
         // If a subtitle already exists afterwards, focus on that one
         // instead of creating another. 
@@ -268,13 +306,19 @@ Template.caption.events({
         // cmd + u : shorten beginning time
         case 85:
           var startTime = Session.get('startTime')
+            , newStart = startTime - 0.5; 
 
-          Subtitles.update({_id: this._id}, {$set: {startTime: startTime - 0.5}})
-          Session.set('startTime', startTime - 0.5)
+          // Ensure non-numbers don't get saved
+          if (newStart < 0 || isNaN(newStart)) {
+            return false; 
+          }
+
+          Subtitles.update({_id: this._id}, {$set: {startTime: newStart}})
+          Session.set('startTime', newStart)
 
           var node = Subtitler.videoNode;
           if (node)
-            node.currentTime = startTime - 0.5;
+            node.currentTime = newStart;
 
           return false
   
@@ -318,21 +362,85 @@ Template.caption.events({
 
 })
 
+var isValidStartTime = function(num, end) {
+    // Ensure non-numbers don't get saved
+    if (num < 0 || isNaN(num)) {
+      return false; 
+    }
+
+    if (num >= end) {
+      return false;
+    }
+
+    return true;
+}
+
+var isValidEndTime = function(num, start) {
+  if (num <= start) {
+    return false
+  }
+
+  return true
+}
+
+
 Template.caption.rendered = function(){
-  // set input height to height of text content upon first render
+
   var self = this
-    , area = this.find('textarea')
-    , span = this.find('span')
+    , area = self.find('textarea')
+    , span = self.find('span')
 
   span.textContent = area.value
 
   self.area = area
   self.span = span
 
-  // focus on current subtitle
-  if (Session.equals('currentSub', this.data._id))  {
+ // focus on current subtitle
+  if (Session.equals('currentSub', self.data._id))  {
     area.focus(); 
   }
+
+  // Create slider to adjust startTime and endTime
+  var range = self.find('.time-slider');
+  $(range).slider({
+    range: true,
+    step: 0.1,
+    min: self.data.startTime - 3,
+    max: self.data.endTime + 3,
+    values: [self.data.startTime, self.data.endTime],
+    change : function(e, ui){
+      var text = self.find('textarea').value
+      if (isValidStartTime(ui.values[0], self.data.endTime) && isValidEndTime(ui.values[1], self.data.startTime)) {
+        Subtitles.update({_id : self.data._id}, {$set : {startTime : ui.values[0], endTime : ui.values[1], text : text}});
+      }
+    },
+    slide: function(e, ui){
+      if (Subtitler.videoNode) {
+        var v = ui.value; 
+
+        // startTime changed
+        if (v === ui.values[0]){
+
+          if (! isValidStartTime(v, self.data.endTime))
+            return false
+          
+          Subtitler.videoNode.currentTime = v;
+
+        } else {
+
+          if (! isValidEndTime(v, self.data.startTime))
+            return false
+
+          Subtitler.videoNode.currentTime = ui.value -1.5; 
+        }
+
+
+        Session.set('startTime', ui.values[0]);
+        Session.set('endTime', ui.values[1]);
+      }
+    }
+  });
+
 }
 
 Template.saving.helpers({
@@ -340,3 +448,5 @@ Template.saving.helpers({
     return Session.get('saving');
   }
 })
+
+})(); 

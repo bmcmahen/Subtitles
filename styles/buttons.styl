@@ -14,11 +14,21 @@ input[type='submit'].btn
   border 1px solid #ccc
   border-bottom 1px solid #bbb
   background #eee
-  background-image linear-gradient(#fff, #D6D6D6)
+  background-image linear-gradient(#fff, #E7E6E6)
   color #444
   box-shadow 0 1px 1px rgba(0, 0, 0, 0.05), inset 0 1px 0px white  
   background-size 1px 40px
   transition background 0.3s
+
+  &.circle
+    padding 5px
+    border-radius 30px
+    background #FAFAFA
+    box-shadow none
+    transition background
+
+    &:hover
+      background #eee
 
   &.large
     padding 7px 14px 7px 14px
@@ -41,7 +51,6 @@ input[type='submit'].btn
   &.pink
   &.blue
     box-shadow 0 1px 1px rgba(0, 0, 0, 0.10), inset 0 1px 0px rgba(255, 255, 255, 0.34)
-    border 1px solid #AAA
 
   &.green
     background-image linear-gradient(#D8FFD0, #60E67B)
@@ -76,6 +85,7 @@ div.btn-group
   padding 0px
   display inline-block
   margin 5px
+  margin-right 0px
   float right
 
   & button.btn
@@ -112,6 +122,7 @@ input
 
   &[type='text']
   &[type='password']
+  &[type='email']
     width: 190px
     padding: 4px
     font-size: 12px
@@ -127,9 +138,6 @@ input
     width default
 
 fieldset
-  margin 15px
-  margin-top 6px
-  margin-bottom 0px
   padding 5px 10px
   border none
   border-radius 3px
@@ -200,12 +208,16 @@ a.video-controls
 
 
 #export-subtitles
-  float right
   margin-right 0px
 
 .controls
-  margin-top 15px
+  margin-top 12px
   text-align center
+
+.video-buttons
+  margin-top 8px
+  text-align center
+
 
 // .intro hr
 //   width 220px

@@ -3,7 +3,7 @@
       <div class='row'>
         <div class='span5 offset1'>
             {{#if currentUser}}
-          <h2> Create a new Project </h2>
+          <h2> NEW PROJECT </h2>
           <div class='wrapper'>
             <div id='dropzone' class='dropzone'>
               <p> <strong>Drop video</strong> or <strong>click</strong> to select video source.</p>
@@ -17,7 +17,7 @@
 
         </div>
         <div class='span5'>
-          <h2> Select an Existing Project </h2>
+          <h2> LIBRARY </h2>
           {{#if currentUser}}
           <div class='wrapper-inset projects'>
            <div id='myCarousel' class='carousel'>
@@ -39,6 +39,23 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Video Format not Supported</h3>
+  </div>
+  <div class="modal-body">
+    <p>Unfortunately, the video format that you have selected is not supported by your web browser. We recommend that you use <a href='http://www.mirovideoconverter.com/'>Miro Video Converter</a> to convert your video into a format supported by your web browser.</p>
+    <p>Your web browser supports playback of <strong>{{supportedFormats}}.</strong></p>
+    <p>Once you have converted your file to a supported format, try selecting it again for use.</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn blue dismiss">Okay</button>
+  </div>
+</div>
+
 </template>
 
 <template name='projectList'>
@@ -50,13 +67,32 @@
 
 <template name='projectSubmenu'>
     <div class='item'> 
-
-      <button class='btn go-back'> Back </button>
-      <hr class='simple'>
-      <div id='drop' class='select-video-file'>
-        <a class='select'> <strong>Drop video</strong> or <strong> click </strong> to select video source. </a>
-        <button class='btn red pull-right delete-sub'> Delete this Project </button>
+      <div class='submenu-header'>
+        <button class='btn go-back circle'> <i class='icon-chevron-left'></i></button>
+          <button class='btn delete-project pull-right'> Delete </button>
+        <button class='btn export-subs pull-right'>Export</button>
       </div>
+      <div class='submenu-content'>
+        <dl class='dl-horizontal'>
+          <dt>Name</dt> <dd>{{name}}</dd>
+          <dt>Created</dt> <dd>
+            {{#with formatDate this}}
+              {{created}}
+            {{/with}}
+        </dd>
+
+          <dt>Duration</dt> <dd>
+          {{#with totalDuration this}}
+            {{duration}}
+          {{/with}}
+        </dd>
+        </dl>
+        <div id='drop' class='select-video-file'>
+          <a class='select'> <strong>Drop video</strong> or <strong> click </strong> to select video source. </a>
+        </div>
+      <button class='btn green pull-right large open-project'>Open Project</button>
+      </div>
+
 
       <input type='file' class='video-select'>
 

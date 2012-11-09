@@ -77,27 +77,7 @@ table.file-list
   opacity 0
   pointer-events none
 
-.select-video-file
-  padding-left 20px
-  padding-top 10px
-  padding-right 25px
 
-  & a
-    width 100%
-    padding-top 30px
-    padding-bottom 30px
-    display block
-    background #FAFAFC
-    border-radius 5px
-    font 400 12px 'Helvetica Neue', Helvetica, arial, sans-serif
-    border 2px dashed #B4b4b4
-    color #999
-    text-align center
-
-    &:hover
-      background whiteSmoke
-      text-decoration none
-      cursor pointer
 
 .projects
   min-height 350px
@@ -124,19 +104,73 @@ input#video-file
   width 0
   margin 0
 
-button.delete-sub
-  margin 0px
-  margin-top 15px
-
 button.go-back
   margin 5px
-  margin-bottom 1px
+  margin-bottom 5px
 
 #myCarousel
-  height 400px
+  height 450px
 
   & .carousel-inner
-    height 400px
+    height 450px
 
 #drop
-  min-height 100px
+  margin-bottom 10px
+  margin-top 10px
+  &:hover
+    cursor pointer
+
+.item:first-child
+  border-radius 5px 5px 0px 0px
+
+.submenu-header
+  border-radius 5px 5px 0px 0px
+  box-shadow 0px 1px 2px rgba(0, 0, 0, 0.08)
+
+  & span
+    vertical-align: bottom
+    margin-bottom: 9px
+    font-weight: 500
+    display: inline-block
+    text-shadow: 1px 1px rgba(255, 255, 255, .8)
+    color: #999
+    font-size: 14px
+
+.submenu-content
+  padding 15px
+  padding-top 10px
+  padding-bottom 0px
+  text-shadow: 1px 1px rgba(255, 255, 255, .8)
+
+  
+  & .pull-right
+    margin-right 0px 
+
+  & p
+    font-size 12px
+    color #999
+    font-weight 400
+    margin-bottom 8px
+    margin-top 8px
+
+.select-video-file
+
+  & a
+    padding-top 50px
+    padding-bottom 50px
+    display block
+    background #FAFAFC
+    border-radius 5px
+    font 400 12px 'Helvetica Neue', Helvetica, arial, sans-serif
+    border 2px dashed #B4b4b4
+    color #999
+    text-align center
+
+    &:hover
+      background whiteSmoke
+      text-decoration none
+      cursor pointer
+
+    &.target
+      border 2px dashed #888
+      background whiteSmoke

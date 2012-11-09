@@ -1,7 +1,7 @@
 @import 'nib'
 
 body
-  padding-top 28px
+  padding-top 55px
   font 12px 'Helvetica Neue', Helvetica, arial, sans-serif
   height 100%
   background-image url('/images/backgrounds/body-bg.jpg')
@@ -19,22 +19,28 @@ h1
   line-height 45px
 
 h2
-  font 200 18px 'Helvetica Neue', Helvetica, arial, sans-serif
-  margin 10px 0px
-  padding: 7px 12px
+  font 800 18px 'Helvetica Neue', Helvetica, arial, sans-serif
+  margin 5px 0px
   color #5a5a5a
   display: inline-block
-  border-radius: 5px
-  background: rgba(255, 255, 255, 0.75)
 
 light
   color #888
 
 h3
-  font 100 18px Helvetica, arial, sans-serif
+  font 500 18px Helvetica, arial, sans-serif
   margin 6px 2px
   color #999
   text-shadow 1px 1px 1px white
+
+h4
+  font: 800 18px 'Helvetica Neue', Helvetica, arial, sans-serif
+  margin: 8px 0px
+  color: #5A5A5A
+  width 100%
+  text-overflow ellipsis
+  overflow hidden
+  white-space nowrap
 
 hr
   height 0px
@@ -62,8 +68,7 @@ video
   border-radius 5px
 
 .wrapper-inset
-  box-shadow inset 1px 1px 0px #CACACA
-  border-radius 5px
+  box-shadow inset 1px 1px 1px #CECECE
   padding-left 1px
   padding-top 1px
   background white
@@ -87,9 +92,8 @@ textarea
 .dropzone
   min-height 170px
   background white
-  box-shadow inset 1px 1px 2px #CACACA
+  box-shadow inset 1px 1px 2px #bbb
   text-align center
-  border-radius 5px
   color #999
   line-height 0
   margin-bottom 8px
@@ -102,15 +106,17 @@ textarea
     display inline-block
     margin-top 80px
 
+  &.target
+    background #F8F5FF
+
 .dropzone.occupied
   padding-top 0px
 
 #captions
   overflow-y auto
   background white
-  padding 3px
-  box-shadow inset 2px 2px 2px rgba(0, 0, 0, 0.15)
-  border-radius 5px
+  padding-top 2px
+  box-shadow inset 0px 1px 2px #BBB
 
 table.captions
   padding 0
@@ -127,6 +133,9 @@ table.captions
     opacity 1
     transition-property  opacity
     transition-duration 0.2s
+
+    &:hover .ui-slider
+      display block
 
     &.selected
       background #EAEAF5
@@ -146,10 +155,14 @@ table.captions
       border-bottom 1px dotted #eee
 
     & td.left-fixed-width
-      width 140px
+      width 170px
 
     & td.right-fixed-width
       width 30px
+
+      & i
+        margin 8px
+        margin-left 9px
 
 td.delete-sub
   vertical-align top
@@ -166,12 +179,12 @@ td.maintext
 td.times
   text-align right
   vertical-align top
-  font 12px HelveticaNeue, Helvetica, sans-serif
 
   & p
     padding 0
     margin 5px
     margin-top 8px
+    margin-bottom 2px
 
 td.start-captioning
   border none !important
@@ -197,7 +210,7 @@ td.start-captioning
 
 .caption
   position relative
-  line-height: 20px
+  // line-height: 20px
   & a
     display inline-block
   & i
@@ -250,7 +263,7 @@ pre
   box-shadow 4px 4px 15px rgba(0, 0, 0, .3);
 
 .toolbar
-  margin-bottom 3px
+  margin-bottom 3px 
 
   & span
     display: inline-block
@@ -259,8 +272,44 @@ pre
 
 img#loader
   margin 13px 20px 13px
-  display none
 
   &.visible
     display block
+
+.tooltipContent
+  display none
+  border 2px solid white
+  position absolute
+  padding 10px
+  background rgba(200, 200, 200, 0.5)
+  box-shadow 1px 1px 10px rgba(0,0,0,0.15)
+  border-radius 7px
+  width 250px
+  z-index 1010
+
+  & .arrow
+    top: -10px
+    left: 50%
+    margin-left: -10px
+    border-bottom-color: #ffffff
+    border-width: 0 10px 10px
+    position: absolute
+    display: inline-block
+    width: 0
+    height: 0
+    border-color: transparent
+    border-style: solid
+
+    &:after   
+      top: -1px
+      left: -11px
+      border-bottom-color: rgba(0, 0, 0, 0.25)
+      border-width: 0 11px 11px
+      z-index: -1
+      content: ""
+
+  &.in
+    display block
+
+
 

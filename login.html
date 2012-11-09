@@ -21,13 +21,13 @@
         {{/constant}}
 
         </div>
-        <div class='span4'>
+        <div class='span4 {{passwordView}}'>
 
          <div class='intro-form-wrapper'>
             <div id='intro-login-form' class='intro-form login'>
               <div class='wrapper'>
                 <form id='login-form'>
-                  <input type='text' id='login-email' class='large' placeholder='Email'/>
+                  <input type='email' id='login-email' class='large' placeholder='Email'/>
                   <input type='password' id='login-password' class='large' placeholder='Password'/>
                   <input type='submit' class='btn green pull-right large'  id='login-button' value='Sign in'/>
                 </form> 
@@ -39,7 +39,7 @@
            <h2>Not Registered? <light>Sign Up.</light> </h2>
             <div class='wrapper'>
               <form id='register-form'>
-                <input type='text' id='account-email' class='large' placeholder='Email'/>
+                <input type='email' id='account-email' class='large' placeholder='Email'/>
                 <input type='password' id='account-password' class='large' placeholder='Password' />
                 <input type='submit' id='create-account' class='btn blue pull-right large wide' value='Create an Account' />
               </form>

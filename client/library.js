@@ -2,104 +2,10 @@
 
 // Select new Project Flow
 var selectProject = function() {
-  console.log(this);
   Session.set('videoURL', null);
   Session.set('currentVideo', this._id);
 };
 
-
-// Determines which formats this browser can play. 
-var supportedFormats = function(){
-  var mpeg4
-    , h264
-    , ogg
-    , webm
-    , compatibleTypes = []
-    , testVideo = document.createElement('video');
-
-  if (testVideo.canPlayType) {
-
-    // H264
-    h264 = "" !== ( testVideo.canPlayType( 'video/mp4; codecs="avc1.42E01E"' )
-    || testVideo.canPlayType( 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"' ) );
-    if (h264) compatibleTypes.push('video/mp4');
-
-    // Check for Ogg support
-    ogg = "" !== testVideo.canPlayType( 'video/ogg; codecs="theora"' );
-    if (ogg) compatibleTypes.push('video/ogg');
-
-    // Check for Webm support
-    webm = "" !== testVideo.canPlayType( 'video/webm; codecs="vp8, vorbis"' );
-    if (webm) compatibleTypes.push('video/webm');
-  }
-  return compatibleTypes;
-};
-
-// Determines if supplied video-type is 
-// compatible with browser.
-var canPlayVideo = function(type) {
- var types = supportedFormats(); 
-  if (_.contains(types, type))
-    return true
-  else
-    return false
-};
-
-// Creates a Video URL and alerts the user 
-// if file type is not supported.
-var createVideoURL = function(file) {
-  var URL = window.URL || window.webkitURL;
-
-  if (! URL) {
-    Session.set('displayMessage', 
-      'Error Loading File & Your web browser does not support loading local files.');
-    return false
-  }
-
-  var type = file.type
-    , fileURL = URL.createObjectURL(file);
-
-  if (canPlayVideo(type))
-    return fileURL
-  else {
-    var supportedString = supportedFormats().join(', '); 
-    new ui.Dialog({ 
-      title: 'Unsupported Video Format', 
-      message:  'Please select a video file encoded in a supported format. Your browser supports ' + supportedString + '.' 
-    })
-      .show()
-      .effect('scale')
-      .closable(); 
-  }
-
-  return false
-};
-
-/**
- * [embedVideo takes a supplied template and video file and embeds it into the #dropzone id]
- * @param  {[object]} t   [template data]
- * @param  {[file]} vid [presumably a video file]
- */
-
-var embedVideo = function(t, vid) {
-  var projectName = t.find('#project-name')
-    , fileURL = createVideoURL(vid);
-
-  if (projectName.value === '') 
-    projectName.value = vid.name;
-
-  if (fileURL) { 
-
-    t.fileURL = fileURL;
-
-    var dropzone = document.getElementById('dropzone')
-      , vidDom = document.createElement('video');
-
-    $(dropzone).html(vidDom);
-
-    vidDom.src = fileURL;
-  }
-}
 
 Template.library.rendered = function(){
   $('#myCarousel').carousel('pause'); 
@@ -108,12 +14,36 @@ Template.library.rendered = function(){
 
 Template.library.events({
 
+  'click .dismiss' : function(e, t) {
+    $('#myModal').removeClass('in');
+  },
+
+  'click .close' : function(e, t) {
+    $('#myModal').removeClass('in');
+  },
+
   'change #video-file, drop #dropzone' : function(e, t) {
     e.preventDefault(); 
-    var files = e.currentTarget.files || e.dataTransfer.files
-      , file = files[0]
+    var fileList = e.currentTarget.files || e.dataTransfer.files
+      , vid = new Subtitler.Video(fileList)
+      , url = vid.createVideoUrl();
 
-    embedVideo(t, file);
+    if (url) {
+      t.videoURL = url; 
+      vid.embedVideo('#dropzone', {projectName : '#project-name'})
+      Session.set('videoURL', url)
+    }     
+
+  },
+
+  'dragenter #dropzone' : function(e, t) {
+    e.currentTarget.classList.add('target')
+    e.currentTarget.innerHTML = '';
+  },
+
+  'dragleave #dropzone, dragend #dropzone' : function(e, t){
+    e.currentTarget.classList.remove('target');
+    e.currentTarget.innerHTML = '<p> <strong>Drop video</strong> or <strong>click</strong> to select video source.</p>'
   },
 
   'loadedmetadata #dropzone video' : function(e, t) {
@@ -123,12 +53,10 @@ Template.library.events({
 
   'click #create-project' : function(e, t) {
     var self = t; 
-    if (! self.fileURL) {
+    if (! self.videoURL) {
       Session.set('displayMessage', 'Error Creating Project & Please select a video file from your hard disk.')
       return false
     }
-
-    console.log(self)
 
     var duration = t.find('#dropzone video').duration
       , name = t.find('#project-name').value;
@@ -141,12 +69,13 @@ Template.library.events({
     var newProject = Videos.insert({
       user : Meteor.userId(),
       name : name,
-      duration : duration
+      duration : duration,
+      created : new Date()
     });
 
-    Session.set('videoURL', self.fileURL);
+    Session.set('videoURL', self.videoURL);
     Session.set('currentVideo', newProject);
-    Session.set('currentView', 'third');
+    Session.set('currentView', 'app');
     Router.navigate('project/' + newProject);
     return false
   },
@@ -162,7 +91,7 @@ Template.library.events({
 
      Meteor.setTimeout(function () {
       selectProject.call(self);
-    }, 1000); 
+    }, 300); 
 
     return false;
   }
@@ -171,6 +100,12 @@ Template.library.events({
 Template.library.helpers({
   project : function(){
     return Videos.find({});
+  },
+
+  supportedFormats : function() {
+    var types = new Subtitler.Video()
+
+    return types.supportedFormats().join(', ')
   }
 });
 
@@ -181,25 +116,44 @@ Template.projectSubmenu.events({
     e.preventDefault();
 
     var fileList = e.currentTarget.files || e.dataTransfer.files
-      , file = fileList[0]
-      , url = createVideoURL(file);
+      , vid = new Subtitler.Video(fileList)
+      , url = vid.createVideoUrl();
 
     if (url) {
-      Session.set('videoURL', url);
-      Session.set('currentView', 'third');
-      Router.navigate('project/' + Session.get('currentVideo'));
-    }
+      t.videoURL = url; 
+      vid.embedVideo(t.find('.select-video-file'));
+      Session.set('videoURL', url)
+    }     
+
+    return false
 
   },
 
-  'click .select-video-file .select' : function(e, t) {
+  'dragenter a.select' : function(e, t) {
+    e.currentTarget.classList.add('target');
+    e.currentTarget.innerHTML = 'Drop Video Here';
+  },
 
+  'dragleave a.select, dragend a.select' : function(e, t){
+    e.currentTarget.classList.remove('target');
+  },
+
+  'dragleave a.select' : function(e, t){
+    e.currentTarget.innerHTML = '<strong>Drop video</strong> or <strong> click </strong> to select video source.'
+  },
+
+  'loadedmetadata #drop video' : function(e, t) {
+    var vid = e.currentTarget
+    t.videoNode = vid; 
+    vid.currentTime = vid.duration / 3; 
+  },
+
+  'click #drop' : function(e, t) {
     var vid = t.find('input.video-select');
     $(vid).trigger('click');
-
   },
 
-  'click button.delete-sub' : function(e, t) {
+  'click button.delete-project' : function(e, t) {
 
     var self = this; 
     new ui.Confirmation(
@@ -220,9 +174,63 @@ Template.projectSubmenu.events({
 
   'click button.go-back' : function(e, t) {
     $('#myCarousel').carousel(0);
-  }
+  },
+
+  'click .submenu-header button.export-subs' : function(e, t) {
+    var subtitles = Subtitles.find({}).fetch()
+      , file = new Subtitler.Exports(subtitles, {format : 'srt'})
+
+    file.toSRT();
+    file.saveAs(); 
+
+    return false
+  },
+
+  'click .submenu-content button.open-project' : function(e, t) {
+
+
+    var transitionToMain = function() {   
+      if (t.videoURL) {
+        Session.set('currentView', 'app');
+        Session.set('videoURL', t.videoURL);
+        Router.navigate('project/' + Session.get('currentVideo'));
+      } else {
+        Session.set('displayMessage', 'Error Opening Project & Please select a video file from your hard disk.')
+      }  
+    };
+
+    // compare duration of videos, to determine if they are the same.
+    // provide warning if they aren't. 
+    if (typeof t.videoNode === 'undefined') {
+      transitionToMain(); 
+      return false;       
+    }
+
+    if (t.data.duration !== t.videoNode.duration) {
+
+      new ui.Confirmation(
+      { title: 'Video Duration Changed',
+        message: 'This video has a different duration than the last video that you used for this project. Are you sure you want to continue?'
+      }).ok('Continue')
+        .cancel('Cancel')
+        .effect('scale')
+        .show(function(ok){
+          if (ok) {
+            Videos.update({_id: Session.get('currentVideo')}, {$set : { duration : t.videoNode.duration }});
+            transitionToMain(); 
+          }
+      });
+
+    } else {
+
+      transitionToMain(); 
+
+    }
+
+    return false
+
+}
 
 });
-
 
 })();

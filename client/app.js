@@ -7,36 +7,37 @@ Subtitles = new Meteor.Collection('subtitles')
 
 
 // Router
+// 
+
 
 var myRouter = Backbone.Router.extend({
   routes : {
     '': 'home',
     'reset-password' : 'resetPassword',
-    'reset-password/:id' : 'newPassword',
     'library' : 'library',
     'project/:id' : 'project'
   },
 
   home : function() {
-    Session.set('currentView', 'first');
+    if (! Accounts._resetPasswordToken) {
+      Session.set('passwordView', null);
+    if (Meteor.user()) {
+      Router.navigate('library', {trigger: true})
+    } else 
+      Session.set('currentView', 'introduction');
+    }
   },
 
   resetPassword : function() {
-    console.log('reset pass');
-    Session.set('currentView', 'password')
-  },
-
-  newPassword : function(id) {
-    console.log('newpw');
-    Session.set('currentView', 'password');
-    Session.set('resetPassword', id);
+    Session.set('currentView', 'introduction');
+    Session.set('passwordView', 'password');
   },
 
   library : function() {
     if (Meteor.user()) {
-      Session.set('currentView', 'second');
+      Session.set('currentView', 'library');
     } else {
-      Session.set('currentView', 'first');
+      Session.set('currentView', 'introduction');
       Router.navigate('');
     }
   },
@@ -45,16 +46,25 @@ var myRouter = Backbone.Router.extend({
     // also need to test if the user owns this particular
     // project!
 
-      Session.set('currentView', 'third');
+      Session.set('currentView', 'app');
       Session.set('currentVideo', id);
   }
 });
 
 Router = new myRouter;
 
+(function(){
+
 Meteor.startup(function () {
   Backbone.history.start({ pushState : true });
 });
+
+if (Accounts._resetPasswordToken) {
+  Session.set('currentView', 'introduction')
+  Session.set('passwordView', 'password')
+  Session.set('resetPassword', Accounts._resetPasswordToken);
+}
+
 
 
 // Session variables, reactive
@@ -77,7 +87,9 @@ Session.set('saving', null)
 
 Session.set('videoURL', null)
 
-Session.set('currentView', 'first');
+Session.set('currentView', 'introduction');
+
+Session.set('loading', null)
 
 
 /**
@@ -103,8 +115,14 @@ Meteor.autosubscribe(function () {
 
 
 Template.body.helpers({
-  currentView: function(){
-    return Session.get('currentView');
+  introduction: function(){
+    return Session.equals('currentView', 'introduction');
+  },
+  library: function(){
+    return Session.equals('currentView', 'library');
+  },
+  app : function(){
+    return Session.equals('currentView', 'app');
   }
 })
 
@@ -200,6 +218,25 @@ Template.video.events({
 
   'pause, ended, error #video-display': function(e,t){
     Session.set('videoPlaying', false)
+  },
+
+  'click #main-player-drop' : function(e, t) {
+    $('input.file').trigger('click');
+  },
+
+  'change input.file, drop #main-player-drop' : function(e, t) {
+    e.preventDefault(); 
+
+    var fileList = e.currentTarget.files || e.dataTransfer.files
+      , vid = new Subtitler.Video(fileList)
+      , url = vid.createVideoUrl();
+
+      if (url) {
+        t.videoURL = url;
+        Session.set('videoURL', url)
+      }
+
+
   }
 
 });
@@ -207,5 +244,13 @@ Template.video.events({
 Template.video.helpers({
   fileURL : function() {
     return Session.get('videoURL');
+  },
+
+  projectName : function() {
+    var vid = Videos.findOne(Session.get('currentVideo'))
+    if (vid)
+      return vid.name
   }
 });
+
+})(); 

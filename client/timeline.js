@@ -1,4 +1,5 @@
 // XXX To do: draggingCursor shouldn't be global variable.
+(function(){
 
 Template.map.events({
 
@@ -26,190 +27,224 @@ Template.map.events({
 
 // D3 Goodness. 
 Template.map.rendered = function () {
+  var self = this;
 
-  var vid = Videos.findOne(Session.get('currentVideo'));
+  self.node = self.find('#video-map')
+  self.marker = self.find('#current-position')
+  self.timelineWrapper = self.find('.timeline-wrapper')
+  self.project = Videos.findOne(Session.get('currentVideo'))
 
-  // Ensure that Video has loaded and exists before running
-  if (vid) {
-    var self = this; 
-    self.node = self.find('#video-map')
-    self.marker = self.find('#current-position')
-    self.timelineWrapper = self.find('.map-wrap')
-
-
-    var videoDuration = vid.duration
-      , timelineWidth = self.node.clientWidth
-      , multiplyBy = timelineWidth / videoDuration
-      , divideBy = videoDuration / timelineWidth;
+  var yScale = d3.scale.linear()
+    .domain([0, 4])
+    .range([10, 60]);
 
 
-    // Draw Timeline 
-    var x = d3.scale.linear()
-      .domain([0, videoDuration])
-      .range(['0px', timelineWidth]);
-
-    // Draw Click Zone
-    d3.select(self.node).select('rect.timeline-click-zone')
-      .attr('width', timelineWidth)
-
-    // Draw Time-Interval Lines
-    d3.select(self.node).select('.tick-bars').selectAll('line')
-      .data(x.ticks(7))
-      .enter().append('line')
-        .attr('class', 'tick-bar')
-        .attr('x1', x)
-        .attr('x2', x)
-        .attr('y1', 1)
-        .attr('y2', -60)
-
-    // Reactively draw or redraw captions as they are added or removed
-    if (! self.handle) {
-
-    // Height scale
-    var yScale = d3.scale.linear()
-      .domain([0, 4])
-      .range([10, 60]);
+  // Sets the xScale, which should change depending on window size.
+  var setXScale = function(duration){
+    self.xScale = d3.scale.linear()
+      .domain([0, self.duration])
+      .range([0, $(self.timelineWrapper).width()])
+  }
 
 
-      self.handle = Meteor.autorun(function () {
+  // Draws the captions
+  var drawSubs = function (caption) {
+    caption
+      .attr('data-id', function (cap) { return cap._id; })
+      .attr('class', 'timelineEvent')
+      .attr('fill', function (cap) { 
 
-        var currentSubId = Session.get('currentSub')
-          , currentSub = Subtitles.findOne(currentSubId);
-
-        // Determine the ratio of words to seconds
-        // 140 words / minute (BBC Recommendation) is 2.3
-        // 180 / minute, 3, is sometime acceptable
-        var getRatio = function(cap) {
-          var dataLength = typeof cap.text === 'undefined' ? 11 : cap.text.split(' ').length
-            , duration = cap.endTime - cap.startTime;
-          
-          return dataLength / duration;
-        }
-
-
-        // need function for drawing each caption span
-        var drawSubs = function (caption) {
-          caption
-            .attr('data-id', function (cap) { return cap._id; })
-            .attr('class', 'timelineEvent')
-            .attr('fill', function (cap) { 
-              // Provide colour warnings if too fast rate / second
-              var rate = getRatio(cap);
-              if (rate <= 2.3)
-                return '#50ddfb';
-              else if (rate > 2.3 && rate < 3.1)
-                return '#fbb450'; // warning
-              else
-                return '#ea8787'; // danger
-            })
-            .attr('x', function (cap) { return x(cap.startTime); })
-            .attr('y', function (cap) { return '-' + yScale(getRatio(cap)); })
-            .attr('width', function (cap) { 
-              return x(cap.endTime) - x(cap.startTime)
-            })
-            .attr('height', function (cap) {
-              return yScale(getRatio(cap)); 
-            });
-        };
-
-        var captions = d3.select(self.node).select('.caption-spans').selectAll('rect')
-          .data(Subtitles.find()
-          .fetch(), function (sub) {
-            return sub._id; 
-          })
-
-        drawSubs(captions.enter().append('rect'));
-        drawSubs(captions.transition().duration(400));
-        captions
-          .exit()
-          .transition()
-          .duration(400)
-          .style('opacity', 0)
-          .remove(); 
+        // Provide colour warnings if too fast rate / second
+        var rate = getRatio(cap);
+        if (rate <= 2.3)
+          return '#50ddfb';
+        else if (rate > 2.3 && rate < 3.1)
+          return '#fbb450'; // warning
+        else
+          return '#ea8787'; // danger
       })
-    }
+      .attr('x', function (cap) { return self.xScale(cap.startTime); })
+      .attr('y', function (cap) { return '-' + yScale(getRatio(cap)); })
+      .attr('width', function (cap) { 
+        return self.xScale(cap.endTime) - self.xScale(cap.startTime)
+      })
+      .attr('height', function (cap) {
+        return yScale(getRatio(cap)); 
+      });
+  };
 
-  // Reactively draw playback position during play
-  if (! self.handle2) {
+  // Gets word per minute ratio to determine colour of caption in timeline
+  var getRatio = function(cap) {
+    var dataLength = typeof cap.text === 'undefined' ? 11 : cap.text.split(' ').length
+      , duration = cap.endTime - cap.startTime;
+    
+    return dataLength / duration;
+  }
 
-    if (! Subtitler.draggingCursor) {
-      self.handle2 = Meteor.autorun(function () {
-        var currentTime = Session.get('currentTime')
-          , xAxis = x(currentTime); 
+  // Resizes the click-zone based on window-width
+  var drawClickZone = function() {
+    d3.select(self.node).select('rect.timeline-click-zone')
+      .attr('width', $(self.timelineWrapper).width())
+  }
+
+  // Basic drawing that is triggered by removal, enter, and changes to data set.
+  var drawTimeline = function(){
+
+      drawSubs(self.captions.enter().append('rect'));
+      drawSubs(self.captions.transition().duration(400));
+      self.captions
+        .exit()
+        .transition()
+        .duration(400)
+        .style('opacity', 0)
+        .remove(); 
+  }
+
+  // DRAW TIMELINE
+  // if Subtitles collection changes, redraw changed captions
+  if (! self.drawTimeline) {
+    self.drawTimeline = Meteor.autorun(function() {
+
+      var subtitles = Subtitles.find().fetch(); 
+
+      if (typeof xScale === 'undefined' && typeof self.project != 'undefined')
+        setXScale(self.project.duration)
+
+      var captions = self.captions = d3.select(self.node).select('.caption-spans').selectAll('rect')
+        .data(subtitles, function (sub) {
+          return sub._id; 
+        })
+
+      // drawSubs(self.captions.transition().duration(400));
+
+      drawTimeline(); 
+
+
+
+    });
+  }
+
+
+  // DRAW CAPTIONS
+  // if the selected video file changes, redraw the entire timeline
+  if (! self.drawCaptions) {
+    self.drawCaptions = Meteor.autorun(function() {
+      var video = Videos.findOne(Session.get('currentVideo'));
+      if (video) {
+        
+        self.duration = video.duration; 
+        setXScale();
+        drawClickZone(); 
+        
+      }
+    })
+  }
+
+  // I need video druation set; 
+  // This allows me to set xScale
+  // Once I have both of these, then I can draw the timeline. 
+  // Once I have all of the subtitles loaded, then i can draw the subtitles. 
+
+  var updateMarkerPosition = function(currentTime) {
+     var xAxis = self.xScale ? self.xScale(currentTime) : 0; 
 
         d3.select(self.marker)
           .transition()
           .duration(200)
           .attr('x1', xAxis)
           .attr('x2', xAxis)
+  }
+
+  // PLAYBACK POSITION
+  // if Session.get('currentTime') changes, redraw the playback position marker
+  if (! self.playbackPosition) {
+    if (! Subtitler.draggingCursor) {
+      self.playbackPosition = Meteor.autorun(function () {
+
+        var currentTime = Session.get('currentTime')
+        updateMarkerPosition(currentTime);
+
       })
     }
   }
 
   // Timeline event handlers in d3 which don't work well with native Meteor
-    var setMarkerPostion = function(options) {
-      var options = options || false 
-        , xPosition = d3.mouse(self.timelineWrapper)[0];
+  var setMarkerPostion = function(options) {
+    var options = options || false 
+      , xPosition = d3.mouse(self.timelineWrapper)[0];
 
-          if (xPosition >= 0 && xPosition <= timelineWidth) {
+        if (xPosition >= 0 && xPosition <= $(self.timelineWrapper).width()) {
 
-            // Don't animate while dragging
-            if (options.animate)
-              d3.select(self.marker)
-                .transition()
-                .duration(200)
-                .attr('x1', xPosition)
-                .attr('x2', xPosition);
-            else
-              d3.select(self.marker)
-                .attr('x1', xPosition)
-                .attr('x2', xPosition);
+          // Don't animate while dragging
+          if (options.animate)
+            d3.select(self.marker)
+              .transition()
+              .duration(200)
+              .attr('x1', xPosition)
+              .attr('x2', xPosition);
+          else
+            d3.select(self.marker)
+              .attr('x1', xPosition)
+              .attr('x2', xPosition);
 
-            if (Subtitler.videoNode)
-              Subtitler.videoNode.currentTime = xPosition * divideBy;
-            
-            Session.set('startTime', null)
-            Session.set('endTime', null)
+          if (Subtitler.videoNode)
+            Subtitler.videoNode.currentTime = self.xScale.invert(xPosition);
+          
+          Session.set('startTime', null)
+          Session.set('endTime', null)
 
-            if (options.sync)
-              Subtitler.syncCaptions(xPosition * divideBy);
-
+          if (options.sync) {
+            Subtitler.syncCaptions(self.xScale.invert(xPosition));
           }
-    };
 
-        // If dragging the cursor during mouse movement, set position of marker.
-        d3.select(window).on('mousemove', function(e, d) {
+        }
+  };
 
-          if (! Subtitler.draggingCursor) 
-            return;
-          setMarkerPostion();
-        });
+    // If dragging the cursor during mouse movement, set position of marker.
+    d3.select(window).on('mousemove', function(e, d) {
+      if (! Subtitler.draggingCursor) 
+        return;
+      setMarkerPostion();
+    });
 
-        // If releasing mouse while dragging cursor, set marker position and disable
-        // dragging (draggingCursor = false)
-        d3.select(window).on('mouseup', function(){
+    // If releasing mouse while dragging cursor, set marker position and disable
+    // dragging (draggingCursor = false)
+    d3.select(window).on('mouseup', function(){
 
-          if (Subtitler.draggingCursor) {
-            Subtitler.draggingCursor = false;
-            var x = d3.select(self.marker).attr('x1');
+      if (Subtitler.draggingCursor) {
+        Subtitler.draggingCursor = false;
+        var x = d3.select(self.marker).attr('x1');
 
-            if (x >= 0 && x <= timelineWidth) {
-              Session.set('currentTime', x * divideBy);
-            }
+        if (x >= 0 && x <= self.node.clientWidth) {
+          Session.set('currentTime', self.xScale.invert(x));
+        }
 
-            Subtitler.syncCaptions(x * divideBy);
-          } 
-        });
+        Subtitler.syncCaptions(self.xScale.invert(x));
+      } 
+    });
 
-        d3.select(self.node).select('.timeline-click-zone').on('click', function(){
-          setMarkerPostion({animate : true, sync : true });
-        });
+    d3.select(self.node).select('.timeline-click-zone').on('click', function(){
+      setMarkerPostion({animate : true, sync : true });
+    });
 
-    }; // end IF
+    // Redraw the timeline AFTER window has been resized, otherwise it might kill my computer.
+    $(window).on('resize', function() {
+      clearTimeout(this.id);
+      this.id = setTimeout(function(){
+        setXScale();
+        drawClickZone(); 
+        drawSubs(self.captions.transition().duration(400));
+        updateMarkerPosition(Session.get('currentTime'));
+      }, 300);
+    });
+
 };
 
 Template.map.destroyed = function () {
   var self = this;
   self.handle && self.handle.stop();
-  self.handle2 && self.handle2.stop(); 
+  self.drawCaptions && self.drawCaptions.stop(); 
+  self.playbackPosition && self.playbackPosition.stop(); 
 };
+
+})(); 

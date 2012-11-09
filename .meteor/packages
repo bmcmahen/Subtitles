@@ -10,3 +10,7 @@ accounts-password
 email
 backbone
 preserve-inputs
+http
+accounts-urls
+underscore
+jquery

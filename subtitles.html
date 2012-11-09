@@ -16,37 +16,60 @@
       <div class='container-fluid'>
       <a class='brand'> Bento Subtitles </a>
       <ul class='nav pull-right'>
-      <li> <img id='loader' src='/images/ajax-loader.gif'/> </li>
 
+
+      {{#if loading}}
+        {{> loading}}
+      {{/if}}
 
       {{#if currentUserLoaded}}
         <li><a href='#' class='view-library'>Library</a></li>
         <li class='dropdown'>
           <a href='#' class='dropdown-toggle' data-toggle='dropdown'>{{displayName}}<b class='caret'></b></a>
           <ul class='dropdown-menu' role='dropdown' aria-labelledby='dropdownMenu' >
-            <li><a href='#' tabindex='-1'>Settings... </a></li>
-            <li class='divider'></li>
             <li><a class='logout' href='#' tabindex='-1'>Logout... </a></li>
           </ul>
         </li>
       {{/if}}
+
+      {{#if currentUser}}
+        {{#unless currentUserLoaded}}
+          {{> loading}}
+        {{/unless}}
+      {{/if}}
+
+
+    
       </ul>
     </div>
   </div>
   </div>
 </template>
 
+<template name='loading'>
+       <li> <img id='loader' src='/images/ajax-loader.gif'/> </li>
+</template>
+
 <template name='body'>
-  <div id='content' class='{{currentView}}'>
-    <div class='intro'>
-      {{> intro}}
-    </div>
-    <div class='library'>
-      {{> library}}
-    </div>
-    <div class='app'>
-      {{> application}}
-    </div>
+  <div id='content'>
+    {{#if introduction}}
+      <div class='intro'>
+        {{> intro}}
+      </div>
+    {{/if}}
+
+    {{#if library}}
+      <div class='library'>
+        {{> library}}
+      </div>
+    {{/if}}
+
+    {{#if app}}
+      <div class='app'>
+        {{> application}}
+      </div>
+    {{/if}}
+    
   </div>
 </template>
 

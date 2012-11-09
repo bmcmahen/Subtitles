@@ -59,24 +59,24 @@ Template.intro.rendered = function() {
 Template.intro.events({
   'submit #login-form' : function(e, t) {
 
-    var email = trimInput(t.find('#login-email').value)
+    var email = trimInput(t.find('#login-email').value.toLowerCase())
     var password = t.find('#login-password').value
 
     if (isNotEmpty(email, 'loginError') && isNotEmpty(password, 'loginError')) {
 
-      var loader = document.getElementById('loader');
-      loader.classList.add('visible');
+      Session.set('loading', true);
 
       Meteor.loginWithPassword(email, password, function(err){
         
-        if(err && err.error === 403)
+        if(err && err.error === 403) {
           Session.set('displayMessage', 'Login Error &' + err.reason);
-        else {
-          Session.set('currentView', 'second')
+          Session.set('loading', false)
+        } else {
+          Session.set('loading', false);
+          Session.set('currentView', 'library')
           Router.navigate('library');
         }
 
-        loader.classList.remove('visible');
 
       });
 
@@ -86,7 +86,7 @@ Template.intro.events({
   },
 
   'submit #register-form' : function(e, t) {
-    var email = trimInput(t.find('#account-email').value)
+    var email = trimInput(t.find('#account-email').value.toLowerCase())
     var password = t.find('#account-password').value
 
     if (isNotEmpty(email, 'accountError')
@@ -94,24 +94,24 @@ Template.intro.events({
       && isEmail(email, 'accountError')
       && isValidPassword(password, 'accountError')) {
 
-      var loader = document.getElementById('loader');
-      loader.classList.add('visible');
+      Session.set('loading', true)
 
       Accounts.createUser({email: email, password : password}, function(err){
-        if (err && err.error === 403)
+        if (err && err.error === 403) {
           Session.set('displayMessage', 'Account Creation Error &' + err.reason)
-        else {
-          Session.set('currentView', 'second');
+          Session.set('loading', false);
+        } else {
+          Session.set('currentView', 'library');
           Router.navigate('library');
         }
-        loader.classList.remove('visible');
+        Session.set('loading', false);
       })
     }
     return false
   },
 
   'click #forgot-password' : function(e, t) {
-    Session.set('currentView', 'password');
+    Session.set('passwordView', 'password')
     Router.navigate('reset-password');
   }
   
@@ -130,18 +130,20 @@ Template.passwordRecovery.events({
 
       if (isNotEmpty(email, 'recoveryError') && isEmail(email, 'recoveryError')) {
         
-        var loader = document.getElementById('loader');
-        loader.classList.add('visible');
+        Session.set('loading', true);
 
         Accounts.forgotPassword({email: email}, function(err){
+
         if (err)
           Session.set('displayMessage', 'Password Reset Error & ' + err.reason)
         else {
           Session.set('displayMessage', 'Email Sent & Please check your email to reset your password.')
-          Session.set('currentView', 'first')
+          Session.set('passwordView', null)
           Router.navigate('');
         }
-        loader.classList.remove('visible');
+
+        Session.set('loading', false);
+
       });
       }
       return false; 
@@ -152,17 +154,17 @@ Template.passwordRecovery.events({
       var pw = t.find('#new-password-password').value;
 
       if (isNotEmpty(pw) && isValidPassword(pw)) {
-        var loader = document.getElementById('loader');
-      loader.classList.add('visible');
+        Session.set('loading', true);
 
         Accounts.resetPassword(Session.get('resetPassword'), pw, function(err){
           if (err)
             Session.set('displayMessage', 'Password Reset Error & '+ err.reason);
           else {
-            Session.set('currentView', 'second');
+            Session.set('currentView', 'library');
+            Session.set('resetPassword', null);
             Router.navigate('library');
           }
-          loader.classList.remove('visible');
+          Session.set('loading', false);
         })
       }
     return false; 
@@ -170,5 +172,11 @@ Template.passwordRecovery.events({
 });
 
 Template.intro.preserve(['#intro-login-form', '#intro-password-form', '#intro-register-form'])
+
+Template.intro.helpers({
+  passwordView : function(){
+    return Session.get('passwordView');
+  }
+})
 
 })();

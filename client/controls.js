@@ -2,6 +2,7 @@
  * Video Playback Controls
  */
 
+(function(){
 
 Template.controls.events({
 
@@ -17,23 +18,28 @@ Template.controls.events({
   },
 
   'click #skip-to-beginning' : function (e, t) {
-    Subtitler.videoNode.currentTime = 0;
+    if (Subtitler.videoNode)
+      Subtitler.videoNode.currentTime = 0;
   },
 
   'click #skip-to-end' : function (e, t) {
-    Subtitler.videoNode.currentTime = Subtitler.videoNode.duration;
+    if (Subtitler.videoNode)
+      Subtitler.videoNode.currentTime = Subtitler.videoNode.duration;
 
   },
 
   'click #play-video' : function (e, t) {
     var node = Subtitler.videoNode;
-    Session.get('videoPlaying') ? 
-      node.pause() : node.play(); 
+    if (node) {
+      Session.get('videoPlaying') ? 
+        node.pause() : node.play(); 
+    }
   },
 
   'change #playback-rate' : function (e, t) {
     Session.set('playbackRate', e.currentTarget.value)
-    Subtitler.videoNode.playbackRate = e.currentTarget.value
+    if (Subtitler.videoNode)
+      Subtitler.videoNode.playbackRate = e.currentTarget.value
   }
 
 })
@@ -41,7 +47,6 @@ Template.controls.events({
 Template.controls.helpers({
 
   looping: function(){
-    console.log('looping', Session.get('looping'));
     return Session.get('looping')
   },
 
@@ -52,6 +57,15 @@ Template.controls.helpers({
   playing: function() {
     if (Session.get('videoPlaying'))
       return 'paused'
+  },
+
+  supported: function() {
+    // Test if playbackRate is supported
+    var vid = document.createElement('video')
+      , playbackRate = vid.playbackRate; 
+
+    if (!_.isUndefined(playbackRate))
+      return true 
   }
 })
 
@@ -67,3 +81,5 @@ Template.controls.rendered = function() {
   self.node = vid; 
 
 }
+
+})();
