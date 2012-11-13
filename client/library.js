@@ -165,6 +165,7 @@ Template.projectSubmenu.events({
         .show(function(ok){
           if (ok) {
             Videos.remove(self._id);
+            Subtitles.remove({videoId : self._id});
             Session.set('displayMessage', 'Project Deleted & ' + self.name + ' deleted.');
             $('#myCarousel').carousel(0);
           } 

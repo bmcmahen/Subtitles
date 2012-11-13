@@ -15,7 +15,8 @@ var myRouter = Backbone.Router.extend({
     '': 'home',
     'reset-password' : 'resetPassword',
     'library' : 'library',
-    'project/:id' : 'project'
+    'project/:id' : 'project',
+    'help' : 'help'
   },
 
   home : function() {
@@ -48,6 +49,10 @@ var myRouter = Backbone.Router.extend({
 
       Session.set('currentView', 'app');
       Session.set('currentVideo', id);
+  },
+
+  help : function(){
+    Session.set('currentView', 'help');
   }
 });
 
@@ -123,6 +128,9 @@ Template.body.helpers({
   },
   app : function(){
     return Session.equals('currentView', 'app');
+  },
+  help: function(){
+    return Session.equals('currentView', 'help');
   }
 })
 
@@ -138,33 +146,33 @@ Subtitler.syncCaptions = function(time, options) {
   var options = options || {}; 
   options.silence = options.silent || false; 
 
-  var binarySearch = function(array, currentTime) {
+  // var binarySearch = function(array, currentTime) {
 
-    var low = 0;
-    var high = array.length - 1;
-    var i;
+  //   var low = 0;
+  //   var high = array.length - 1;
+  //   var i;
 
-    while (low <= high) {
-      i = Math.floor((low + high) / 2);
+  //   while (low <= high) {
+  //     i = Math.floor((low + high) / 2);
 
-      if (array[i].startTime <= currentTime) {
+  //     if (array[i].startTime <= currentTime) {
 
-        if (array[i].endTime >= currentTime ){
-          // this is the one
-          return array[i]._id; 
+  //       if (array[i].endTime >= currentTime ){
+  //         // this is the one
+  //         return array[i]._id; 
 
-        } else {
-          low = i + 1;
-        }
-      }
+  //       } else {
+  //         low = i + 1;
+  //       }
+  //     }
 
-      else {
-        high = i - 1;
-      }
-    } 
+  //     else {
+  //       high = i - 1;
+  //     }
+  //   } 
 
-    return null;
-  }
+  //   return null;
+  // }
 
 
 // Only run the search if its not playing on the same caption.

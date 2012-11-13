@@ -12,6 +12,15 @@ Template.navigation.helpers({
 })
 
 Template.navigation.events({
+
+  'click .brand' : function() {
+    Session.set('currentView', 'introduction');
+    Session.set('currentVideo', null);
+    Session.set('videoURL', null);
+    Subtitler.videoNode = null; 
+    Router.navigate('');
+    return false; 
+  },
   'click .logout' : function() {
     Meteor.logout(); 
     Session.set('currentView', 'introduction');
@@ -29,6 +38,15 @@ Template.navigation.events({
     Subtitler.videoNode = null; 
     Router.navigate('library');
     return false;
+  },
+
+  'click .view-help' : function() {
+    Session.set('currentVideo', null);
+    Session.set('currentView', 'help');
+    Session.set('videoURL', null);
+    Subtitler.videoNode = null; 
+    Router.navigate('help');
+    return false; 
   }
 })
 

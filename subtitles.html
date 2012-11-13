@@ -14,14 +14,17 @@
     <div class='navbar navbar-fixed-top'>
     <div class='navbar-inner'>
       <div class='container-fluid'>
-      <a class='brand'> Bento Subtitles </a>
+      <a class='brand'> <span class='light'>fiddleware</span> Subtitles </a>
       <ul class='nav pull-right'>
+
 
 
       {{#if loading}}
         {{> loading}}
       {{/if}}
-
+        <li>
+          <a href='#' class='view-help'>Help</a>
+        </li>
       {{#if currentUserLoaded}}
         <li><a href='#' class='view-library'>Library</a></li>
         <li class='dropdown'>
@@ -67,6 +70,12 @@
     {{#if app}}
       <div class='app'>
         {{> application}}
+      </div>
+    {{/if}}
+
+    {{#if help}}
+      <div class='help'>
+        {{> help}}
       </div>
     {{/if}}
     

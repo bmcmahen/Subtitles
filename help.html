@@ -1,0 +1,74 @@
+<template name='help'>
+  <div class='container'>
+    <div class='row'>
+      <div class='span4'>
+        <ul class='nav nav-list'>
+          <li class='caption'>
+            <a href='#faq'>
+              <i class='icon-chevron-right'></i>
+              Frequently Asked Questions
+            </a>
+          </li>
+          <li class='caption'>
+            <a href='#about'>
+              <i class='icon-chevron-right'></i>
+              About
+            </a>
+        </ul>
+      </div>
+      <div class='span8'>
+        <div class='white faq' name='faq' id='faq'>
+        <h1>Frequently Asked Questions</h1>
+
+<p class='question'><strong>How do I properly load my video? It either tells me that the video format isn't supported, it shows up blank, or it disappears when I reload the page.</strong></p>
+
+<p>
+In order to correctly load your video, it needs to be converted to a format that your web browser supports. And because different web browsers support different video formats, not one single video format will work universally. If you are using Google Chrome, Apple's Safari, or Internet Explorer 10, we recommend using h264 formatted video. If you are using Mozilla Firefox we recommend either webM or Ogg. </p>
+<p>
+There are a number of free, easy-to-use video converts available for Mac OS and Windows. <a href='http://www.mirovideoconverter.com/'>Miro Video Converter</a> is highly recommended. </p>
+<p>
+If your video disappears when you reload your web page, it's due to limitations in browser technology. For security reasons, a website is unable to permanently reference local client files. This means that the user will need to select the video file each time they reload the web page. </p>
+
+<p class='question'><strong>Can I import subtitle files?</strong></p>
+
+<p>
+Yes. Start by creating a new subtitle project as you ordinarily would. Look for a button titled 'import' on the main caption toolbar. Clicking this will allow you to import an SRT file from your hard drive. Note that importing a caption file will erase all of your current captions in that project.</p>
+
+<p class='question'><strong>How do I use the .SRT files generated when exporting?</strong></p>
+<p>
+The .srt file that's generated when exporting is basically a text-document that is formatted in a particular way. These documents are typically loaded by your video player, such as Quicktime, VLC, Windows Media Player, or Youtube along with the accompanied video file. </p>
+
+<p>
+<a href='http://www.videolan.org/doc/play-howto/en/ch03.html#id587568'>VLC instructions</a>
+</p><p>
+<a href='http://www.ehow.com/how_12139892_open-srt-subtitles-quicktime-mp4.html'>Quicktime</a>
+<p></p>
+<a href='http://windows.microsoft.com/en-CA/windows7/Show-captions-or-subtitles-in-Windows-Media-Player'>
+Windows Media Player</a></p>
+<p>
+Note that subtitle files are typically not embedded directly into the video, thus allowing the user to turn off the subtitles if they aren't needed or switch subtitle tracks. </p>
+
+<p class='question'><strong>Is .SRT the only supported format?</strong></p>
+<p>Currently, yes. The goal is to support other formats in the future, including WebVTT, and the flexibility/customization that these formats provide.</p>
+
+<p class='question'><strong>Is fiddleware Subtitles suitable for captioning longer videos?</strong></p>
+<p>The app was initially created with shorter, 5-30 minute videos in mind, but it should work for longer videos too. We are actively looking at performance enhancements and interface features that will aid in captioning longer videos. </p>
+
+<p class='question'><strong>Why does the timeline have different colours for different captions? What does the height of the caption indicate?</strong></p>
+
+<p>The width of the caption indicates its duration, and the height of the caption indicates Words Per Minute. The higher the words per minute in the caption, the taller the caption in the timeline. If the colour of the caption is blue, this means that it's under 140 word per minute, which is a general recommendation. If it's orange, it's between 140 wpm and 170wpm, which is acceptable in some circumstances. If it's red, then it's over 170 wpm, and should probably be altered.</p>
+
+<p class='question'><strong>What web browsers are supported?</strong>
+<p>Currently, Subtitles has been tested with the latest version of <em>Google Chrome</em> and <em>Mozilla Firefox.</em> The goal is to eventually support all modern browsers, including Safari and Internet Explorer 10. </p>
+</div>
+
+<div class='white faq' name='about' id='about'>
+  <h1>About</h1>
+
+<p>Subtitles was made by Ben McMahen, a developer/designer based out of Edmonton, Canada. The application was built using the Meteor framework.</p><p> For enquiries, please email ben(dot)mcmahen(at)gmail.com.</p>
+
+</div>
+      </div>
+    </div>
+  </div>
+</template>

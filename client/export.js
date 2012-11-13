@@ -33,7 +33,7 @@ _.extend(Exports.prototype, {
 
     _.each(subtitles, function(value, index){
       // Don't include empty boxes
-      if (value.text.match(/\S/)) {
+      if (typeof value.text !== 'undefined' && value.text.match(/\S/)) {
         var bufLength = buf.length
         buf[bufLength] = index + 1; 
         buf[bufLength + 1] = Subtitler.utilities.secondsToHms(value.startTime) + ' --> ' + Subtitler.utilities.secondsToHms(value.endTime);
