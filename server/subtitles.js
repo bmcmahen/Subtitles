@@ -1,4 +1,4 @@
-
+Subtitler = {};
 
 Videos = new Meteor.Collection('videos')
 Subtitles = new Meteor.Collection('subtitles')
@@ -71,4 +71,3 @@ Subtitles.allow({
   
   Accounts.emailTemplates.siteName = "Bento Subtitles";
   Accounts.emailTemplates.from = "Bento Subtitles <no-reply@meteor.com";
-

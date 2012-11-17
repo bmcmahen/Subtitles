@@ -46,6 +46,10 @@ Template.library.events({
     e.currentTarget.innerHTML = '<p> <strong>Drop video</strong> or <strong>click</strong> to select video source.</p>'
   },
 
+  'error #dropzone video' : function(e, t){
+  	console.log('error'); // XXX
+  },
+
   'loadedmetadata #dropzone video' : function(e, t) {
     e.currentTarget.currentTime = e.currentTarget.duration / 3; 
     this.videoNode = e.currentTarget;
@@ -178,17 +182,18 @@ Template.projectSubmenu.events({
   },
 
   'click .submenu-header button.export-subs' : function(e, t) {
-    var subtitles = Subtitles.find({}).fetch()
-      , file = new Subtitler.Exports(subtitles, {format : 'srt'})
-
-    file.toSRT();
-    file.saveAs(); 
-
+    var subtitles = Subtitles.find({}).fetch();
+    Session.set('loading', true);
+    Meteor.call('export', subtitles, function(err, result){
+    	Session.set('loading', false);
+    	if (!err)
+    		Subtitler.utilities.saveAs(result, 'srt')
+    });
+    
     return false
   },
 
   'click .submenu-content button.open-project' : function(e, t) {
-
 
     var transitionToMain = function() {   
       if (t.videoURL) {

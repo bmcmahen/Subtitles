@@ -35,6 +35,12 @@
         return false
       }
 
+      if (typeof URL.createObjectURL === 'undefined') {
+      	Session.set('displayMessage',
+      		'Error Loading File & Your web browser does not support this feature.');
+      		return false; 
+      }
+
       var fileURL = self.fileURL = URL.createObjectURL(file);
 
       if (self.canPlayVideo(self.type))

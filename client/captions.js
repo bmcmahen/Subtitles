@@ -96,12 +96,16 @@ Template.captions.events({
   },
 
   'click #export-subtitles' : function ( e, t ) {
-    var subtitles = Subtitles.find({}).fetch()
-      , file = new Subtitler.Exports(subtitles, {format : 'srt'})
+    var subtitles = Subtitles.find({}).fetch();
 
-    file.toSRT();
-    file.saveAs(); 
-
+    Session.set('loading', true);
+    Meteor.call('export', subtitles, function(err, result){
+    	Session.set('loading', false);
+    	if (!err)
+    		Subtitler.utilities.saveAs(result, 'srt')
+    });
+    
+    return false
   },
 
   'click #import-subtitles' : function (e, t) {
@@ -112,12 +116,16 @@ Template.captions.events({
     var file = e.currentTarget.files[0]
       , imported = new Subtitler.Imports(file);
 
+    Session.set('loading', true);
     if (imported.type === 'srt') {
       imported.readAsText(function(){
-        imported.parseSRT();
-        imported.insertSubs(); 
+        imported.parseSRT(function(){
+        	imported.insertSubs(); 
+        	Session.set('loading', false);
+        });
       })
     } else {
+    	Session.set('loading', false);
       Session.set('displayMessage', 'File Type not Supported & At this time, only SRT files are supported.');
     }
 

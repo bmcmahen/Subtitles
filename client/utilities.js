@@ -41,8 +41,30 @@
 
     return hourString + minuteString + seconds
 
-    }
-  }
+    },
+
+    saveAs: function(string, format){
+			var name = Videos.findOne(Session.get('currentVideo')).name
+	      , blob = utilities.buildBlob(string, {'type' : 'text/plain' });
+
+	    window.saveAs(blob, name + '.' + format);
+ 	 },
+
+ 	 buildBlob: function(value, type){
+ 	 	var prefixedBB = window.MSBlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+ 	 	if (typeof Blob !== "undefined") {
+			return new Blob([value], type);
+		} else if (prefixedBB) {
+			var bb = new prefixedBB();
+			bb.append(value);
+			return bb.getBlob('text/plain');
+		} else {
+			return false; 
+		}
+ 	 }
+
+ 	};
 
 
 })(); 
