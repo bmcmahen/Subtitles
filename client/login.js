@@ -57,6 +57,11 @@ Template.intro.rendered = function() {
 }
 
 Template.intro.events({
+
+	'click .watch-video' : function(e, t){
+		$(e.currentTarget).parent().html('<iframe src="http://player.vimeo.com/video/53719196?badge=0&autoplay=1" width="600" height="329" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>');
+		return false; 
+	},
   'submit #login-form' : function(e, t) {
 
     var email = trimInput(t.find('#login-email').value.toLowerCase())

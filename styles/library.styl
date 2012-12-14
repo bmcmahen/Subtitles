@@ -1,5 +1,6 @@
 @import 'nib'
 
+
 ul.file-list
   height 400px
   overflow auto
@@ -156,8 +157,8 @@ button.go-back
 .select-video-file
 
   & a
-    padding-top 50px
-    padding-bottom 50px
+    padding-top 70px
+    padding-bottom 70px
     display block
     background #FAFAFC
     border-radius 5px
@@ -174,3 +175,52 @@ button.go-back
     &.target
       border 2px dashed #888
       background whiteSmoke
+
+
+.columns
+	position relative
+	line-height 1
+	height 400px
+	overflow auto
+
+	& .nav-list
+		height 400px
+
+	& input[type=file]
+		display none
+
+	& .nav-list a
+		padding-right 20px
+
+.columns-inner
+	overflow hidden
+	width 100%
+	position relative
+	
+.columns
+	& .item
+		transition-property left
+		transition-duration 0.3s
+		display block
+
+	& .menu
+		position: relative
+		left 0
+
+	& .submenu
+		position absolute
+		top 0
+		width 100%
+		left 100%
+
+.columns.sub
+	& .menu
+		position absolute
+		left -100%
+		top 0
+		width 100%
+
+	& .submenu
+		position relative
+		left 0
+

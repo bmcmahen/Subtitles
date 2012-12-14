@@ -67,10 +67,10 @@ Template.captions.rendered = function() {
 
 // Helper to set cursor at the end of a textarea's content
 function moveCaretToEnd(el) {
-     var value =  $(el).val(); //store the value of the element
-        $(el).focus().val("");
-        $(el).focus().val(value);
-        $(el).unbind();
+   var value =  $(el).val(); //store the value of the element
+      $(el).focus().val("");
+      $(el).focus().val(value);
+      $(el).unbind();
 }
 
 Template.captions.preserve(['.captions']);
@@ -187,6 +187,8 @@ Template.caption.events({
 
   'keydown textarea' : function(e, t){
 
+  	console.log('keyup', e)
+
     var key = e.which
       , self = this; 
 
@@ -250,6 +252,12 @@ Template.caption.events({
 
           var textareas = document.querySelectorAll('textarea.caption-text')
             , index = $('#' + t.data._id).closest('tr').index()
+
+           // In IE10, the cursor gets screwed up if there arent any other textareas
+           // to focus on. So we need to manually blur it before removing it.
+          if (index === 0) {
+          	$(e.currentTarget).blur(); 
+          }
           
           Subtitles.remove(t.data._id, function(err){
             if (! err)
@@ -265,6 +273,8 @@ Template.caption.events({
     }
 
     if (e.metaKey) {
+
+    	e.preventDefault();
 
       switch(key) {
         // Cmd P : Lengthen end time
@@ -296,6 +306,7 @@ Template.caption.events({
               node.currentTime = endTime - 1.5;          
             }
           }
+
           return false;
 
         // cmd + i : lengthen beginning time
@@ -455,6 +466,10 @@ Template.saving.helpers({
   saveState: function(){
     return Session.get('saving');
   }
-})
+});
+
+Template.captions.preserve({
+	'textarea[id]' : function (node) { return node.id; }
+});
 
 })(); 

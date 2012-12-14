@@ -224,7 +224,7 @@ Template.video.events({
     Session.set('videoPlaying', true)
   },
 
-  'pause, ended, error #video-display': function(e,t){
+  'pause, error #video-display': function(e,t){
     Session.set('videoPlaying', false)
   },
 

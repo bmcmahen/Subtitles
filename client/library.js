@@ -1,15 +1,12 @@
 (function(){
 
+Session.set('columnClass', null);
+
 // Select new Project Flow
 var selectProject = function() {
   Session.set('videoURL', null);
   Session.set('currentVideo', this._id);
 };
-
-
-Template.library.rendered = function(){
-  $('#myCarousel').carousel('pause'); 
-}
 
 
 Template.library.events({
@@ -47,7 +44,7 @@ Template.library.events({
   },
 
   'error #dropzone video' : function(e, t){
-  	console.log('error'); // XXX
+  	Session.set('displayMessage', 'Error Loading Video && There was an error loading your video.');
   },
 
   'loadedmetadata #dropzone video' : function(e, t) {
@@ -90,8 +87,7 @@ Template.library.events({
 
   'click a.project-name' : function(e, t) {
     var self = this; 
-    var i = $(e.currentTarget).closest('li').index();
-    $('#myCarousel').carousel(i + 1);
+    Session.set('columnClass', 'sub');
 
      Meteor.setTimeout(function () {
       selectProject.call(self);
@@ -99,9 +95,12 @@ Template.library.events({
 
     return false;
   }
-})
+});
+
+Template.library.preserve(['.menu', '.submenu']);
 
 Template.library.helpers({
+
   project : function(){
     return Videos.find({});
   },
@@ -110,6 +109,10 @@ Template.library.helpers({
     var types = new Subtitler.Video()
 
     return types.supportedFormats().join(', ')
+  },
+
+  columnClass : function(){
+  	return Session.get('columnClass');
   }
 });
 
@@ -152,6 +155,10 @@ Template.projectSubmenu.events({
     vid.currentTime = vid.duration / 3; 
   },
 
+  'error #drop video' : function(e, t){
+  	Session.set('displayMessage', 'Error Loading Video && There was an error loading your video.');
+  },
+
   'click #drop' : function(e, t) {
     var vid = t.find('input.video-select');
     $(vid).trigger('click');
@@ -171,14 +178,14 @@ Template.projectSubmenu.events({
             Videos.remove(self._id);
             Subtitles.remove({videoId : self._id});
             Session.set('displayMessage', 'Project Deleted & ' + self.name + ' deleted.');
-            $('#myCarousel').carousel(0);
+            Session.set('columnClass', null);
           } 
         });
     return false; 
   },
 
   'click button.go-back' : function(e, t) {
-    $('#myCarousel').carousel(0);
+    Session.set('columnClass', null);
   },
 
   'click .submenu-header button.export-subs' : function(e, t) {
@@ -205,38 +212,19 @@ Template.projectSubmenu.events({
       }  
     };
 
-    // compare duration of videos, to determine if they are the same.
-    // provide warning if they aren't. 
-    if (typeof t.videoNode === 'undefined') {
-      transitionToMain(); 
-      return false;       
-    }
-
-    if (t.data.duration !== t.videoNode.duration) {
-
-      new ui.Confirmation(
-      { title: 'Video Duration Changed',
-        message: 'This video has a different duration than the last video that you used for this project. Are you sure you want to continue?'
-      }).ok('Continue')
-        .cancel('Cancel')
-        .effect('scale')
-        .show(function(ok){
-          if (ok) {
-            Videos.update({_id: Session.get('currentVideo')}, {$set : { duration : t.videoNode.duration }});
-            transitionToMain(); 
-          }
-      });
-
-    } else {
-
-      transitionToMain(); 
-
-    }
+    transitionToMain(); 
 
     return false
 
 }
 
 });
+
+Template.projectSubmenu.helpers({
+	project: function(){
+		if (Session.get('currentVideo'))
+			return Videos.findOne(Session.get('currentVideo'));
+	}
+})
 
 })();
