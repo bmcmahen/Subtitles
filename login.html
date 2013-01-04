@@ -3,9 +3,9 @@
     <!-- login -->
       <div class='container'>
         <div class='row'>
-          <div class='span12'>
+          <div class='span8'>
             <h1 class='header'> Subtitles </h1> <span class='madeby'>by fiddleware</span>
-            <h3> Easily create subtitiles for your videos. For a demo, watch the video below. </h3>
+            <h3> Easily create subtitles for your videos directly in your web browser. For a quick demo, watch the video below. </h3>
           </div>
         </div>
 
@@ -14,11 +14,9 @@
 
         {{#constant}}
           <div class='subtitler-video'>
-              <div class='wrapper'>
               	<a href='#' class='watch-video'>
-              		<img src='./images/screenshots/full.png'>
+              		<img src='./images/intro2.jpg' style='border: 4px solid white; box-sizing: border-box;'>
               	</a>
-              </div>
           </div>
         {{/constant}}
 
@@ -27,25 +25,21 @@
 
          <div class='intro-form-wrapper'>
             <div id='intro-login-form' class='intro-form login'>
-              <div class='wrapper'>
                 <form id='login-form'>
-                  <input type='email' id='login-email' class='large' placeholder='Email'/>
+                  <input type='email' id='login-email' class='large wide' style='margin-top: 0;' placeholder='Email'/>
                   <input type='password' id='login-password' class='large' placeholder='Password'/>
-                  <input type='submit' class='btn green pull-right large'  id='login-button' value='Sign in'/>
+                  <input type='submit' class='btn tan pull-right large'  id='login-button' value='Sign in'/>
                 </form> 
                 <a href='#forgotPassword' data-toggle='modal' id='forgot-password'>Forgot password?</a>
-              </div>
             </div>
 
           <div id='intro-register-form' class='intro-form register'>
            <h2>Not Registered? <light>Sign Up.</light> </h2>
-            <div class='wrapper'>
               <form id='register-form'>
-                <input type='email' id='account-email' class='large' placeholder='Email'/>
-                <input type='password' id='account-password' class='large' placeholder='Password' />
-                <input type='submit' id='create-account' class='btn blue pull-right large wide' value='Create an Account' />
+                <input type='email' id='account-email' class='large wide' placeholder='Email'/>
+                <input type='password' id='account-password' class='large wide' placeholder='Password' />
+                <input type='submit' id='create-account' class='btn pink pull-right large wide' value='Create an Account' />
               </form>
-            </div>
           </div>
 
           <div id='intro-password-form' class='intro-form password-form'>
@@ -55,6 +49,14 @@
           </div>
         </div>
 
+      </div>
+    </div>
+    <div class='row'>
+      <div class='span12'>
+        <ul class='footer'>
+          <li><a href='https://github.com/bmcmahen/Subtitles'>Subtitles on Github</a></li>
+          <li><a href='http://benmcmahen.com'>Made by Ben McMahen</a></li>
+        </ul>
       </div>
     </div>
   </div>

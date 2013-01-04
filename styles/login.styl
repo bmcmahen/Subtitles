@@ -1,67 +1,17 @@
 @import 'nib'
 @import '../styles/bootstrap/variables'
 
-// main page transitions
-// 
 
-// .intro
-// .library
-// .app
-//   position fixed
-//   transition opacity 0.5s ease-in
-//   width 100%
-
-// .intro
-//   top 10%
-//   left 0
-
-// .library
-//   top 15%
-//   left 110%
-//   opacity 0
-
-// .app
-//   top 0
-//   left 110%
-//   opacity 0
-
-// .first
-
-//   & .intro
-//     left 0
-//     opacity 1
-
-// .second
-
-//   & .library
-//     left 0
-//     opacity 1
-
-//   & .intro
-//     left -100%
-//     opacity 0
-
-//   & .app
-//     left 110%
-//     opacity 0
-
-// .third
-  
-//   & .app
-//     left 0
-//     opacity 1
-
-//   & .library, .intro
-//     left -110%
-//     opacity 0
-
-// intro page forms view
 
 .intro-form-wrapper
   position relative
 
 .intro-form
   transition 0.2s opacity ease-out, 0.2s top ease-out
+
+  & h2
+    font-size 16px
+    font-weight 700
 
   & form
     float left
@@ -73,10 +23,9 @@
   & input[type='password']
   & input[type='email']
     margin 4px 0
-    width 272px
 
     &#login-password
-      width 195px
+      width 75%
 
   &.login
     absolute top left
@@ -120,3 +69,42 @@ div.password
     absolute top -40px left 0px
     opacity 0.3
     pointer-events none
+
+a.watch-video
+  display block
+  position relative
+  opacity 1
+  transition opacity .3s
+
+  &:hover
+    opacity 0.8
+
+a.watch-video:before
+  background-image url('/images/controls/playbutton.png')
+  background-repeat no-repeat
+  position absolute
+  top 50%
+  left 50%
+  width 50px
+  height 50px
+  margin-top -25px
+  margin-left -25px
+  content ''
+
+ul.footer
+  padding-left 0
+  margin-top 50px
+  text-align center
+  list-style-type none
+
+  & li
+    display inline-block
+    padding-right 10px
+    padding-left 10px
+    border-right 1px solid #ccc
+
+    & a
+      color #bbb
+
+  & li:last-child
+    border-right none

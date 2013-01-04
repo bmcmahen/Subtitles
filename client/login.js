@@ -59,7 +59,7 @@ Template.intro.rendered = function() {
 Template.intro.events({
 
 	'click .watch-video' : function(e, t){
-		$(e.currentTarget).parent().html('<iframe src="http://player.vimeo.com/video/53719196?badge=0&autoplay=1" width="600" height="329" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>');
+		$(e.currentTarget).parent().html('<iframe src="http://player.vimeo.com/video/53719196?badge=0&autoplay=1" width="620" height="349" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>');
 		return false; 
 	},
   'submit #login-form' : function(e, t) {
@@ -69,15 +69,11 @@ Template.intro.events({
 
     if (isNotEmpty(email, 'loginError') && isNotEmpty(password, 'loginError')) {
 
-      Session.set('loading', true);
-
       Meteor.loginWithPassword(email, password, function(err){
         
         if(err && err.error === 403) {
           Session.set('displayMessage', 'Login Error &' + err.reason);
-          Session.set('loading', false)
         } else {
-          Session.set('loading', false);
           Session.set('currentView', 'library')
           Router.navigate('library');
         }

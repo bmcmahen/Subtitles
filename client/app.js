@@ -114,6 +114,7 @@ Meteor.autosubscribe(function () {
     Meteor.subscribe('subtitles', selectedVideo)
 })
 
+
 /**
  * Main view
  */
@@ -145,35 +146,6 @@ Subtitler.syncCaptions = function(time, options) {
 
   var options = options || {}; 
   options.silence = options.silent || false; 
-
-  // var binarySearch = function(array, currentTime) {
-
-  //   var low = 0;
-  //   var high = array.length - 1;
-  //   var i;
-
-  //   while (low <= high) {
-  //     i = Math.floor((low + high) / 2);
-
-  //     if (array[i].startTime <= currentTime) {
-
-  //       if (array[i].endTime >= currentTime ){
-  //         // this is the one
-  //         return array[i]._id; 
-
-  //       } else {
-  //         low = i + 1;
-  //       }
-  //     }
-
-  //     else {
-  //       high = i - 1;
-  //     }
-  //   } 
-
-  //   return null;
-  // }
-
 
 // Only run the search if its not playing on the same caption.
 
