@@ -234,7 +234,7 @@ Template.video.helpers({
   }
 });
 
-
+// Canvas Loading Animation
 Template.loading.rendered = function(){
   var loading = require('bmcmahen-canvas-loading-animation')
     , spinner = new loading({

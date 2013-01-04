@@ -40,9 +40,7 @@
           <a href='#' class='view-help'>Help</a>
         </li>
       {{#if currentUser}}
-         {{#if loggingIn}}
-            {{> loading}}
-         {{else}}
+         {{#unless loggingIn}}
           <li><a href='#' class='view-library'>Library</a></li>
           <li class='dropdown'>
             <a href='#' class='dropdown-toggle' data-toggle='dropdown'>{{displayName}}<b class='caret'></b></a>
@@ -50,7 +48,11 @@
               <li><a class='logout' href='#' tabindex='-1'>Logout... </a></li>
             </ul>
           </li>
-          {{/if}}
+          {{/unless}}
+      {{/if}}
+
+      {{#if loggingIn}}
+        {{> loading}}
       {{/if}}
 
 
