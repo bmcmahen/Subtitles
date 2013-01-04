@@ -187,8 +187,6 @@ Template.caption.events({
 
   'keydown textarea' : function(e, t){
 
-  	console.log('keyup', e)
-
     var key = e.which
       , self = this; 
 
