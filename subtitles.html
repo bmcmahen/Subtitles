@@ -40,17 +40,17 @@
           <a href='#' class='view-help'>Help</a>
         </li>
       {{#if currentUser}}
-        <li><a href='#' class='view-library'>Library</a></li>
-        <li class='dropdown'>
-          <a href='#' class='dropdown-toggle' data-toggle='dropdown'>{{displayName}}<b class='caret'></b></a>
-          <ul class='dropdown-menu' role='dropdown' aria-labelledby='dropdownMenu' >
-            <li><a class='logout' href='#' tabindex='-1'>Logout... </a></li>
-          </ul>
-        </li>
-      {{/if}}
-
-      {{#if loggingIn}}
-        {{> loading}}
+         {{#if loggingIn}}
+            {{> loading}}
+         {{else}}
+          <li><a href='#' class='view-library'>Library</a></li>
+          <li class='dropdown'>
+            <a href='#' class='dropdown-toggle' data-toggle='dropdown'>{{displayName}}<b class='caret'></b></a>
+            <ul class='dropdown-menu' role='dropdown' aria-labelledby='dropdownMenu' >
+              <li><a class='logout' href='#' tabindex='-1'>Logout... </a></li>
+            </ul>
+          </li>
+          {{/if}}
       {{/if}}
 
 
@@ -62,7 +62,7 @@
 </template>
 
 <template name='loading'>
-       <li> <img id='loader' src='/images/ajax-loader.gif'/> </li>
+       <li id='loading-wrapper'> </li>
 </template>
 
 <template name='body'>

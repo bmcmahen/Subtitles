@@ -58,6 +58,7 @@ var myRouter = Backbone.Router.extend({
 
 Router = new myRouter;
 
+
 (function(){
 
 Meteor.startup(function () {
@@ -232,5 +233,20 @@ Template.video.helpers({
       return vid.name
   }
 });
+
+
+Template.loading.rendered = function(){
+  var loading = require('bmcmahen-canvas-loading-animation')
+    , spinner = new loading({
+        width: 40,
+        height: 40,
+        radius: 9,
+        dotRadius: 1.8
+      });
+
+  var wrapper = this.find('#loading-wrapper');
+
+  wrapper.appendChild(spinner.canvas);
+}
 
 })(); 
