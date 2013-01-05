@@ -2,7 +2,7 @@
  * Timer for saving
  */
 
-// XXX Universal Variable!
+// XXX This is a global variable! And I should be using the Meteor timers!
 
 var myTimer = function(){
   var timer;

@@ -275,6 +275,7 @@ Template.caption.events({
     	e.preventDefault();
 
       switch(key) {
+
         // Cmd P : Lengthen end time
         case 80:
           var endTime = Session.get('endTime')
@@ -349,7 +350,7 @@ Template.caption.events({
           t.find('span').textContent = target.value
           return false
       }
-    }; // end If MetaKey
+    }; 
 
   },
 
@@ -372,6 +373,9 @@ Template.caption.events({
   'click .delete-sub' : function( e, t) {
     var self = this;
     t.find('tr').classList.add('deleted');
+
+    // Delay removal of caption so that we can show an animation. This is
+    // kinda crappy, but is an important visual indicator. 
     Meteor.setTimeout(function () {
       Subtitles.remove({ _id: self._id })
     }, 200); 
@@ -418,6 +422,8 @@ Template.caption.rendered = function(){
   }
 
   // Create slider to adjust startTime and endTime
+  // I'm using the jQuery UI slider because I'm lazy and it works. There 
+  // aren't many great alternatives either. 
   var range = self.find('.time-slider');
   $(range).slider({
     range: true,
