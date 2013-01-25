@@ -33,6 +33,10 @@ Template.library.events({
 
   },
 
+  'dragover #dropzone' : function(e, t) {
+    e.preventDefault(); 
+  },
+
   'dragenter #dropzone' : function(e, t) {
     e.currentTarget.classList.add('target')
     e.currentTarget.innerHTML = '';
@@ -133,6 +137,12 @@ Template.projectSubmenu.events({
     }     
 
     return false
+
+  },
+
+  'dragover .select-video-file' : function(e, t) {
+
+    e.preventDefault(); 
 
   },
 

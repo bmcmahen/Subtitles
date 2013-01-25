@@ -218,6 +218,10 @@ Template.video.events({
       }
 
 
+  },
+
+  'dragover #main-player-drop' : function(e, t){
+    e.preventDefault(); 
   }
 
 });
