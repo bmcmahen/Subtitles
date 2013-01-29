@@ -2,7 +2,7 @@
  * Video Playback Controls
  */
 
-(function(){
+(function(Subtitler){
 
 Template.controls.events({
 
@@ -14,32 +14,33 @@ Template.controls.events({
   },
 
   'change #loop-duration' : function (e, t) {
-    Session.set('loopDuration', Number(e.currentTarget.value))
+    Session.set('loopDuration', +e.currentTarget.value)
   },
 
   'click #skip-to-beginning' : function (e, t) {
     if (Subtitler.videoNode)
-      Subtitler.videoNode.currentTime = 0;
+      Subtitler.videoNode.seekTo(0);
   },
 
   'click #skip-to-end' : function (e, t) {
     if (Subtitler.videoNode)
-      Subtitler.videoNode.currentTime = Subtitler.videoNode.duration;
-
+      Subtitler.videoNode.seekTo(Subtitler.videoNode.getVideoDuration());
   },
 
   'click #play-video' : function (e, t) {
+    console.log('hello');
     var node = Subtitler.videoNode;
+    console.log(Subtitler.videoNode);
     if (node) {
       Session.get('videoPlaying') ? 
-        node.pause() : node.play(); 
+        node.pauseVideo() : node.playVideo(); 
     }
   },
 
   'change #playback-rate' : function (e, t) {
     Session.set('playbackRate', e.currentTarget.value)
     if (Subtitler.videoNode)
-      Subtitler.videoNode.playbackRate = e.currentTarget.value
+      Subtitler.videoNode.setPlaybackRate(e.currentTarget.value);
   }
 
 })
@@ -82,4 +83,4 @@ Template.controls.rendered = function() {
 
 }
 
-})();
+})(Subtitler);

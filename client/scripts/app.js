@@ -59,7 +59,7 @@ var myRouter = Backbone.Router.extend({
 Router = new myRouter;
 
 
-(function(){
+(function(Subtitler){
 
 Meteor.startup(function () {
   Backbone.history.start({ pushState : true });
@@ -162,44 +162,7 @@ if (time > Session.get('endTime') || time < Session.get('startTime')) {
 
 }
 
-Template.video.events({
-
-  'loadedmetadata #video-display' : function(e, t) {
-    Subtitler.videoNode = e.currentTarget;
-  },
-
-  'timeupdate #video-display': function(e, t){
-
-    var node = Subtitler.videoNode; 
-
-    // if dragging, dont run the below logic. It slows things down.     
-    if (Subtitler.draggingCursor)
-      return
-
-    // Updates timeline cursor position
-    Session.set('currentTime', node.currentTime)
-
-    // loop the video, if looping true and if currently playing
-    // this logic should go into reactive function for efficiency
-    var end = Session.get('endTime')
-    if (! end) {
-      Session.set('endTime', node.currentTime + Session.get('loopDuration'))
-      Session.set('startTime', node.currentTime)
-    } 
-    else if (Session.get('looping') && Session.get('videoPlaying')) {
-      if (node.currentTime > end){
-        node.currentTime = Session.get('startTime')
-      }
-    }
-  },
-
-  'playing #video-display': function(e,t){
-    Session.set('videoPlaying', true)
-  },
-
-  'pause, error #video-display': function(e,t){
-    Session.set('videoPlaying', false)
-  },
+Template.mainPlayerView.events({
 
   'click #main-player-drop' : function(e, t) {
     $('input.file').trigger('click');
@@ -208,13 +171,19 @@ Template.video.events({
   'change input.file, drop #main-player-drop' : function(e, t) {
     e.preventDefault(); 
 
+    // Assume it's an HTML video if we're dragging in a file. Then
+    // create a videoURL, and pass this to the videoElement 
+    // constructor. 
     var fileList = e.currentTarget.files || e.dataTransfer.files
       , vid = new Subtitler.Video(fileList)
       , url = vid.createVideoUrl();
 
       if (url) {
-        t.videoURL = url;
         Session.set('videoURL', url)
+        this.videoNode = new Subtitler.VideoElement(url, {
+          target: '#main-player-drop'
+        }).embedVideo();
+        Subtitler.videoNode = this.videoNode;
       }
 
 
@@ -227,16 +196,19 @@ Template.video.events({
 });
 
 Template.video.helpers({
-  fileURL : function() {
-    return Session.get('videoURL');
-  },
 
   projectName : function() {
     var vid = Videos.findOne(Session.get('currentVideo'))
     if (vid)
       return vid.name
   }
+
 });
+
+Template.mainPlayerView.rendered = function(){
+  if (Subtitler.videoNode)
+    Subtitler.videoNode.embedVideo('#main-player-drop'); 
+};
 
 // Canvas Loading Animation
 Template.loading.rendered = function(){
@@ -253,4 +225,4 @@ Template.loading.rendered = function(){
   wrapper.appendChild(spinner.canvas);
 }
 
-})(); 
+})(Subtitler); 

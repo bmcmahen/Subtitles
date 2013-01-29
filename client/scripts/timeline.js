@@ -1,5 +1,5 @@
 // XXX To do: draggingCursor shouldn't be global variable.
-(function(){
+(function(Subtitler){
 
 Template.map.events({
 
@@ -12,8 +12,8 @@ Template.map.events({
     Session.set('endTime', currentSub.endTime)
     Session.set('currentTime', currentSub.startTime)
 
-    if (Subtitler.videoNode && Subtitler.videoNode.currentTime)
-      Subtitler.videoNode.currentTime = currentSub.startTime;
+    if (Subtitler.videoNode && Subtitler.videoNode.getCurrentTime())
+      Subtitler.videoNode.seekTo(currentSub.startTime);
     
     document.getElementById(id).focus(); 
     return false
@@ -29,10 +29,10 @@ Template.map.events({
 Template.map.rendered = function () {
   var self = this;
 
-  self.node = self.find('#video-map')
-  self.marker = self.find('#current-position')
-  self.timelineWrapper = self.find('.timeline-wrapper')
-  self.project = Videos.findOne(Session.get('currentVideo'))
+  self.node = self.find('#video-map');
+  self.marker = self.find('#current-position');
+  self.timelineWrapper = self.find('.timeline-wrapper');
+  self.project = Videos.findOne(Session.get('currentVideo'));
 
   var yScale = d3.scale.linear()
     .domain([0, 4])
@@ -43,8 +43,9 @@ Template.map.rendered = function () {
   var setXScale = function(duration){
     self.xScale = d3.scale.linear()
       .domain([0, self.duration])
-      .range([0, $(self.timelineWrapper).width()])
+      .range([0, $(self.timelineWrapper).width()]);
   }
+
 
 
   // Draws the captions
@@ -115,11 +116,7 @@ Template.map.rendered = function () {
           return sub._id; 
         })
 
-      // drawSubs(self.captions.transition().duration(400));
-
       drawTimeline(); 
-
-
 
     });
   }
@@ -145,60 +142,60 @@ Template.map.rendered = function () {
   // Once I have both of these, then I can draw the timeline. 
   // Once I have all of the subtitles loaded, then i can draw the subtitles. 
 
-  var updateMarkerPosition = function(currentTime) {
-     var xAxis = self.xScale ? self.xScale(currentTime) : 0; 
+  // var updateMarkerPosition = function(currentTime) {
+  //    var xAxis = self.xScale ? self.xScale(currentTime) : 0; 
 
-        d3.select(self.marker)
-          .transition()
-          .duration(200)
-          .attr('x1', xAxis)
-          .attr('x2', xAxis)
-  }
+  //       d3.select(self.marker)
+  //         .transition()
+  //         .duration(200)
+  //         .attr('x1', xAxis)
+  //         .attr('x2', xAxis)
+  // }
 
-  // PLAYBACK POSITION
-  // if Session.get('currentTime') changes, redraw the playback position marker
-  if (! self.playbackPosition) {
-    if (! Subtitler.draggingCursor) {
-      self.playbackPosition = Meteor.autorun(function () {
+  // // PLAYBACK POSITION
+  // // if Session.get('currentTime') changes, redraw the playback position marker
+  // if (! self.playbackPosition) {
+  //   if (! Subtitler.draggingCursor) {
+  //     self.playbackPosition = Meteor.autorun(function () {
 
-        var currentTime = Session.get('currentTime')
-        updateMarkerPosition(currentTime);
+  //       var currentTime = Session.get('currentTime')
+  //       updateMarkerPosition(currentTime);
 
-      })
-    }
-  }
+  //     });
+  //   }
+  // }
 
-  // Timeline event handlers in d3 which don't work well with native Meteor
-  var setMarkerPostion = function(options) {
-    var options = options || false 
-      , xPosition = d3.mouse(self.timelineWrapper)[0];
+  // // Timeline event handlers in d3 which don't work well with native Meteor
+  // var setMarkerPostion = function(options) {
+  //   var options = options || false 
+  //     , xPosition = d3.mouse(self.timelineWrapper)[0];
 
-        if (xPosition >= 0 && xPosition <= $(self.timelineWrapper).width()) {
+  //       if (xPosition >= 0 && xPosition <= $(self.timelineWrapper).width()) {
 
-          // Don't animate while dragging
-          if (options.animate)
-            d3.select(self.marker)
-              .transition()
-              .duration(200)
-              .attr('x1', xPosition)
-              .attr('x2', xPosition);
-          else
-            d3.select(self.marker)
-              .attr('x1', xPosition)
-              .attr('x2', xPosition);
+  //         // Don't animate while dragging
+  //         if (options.animate)
+  //           d3.select(self.marker)
+  //             .transition()
+  //             .duration(200)
+  //             .attr('x1', xPosition)
+  //             .attr('x2', xPosition);
+  //         else
+  //           d3.select(self.marker)
+  //             .attr('x1', xPosition)
+  //             .attr('x2', xPosition);
 
-          if (Subtitler.videoNode)
-            Subtitler.videoNode.currentTime = self.xScale.invert(xPosition);
+  //         if (Subtitler.videoNode)
+  //           Subtitler.videoNode.seekTo(self.xScale.invert(xPosition));
           
-          Session.set('startTime', null)
-          Session.set('endTime', null)
+  //         Session.set('startTime', null)
+  //         Session.set('endTime', null)
 
-          if (options.sync) {
-            Subtitler.syncCaptions(self.xScale.invert(xPosition));
-          }
+  //         if (options.sync) {
+  //           Subtitler.syncCaptions(self.xScale.invert(xPosition));
+  //         }
 
-        }
-  };
+  //       }
+  // };
 
     // If dragging the cursor during mouse movement, set position of marker.
     d3.select(window).on('mousemove', function(e, d) {
@@ -219,7 +216,7 @@ Template.map.rendered = function () {
           Session.set('currentTime', self.xScale.invert(x));
         }
 
-        Subtitler.syncCaptions(self.xScale.invert(x));
+        Subtitler.videoNode.syncCaptions(self.xScale.invert(x));
       } 
     });
 
@@ -247,4 +244,4 @@ Template.map.destroyed = function () {
   self.playbackPosition && self.playbackPosition.stop(); 
 };
 
-})(); 
+})(Subtitler); 

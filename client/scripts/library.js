@@ -1,4 +1,4 @@
-(function(){
+(function(Subtitler){
 
 Session.set('columnClass', null);
 
@@ -27,7 +27,11 @@ Template.library.events({
 
     if (url) {
       t.videoURL = url; 
-      vid.embedVideo('#dropzone', {projectName : '#project-name'})
+      Subtitler.videoNode = new Subtitler.VideoElement(url, {
+        type: 'html',
+        target: '#dropzone'
+      }).embedVideo(); 
+      console.log(Subtitler.videoNode);
       Session.set('videoURL', url)
     }     
 
@@ -237,4 +241,4 @@ Template.projectSubmenu.helpers({
 	}
 })
 
-})();
+})(Subtitler);

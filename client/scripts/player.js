@@ -8,28 +8,37 @@
  *
  */
 
-(function(Subtitler, YT){
+(function(Subtitler){
 
   // Constructor
   // 
   // src = either a video URL, or Blob URL (if embedding locally)
   // type = either 'youtube' or 'html'
-  var VideoElement = function(src, type){
+  var VideoElement = function(src, options){
+    var options = options || {};
 
-    if (!type)
-      return
-
+    this.type = options.type || 'html';
+    this.target = options.target || '#player';
     this.isReady = false; 
 
     // If we're embedding a youtube video, use the 
     // following constructor.
-    if (type === 'youtube') {
-      this.isYoutube = true;
-      this.videoNode = new YT.Player('player', {
-        height: '390',
-        width: '640',
-        videoId: src
-      });
+    if (this.type === 'youtube') {
+      // Async load the required script for youtube
+      var tag = document.createElement('script');
+      tag.src = "//www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      function onYouTubeIframeAPIReady() {
+        // Build the iframe
+        this.isYoutube = true;
+        this.videoNode = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: src
+        });
+      }
     }
 
     // If we're embedding an HTML video, use the 
@@ -37,21 +46,18 @@
     // 
     // Will this work if we supply a regular HTML5 URL
     // instead of constructing the blob url?
-    if (type === 'html') {
+    if (this.type === 'html') {
       this.isHTML = true; 
       var el = this.videoNode = document.createElement('video');
       el.setAttribute('id', 'video-display');
       el.src = src;
-      $('player').html(el);
     }
 
     // XXX Vimeo embed code
-    if (type === 'vimeo') {
+    if (this.type === 'vimeo') {
+      this.isVimeo = true; 
       // https://developer.vimeo.com/player/embedding
     }
-
-    // XXX Only call this once video is onReady?
-    this.bindReady(); 
 
   };
 
@@ -66,7 +72,7 @@
     onTimeUpdate: function(){
 
       if (Subtitler.draggingCursor)
-        return
+        return;
 
       var currentTime = this.getCurrentTime()
         , end = Session.get('endTime')
@@ -79,7 +85,7 @@
         Session.set('endTime', currentTime + duration);
         Session.set('startTime', currentTime);
       } else if (Session.get('looping') 
-          && Session.get('videPlaying')
+          && Session.get('videoPlaying')
           && currentTime > end) {
         this.seekTo(start);
       }
@@ -93,6 +99,7 @@
     },
 
     onPauseOrError: function(){
+      console.log('pause or error');
       Session.set('videoPlaying', false);
       if (this.isYoutube && this.youtubeInterval)
         Meteor.clearInterval(this.youtubeInterval);
@@ -132,14 +139,16 @@
       // HTML5 Events
       } else if (this.isHTML) {
         vid.addEventListener('playing', _.bind(this.onPlayback, this));
-        vid.addEventListener('pause, error', _.bind(this.onPauseOrError, this));
+        vid.addEventListener('pause', _.bind(this.onPauseOrError, this));
+        vid.addEventListener('error', _.bind(this.onPauseOrError, this));
         vid.addEventListener('timeupdate', _.bind(this.onTimeUpdate, this));
  
       // Vimeo Events     
       } else if (this.isVimeo) {
         vid.addEventListener('playProgress, seek', _.bind(this.onTimeUpdate, this));
         vid.addEventListener('play', _.bind(this.onPlayback, this));
-        vid.addEventListener('pause, finish', _.bind(this.onPauseOrError, this));
+        vid.addEventListener('pause', _.bind(this.onPauseOrError, this));
+        vid.addEventListener('finish', _.bind(this.onPauseOrError, this));
       }
     },
 
@@ -159,7 +168,7 @@
 
     // Playback Control / State
     getCurrentTime: function(){
-      this.isHTML
+      return this.isHTML
         ? this.videoNode.currentTime
         : this.videoNode.getCurrentTime(); 
     },
@@ -176,8 +185,8 @@
         : this.videoNode.play(); 
     },
 
-    getVideoDuration: function{
-      this.isHTML
+    getVideoDuration: function(){
+      return this.isHTML
         ? this.videoNode.duration
         : this.videoNode.getDuration(); 
     },
@@ -195,6 +204,20 @@
         this.videoNode.setPlaybackRate(rate)
       else if (this.isHTML)
         this.videoNode.playbackRate = rate; 
+    },
+
+    setTarget: function(target){
+      this.target = target; 
+      return this;
+    },
+
+    embedVideo: function(target) {
+      target && this.setTarget(target);
+      $(this.target).html(this.videoNode);
+
+      // XXX Only call this once video is onReady?
+      this.bindReady(); 
+      return this;
     },
 
     // Sync our video with our captions
@@ -222,4 +245,4 @@
   // Expose this class to the world.
   Subtitler.VideoElement = VideoElement; 
 
-})(Subtitler, YT);
+})(Subtitler);

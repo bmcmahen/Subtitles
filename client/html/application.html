@@ -44,19 +44,8 @@
   <div class='row-fluid'>
     <div class='span12'>
         <div class='video-dropzone'>
-          {{#if fileURL}}
-          <video id='video-display' src='{{fileURL}}'>
-          </video>
-          {{else}}
 
-            <div id='main-player-drop' class='dropzone'>
-              <p> 
-                <strong>Drop video</strong> or <strong> Click </strong> to select video source.
-              </p>
-            </div>
-            <input type='file' class='file' style='display:none'/>
-
-          {{/if}}
+          {{> mainPlayerView}}
         </div>
       </div>
 
@@ -67,6 +56,17 @@
 
 </template>
 
+<template name='mainPlayerView'>
+   {{#constant}}
+    <div id='main-player-drop' class='dropzone'>
+      <p> 
+        <strong>Drop video</strong> or <strong> Click </strong> to select video source.
+      </p>
+    </div>
+    <form id='external-url'>
+    <input type='file' class='file' style='display:none'/>
+  {{/constant}}
+</template>
 
 <template name='controls'>
   <div class='row-fluid'>
