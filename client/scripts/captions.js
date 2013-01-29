@@ -2,7 +2,7 @@
  * CAPTIONS
  */
 
-(function(){
+(function(Subtitler){
 
 // Load video
 Template.application.helpers({
@@ -182,7 +182,7 @@ Template.caption.events({
     };
 
     if (Subtitler.videoNode)
-      Subtitler.videoNode.currentTime =  self.startTime; 
+      Subtitler.videoNode.seekTo(self.startTime);
   },
 
   'keydown textarea' : function(e, t){
@@ -285,8 +285,8 @@ Template.caption.events({
 
           // sync video 1 seconds before new endTime
           var node = Subtitler.videoNode; 
-          if (node && node.currentTime) {
-            node.currentTime = endTime - 1;
+          if (node && node.getCurrentTime()) {
+            node.seekTo(endTime - 1);
           }
 
           return false;
@@ -301,8 +301,8 @@ Template.caption.events({
             Session.set('endTime', endTime - 0.5)
 
             var node = Subtitler.videoNode;
-            if (node && node.currentTime) {
-              node.currentTime = endTime - 1.5;          
+            if (node && node.getCurrentTime()) {
+              node.seekTo(endTime - 1.5);          
             }
           }
 
@@ -317,7 +317,7 @@ Template.caption.events({
 
           var node = Subtitler.videoNode;
           if (node)
-            node.currentTime = startTime + 0.5
+            node.seekTo(startTime + 0.5);
 
           return false;
 
@@ -336,7 +336,7 @@ Template.caption.events({
 
           var node = Subtitler.videoNode;
           if (node)
-            node.currentTime = newStart;
+            node.seekTo(newStart);
 
           return false
   
@@ -447,14 +447,14 @@ Template.caption.rendered = function(){
           if (! isValidStartTime(v, self.data.endTime))
             return false
           
-          Subtitler.videoNode.currentTime = v;
+          Subtitler.videoNode.seekTo(v);
 
         } else {
 
           if (! isValidEndTime(v, self.data.startTime))
             return false
 
-          Subtitler.videoNode.currentTime = ui.value -1.5; 
+          Subtitler.videoNode.seekTo(ui.value -1.5); 
         }
 
 
@@ -476,4 +476,4 @@ Template.captions.preserve({
 	'textarea[id]' : function (node) { return node.id; }
 });
 
-})(); 
+})(Subtitler); 

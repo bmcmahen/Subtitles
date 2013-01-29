@@ -25,6 +25,10 @@
 
     // If we're embedding a youtube video, use the 
     // following constructor.
+    // 
+    // NOTE: This actually embeds the youtube video. So if
+    // we go to another page, we'll have to use this constructor
+    // again. Embeds should be in a separate function.
     if (this.type === 'youtube') {
       // Async load the required script for youtube
       var tag = document.createElement('script');
@@ -200,6 +204,7 @@
     },
 
     seekTo: function(number){
+      console.log('player seeking');
       this.isHTML
         ? this.videoNode.currentTime = number
         : this.videoNode.seekTo(number); 
