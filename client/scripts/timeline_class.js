@@ -2,8 +2,11 @@
  * A new Timeline Class
  */
 
+/*jshint laxcomma:true */
+
 (function(Subtitler, d3){
 
+  // Timeline Constructor
   var Timeline = function(attr){
     attr = attr || {};
 
@@ -13,28 +16,41 @@
     this.project = attr.project;
 
     this.draggingCursor = false; 
+    this.druation = this.project.duration; 
 
-    // Duration?
-  }
+    this.setYScale().setXScale(); 
+    this.bindEvents(); 
+  };
 
+  // Timeline Functions
   _.extend(Timeline.prototype, {
 
+    // determine our Y scale. Constant...
     setYScale : function(){
       this.yScale = d3.scale.liner()
         .domain([0, 4])
         .range([10, 60]);
+      return this;
     },
 
+    // determine our X scale. This is dependent
+    // upon our wrapper width and the duration of the video.
     setXScale : function(){
       this.xScale = d3.scale.linear()
         .domain([0, this.duration])
         .range([0, $(this.wrapper).width()]);
+      return this;
+    },
+
+    setDuration: function(time){
+      this.duration = time; 
+      return this;
     },
 
     // Determine the WPM of a supplied caption
-    getWPMRatio : function(caption){
+    getWPMRatio : function(cap){
       var dataLength = typeof cap.text === 'undefined' ? 11 : cap.text.split(' ').length
-      , duration = cap.endTime - cap.startTime;
+        , duration = cap.endTime - cap.startTime;
     
       return dataLength / duration;
     },
@@ -60,7 +76,7 @@
         .attr('x', function (cap) { return self.xScale(cap.startTime); })
         .attr('y', function (cap) { return '-' + self.yScale(self.getWPMRatio(cap)); })
         .attr('width', function (cap) { 
-          return self.xScale(cap.endTime) - self.xScale(cap.startTime)
+          return self.xScale(cap.endTime) - self.xScale(cap.startTime);
         })
         .attr('height', function (cap) {
           return self.yScale(self.getWPMRatio(cap)); 
@@ -105,15 +121,15 @@
 
     // Our basic events start here. If we are dragging our cursor
     // on the timeline, we run this. 
-    setMarkerPosition: function(options) {
+    setMarkerPosition: function(opts) {
       var self = this
-        , options = options || false 
+        , opts = opts || false 
         , xPosition = d3.mouse(self.timelineWrapper)[0];
 
       if (xPosition >= 0 && xPosition <= $(self.timelineWrapper).width()) {
 
         // Don't animate while dragging
-        if (options.animate)
+        if (opts.animate)
           d3.select(self.marker)
             .transition()
             .duration(200)
@@ -127,10 +143,10 @@
         if (Subtitler.videoNode)
           Subtitler.videoNode.seekTo(self.xScale.invert(xPosition));
         
-        Session.set('startTime', null)
-        Session.set('endTime', null)
+        Session.set('startTime', null);
+        Session.set('endTime', null);
 
-        if (options.sync) {
+        if (opts.sync) {
           Subtitler.syncCaptions(self.xScale.invert(xPosition));
         }
       }
@@ -139,13 +155,13 @@
     onMouseUp: function(){
       if (this.draggingCursor) {
         this.draggingCursor = false;
-        var x = d3.select(self.marker).attr('x1');
+        var x = d3.select(this.marker).attr('x1');
 
-        if (x >= 0 && x <= self.node.clientWidth) {
-          Session.set('currentTime', self.xScale.invert(x));
+        if (x >= 0 && x <= this.node.clientWidth) {
+          Session.set('currentTime', this.xScale.invert(x));
         }
 
-        Subtitler.videoNode.syncCaptions(self.xScale.invert(x));
+        Subtitler.videoNode.syncCaptions(this.xScale.invert(x));
       } 
     },
 
@@ -171,9 +187,9 @@
       d3.select(window).on('resize', _.debounce(_.bind(this.onWindowResize, this), 300));
     }
 
+  });
 
-
-
-  })
+  // Attach to our global.
+  Subtitler.Timeline = Timeline;  
   
 })(Subtitler, d3);
