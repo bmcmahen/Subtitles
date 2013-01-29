@@ -8,7 +8,9 @@
  *
  */
 
-(function(Subtitler){
+
+(function(Subtitler, window){
+
 
   // Constructor
   // 
@@ -30,14 +32,19 @@
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-      function onYouTubeIframeAPIReady() {
+      // The async callback provided by YouTube
+      var self = this; 
+      window.onYouTubeIframeAPIReady = function(){
         // Build the iframe
-        this.isYoutube = true;
-        this.videoNode = new YT.Player('player', {
-          height: '390',
-          width: '640',
-          videoId: src
+        self.isYoutube = true;
+        self.videoNode = new YT.Player(self.target, {
+          width: '400',
+          videoId: src,
+          playerVars: {
+            controls: 0
+          }
         });
+        self.bindReady(); 
       }
     }
 
@@ -93,6 +100,7 @@
     },
 
     onPlayback: function(){
+      console.log('on playback called');
       Session.set('videoPlaying', true);
       if (this.isYoutube)
         this.youtubeTimeUpdate();
@@ -118,7 +126,7 @@
     // timeupdate interval fires (i think) at different rates 
     // depending on system load. We'll just stick with a conservative(?) 250. 
     youtubeTimeUpdate: function(stop){
-      var update = _.bind(onTimeUpdate, this);
+      var update = _.bind(this.onTimeUpdate, this);
       this.youtubeInterval && Meteor.clearInterval(this.youtubeInterval);
       this.youtubeInterval = Meteor.setInterval(update, 250);
     },
@@ -131,8 +139,8 @@
       // Youtube Events
       if (this.isYoutube) {
         vid.addEventListener('onStateChange', function(state){
-          if (state === 1) self.onPlayback();
-          if (state === 0 || state === 2) self.onPauseOrError();
+          if (state.data === 1) self.onPlayback();
+          if (state.data === 0 || state.data === 2) self.onPauseOrError();
         });
         vid.addEventListener('onError', _.bind(this.onPauseOrError, this));
 
@@ -245,4 +253,4 @@
   // Expose this class to the world.
   Subtitler.VideoElement = VideoElement; 
 
-})(Subtitler);
+})(Subtitler, window);

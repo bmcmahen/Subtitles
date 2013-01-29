@@ -30,7 +30,6 @@ Template.controls.events({
   'click #play-video' : function (e, t) {
     console.log('hello');
     var node = Subtitler.videoNode;
-    console.log(Subtitler.videoNode);
     if (node) {
       Session.get('videoPlaying') ? 
         node.pauseVideo() : node.playVideo(); 
@@ -42,8 +41,8 @@ Template.controls.events({
     if (Subtitler.videoNode)
       Subtitler.videoNode.setPlaybackRate(e.currentTarget.value);
   }
-
-})
+  
+});
 
 Template.controls.helpers({
 

@@ -191,7 +191,16 @@ Template.mainPlayerView.events({
 
   'dragover #main-player-drop' : function(e, t){
     e.preventDefault(); 
+  },
+
+  'click #try-youtube' : function(e, t){
+    this.videoNode = new Subtitler.VideoElement('jNwXsTJddVo', {
+      target: 'main-player-drop',
+      type: 'youtube'
+    });
+    Subtitler.videoNode = this.videoNode;
   }
+
 
 });
 
