@@ -10,13 +10,15 @@
   var Timeline = function(attr){
     attr = attr || {};
 
+    console.log(attr);
+
     this.node = attr.node;
     this.marker = attr.marker;
     this.wrapper = attr.wrapper;
     this.project = attr.project;
 
     this.draggingCursor = false; 
-    this.druation = this.project.duration; 
+    this.duration = this.project.duration; 
 
     this.setYScale().setXScale(); 
     this.bindEvents(); 
@@ -27,7 +29,7 @@
 
     // determine our Y scale. Constant...
     setYScale : function(){
-      this.yScale = d3.scale.liner()
+      this.yScale = d3.scale.linear()
         .domain([0, 4])
         .range([10, 60]);
       return this;
@@ -96,8 +98,8 @@
     drawTimeline : function(){
       var self = this;
 
-      self.drawSubs(self.captions.enter().append('rect'));
-      self.drawSubs(self.captions.transition().duration(400));
+      self.drawSubtitles(self.captions.enter().append('rect'));
+      self.drawSubtitles(self.captions.transition().duration(400));
       self.captions
         .exit()
         .transition()
@@ -124,9 +126,11 @@
     setMarkerPosition: function(opts) {
       var self = this
         , opts = opts || false 
-        , xPosition = d3.mouse(self.timelineWrapper)[0];
+        , xPosition = d3.mouse(self.wrapper)[0];
 
-      if (xPosition >= 0 && xPosition <= $(self.timelineWrapper).width()) {
+        console.log('set marker position');
+
+      if (xPosition >= 0 && xPosition <= $(self.wrapper).width()) {
 
         // Don't animate while dragging
         if (opts.animate)
@@ -146,8 +150,8 @@
         Session.set('startTime', null);
         Session.set('endTime', null);
 
-        if (opts.sync) {
-          Subtitler.syncCaptions(self.xScale.invert(xPosition));
+        if (opts.sync && Subtitler.videoNode) {
+          Subtitler.videoNode.syncCaptions(self.xScale.invert(xPosition));
         }
       }
     },
@@ -168,21 +172,23 @@
     onWindowResize: function(){
       this.setXScale();
       this.drawClickZone();
-      this.drawSubs(this.captions.transition().duration(400));
+      this.drawSubtitles(this.captions.transition().duration(400));
       this.updateMarkerPosition(Session.get('currentTime'));
     },
 
     bindEvents: function(){
+      var self = this; 
+
       d3.select(window).on('mousemove', function(){
-        if (!this.draggingCursor) return;
-        this.setMarkerPosition();
-      }, this);
+        if (!self.draggingCursor) return;
+        self.setMarkerPosition();
+      });
 
       d3.select(window).on('mouseup', _.bind(this.onMouseUp, this));
 
       d3.select(self.node).select('.timeline-click-zone').on('click', function(){
-        this.setMarkerPosition({ animate: true, sync: true });
-      }, this);
+        self.setMarkerPosition({ animate: true, sync: true });
+      });
 
       d3.select(window).on('resize', _.debounce(_.bind(this.onWindowResize, this), 300));
     }

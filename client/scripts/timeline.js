@@ -29,8 +29,8 @@ Template.map.events({
   },
 
   // Initiates a marker dragging event
-  'mousedown #current-position' : function () {
-    this.timeline.draggingCursor = true; 
+  'mousedown #current-position' : function (e, t) {
+    t.timeline.draggingCursor = true; 
     return false;
   }
 
@@ -42,12 +42,17 @@ Template.map.events({
 // and current video. 
 Template.map.rendered = function () {
 
-  var timeline = this.timeline = new Subtitler.timeline({
-    node : this.find('#video-map'),
-    marker : this.find('#current-position'),
-    wrapper : this.find('.timeline-wrapper'),
-    project : Videos.findOne(Session.get('currentVideo'))
-  });
+  var self = this
+    , timeline;
+
+  var constructTimeline = function(){
+   timeline = self.timeline = new Subtitler.Timeline({
+      node : self.find('#video-map'),
+      marker : self.find('#current-position'),
+      wrapper : self.find('.timeline-wrapper'),
+      project : Videos.findOne(Session.get('currentVideo'))
+    });
+  }
 
   // DRAW TIMELINE
   // if Subtitles collection changes, redraw changed captions. In effect,
@@ -56,6 +61,9 @@ Template.map.rendered = function () {
     this.drawTimeline = Meteor.autorun(function() {
 
       var subtitles = Subtitles.find().fetch();
+
+      if (!timeline)
+        return;
       
       timeline.captions = d3.select(timeline.node)
         .select('.caption-spans')
@@ -75,6 +83,9 @@ Template.map.rendered = function () {
     this.drawCaptions = Meteor.autorun(function() {
       var video = Videos.findOne(Session.get('currentVideo'));
       if (video) {
+
+        if (!timeline) constructTimeline(); 
+
         timeline
           .setDuration(video.duration)
           .setXScale()
@@ -86,14 +97,17 @@ Template.map.rendered = function () {
   // PLAYBACK POSITION
   // if Session.get('currentTime') changes, redraw the playback position marker
   if (! this.playbackPosition) {
-    if (! timeline.draggingCursor) {
       this.playbackPosition = Meteor.autorun(function () {
-
         var currentTime = Session.get('currentTime');
-        timeline.updateMarkerPosition(currentTime);
 
+        if (!timeline)
+          return;
+        
+        if (timeline.draggingCursor)
+          return; 
+
+        timeline.updateMarkerPosition(currentTime);
       });
-    }
   }
 
 }; // End of Template Rendered
