@@ -128,8 +128,6 @@
         , opts = opts || false 
         , xPosition = d3.mouse(self.wrapper)[0];
 
-        console.log('set marker position');
-
       if (xPosition >= 0 && xPosition <= $(self.wrapper).width()) {
 
         // Don't animate while dragging
@@ -161,7 +159,7 @@
         this.draggingCursor = false;
         var x = d3.select(this.marker).attr('x1');
 
-        if (x >= 0 && x <= this.node.clientWidth) {
+        if (x >= 0 && x <= $(this.node).width()) {
           Session.set('currentTime', this.xScale.invert(x));
         }
 

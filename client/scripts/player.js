@@ -53,7 +53,7 @@
     }
 
     // If we're embedding an HTML video, use the 
-    // following constructor. 
+    // following constructor.
     // 
     // Will this work if we supply a regular HTML5 URL
     // instead of constructing the blob url?
@@ -67,6 +67,15 @@
     // XXX Vimeo embed code
     if (this.type === 'vimeo') {
       this.isVimeo = true; 
+
+      // Construct the iFrame and append it to the DOM.
+      // Then this.videoNode = $f(iframe);
+      // 
+      // Import froogaloop.js first
+      //<iframe src="http://player.vimeo.com/video/VIDEO_ID?api=1" width="WIDTH" 
+      // height="HEIGHT" frameborder="0" webkitAllowFullScreen 
+      // mozallowfullscreen allowFullScreen></iframe>
+      // 
       // https://developer.vimeo.com/player/embedding
     }
 
