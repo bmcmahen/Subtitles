@@ -10,8 +10,6 @@
   var Timeline = function(attr){
     attr = attr || {};
 
-    console.log(attr);
-
     this.node = attr.node;
     this.marker = attr.marker;
     this.wrapper = attr.wrapper;
@@ -22,6 +20,8 @@
 
     this.setYScale().setXScale(); 
     this.bindEvents(); 
+
+    Subtitler.timeline = this; 
   };
 
   // Timeline Functions
@@ -119,6 +119,18 @@
         .attr('x2', xAxis);
     },
 
+    // Appends our subtitles reactive data source to our
+    // d3 captions.
+    appendData : function(subtitles){
+      this.captions = d3.select(this.node)
+        .select('.caption-spans')
+        .selectAll('rect')
+        .data(subtitles, function(sub){
+          return sub._id;
+        });
+      return this; 
+    },
+
     // Events:
 
     // Our basic events start here. If we are dragging our cursor
@@ -163,7 +175,9 @@
           Session.set('currentTime', this.xScale.invert(x));
         }
 
-        Subtitler.videoNode.syncCaptions(this.xScale.invert(x));
+        Subtitler.videoNode.syncCaptions(this.xScale.invert(x), {
+          silent: true
+        });
       } 
     },
 

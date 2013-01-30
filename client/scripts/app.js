@@ -198,7 +198,13 @@ Template.mainPlayerView.events({
       target: 'main-player-drop',
       type: 'youtube'
     });
-    Subtitler.videoNode = this.videoNode;
+  },
+
+  'click #try-vimeo' : function(e, t){
+    this.videoNode = new Subtitler.VideoElement('58179312', {
+      target: '#main-player-drop',
+      type: 'vimeo'
+    });
   }
 
 

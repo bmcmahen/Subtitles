@@ -9,7 +9,7 @@ input[type='submit'].btn
   color white
   border-radius 2px
   margin 3px
-  background-color #757575
+  background-color rgb(177, 177, 177)
   border none
   padding 5px 11px
 
@@ -49,9 +49,12 @@ input[type='submit'].btn
 .toolbar input[type='button'].btn,
 .toolbar .btn
   padding 5px 13px
-
-#hints
-  margin 5px
+  border 1px solid #aaa
+  border-bottom none
+  box-shadow 1px -1px 4px rgba(0,0,0,0.1)
+  border-bottom-left-radius 0px
+  border-bottom-right-radius 0px
+  font-size 13px
 
 .close
   float right
@@ -84,7 +87,7 @@ div.btn-group
 
     &:first-child
       border-top-left-radius 2px
-      border-bottom-left-radius 2px
+      border-bottom-left-radius 0px
       margin-left 0px
 
   & button.active
@@ -102,7 +105,7 @@ fieldset > .btn:last-child
 .btn-group > .btn:last-child
 .btn-group > .dropdown-toggle
   border-top-right-radius 2px !important
-  border-bottom-right-radius 2px !important
+  border-bottom-right-radius 0px !important
 
 input
   border 0px
@@ -196,9 +199,8 @@ a.video-controls
     &:hover
       background-position -5px 0px
 
-
-#export-subtitles
-  margin-right 0px
+#import-subtitles
+  margin-right 0
 
 .controls
   margin-top 12px
@@ -208,36 +210,6 @@ a.video-controls
   margin-top 8px
   text-align center
 
-
-// .intro hr
-//   width 220px
-
-// .login-errors
-//   position absolute
-//   top 10px
-//   left 230px
-//   width 100px
-//   text-align center
-//   opacity 0
-//   transform scale3d(0.001, 0.001, 1)
-//   z-index 1
-//   background rgba(60, 60, 60, 0.85)
-//   border 2px solid white
-//   color white
-//   font-size 11px
-//   border-radius 5px
-//   padding 10px
-//   box-shadow 1px 1px 15px rgba(0, 0, 0, 0.45)
-//   pointer-events none
-//   transition-property opacity, -webkit-transform
-//   transition-duration 0.2s
-
-
-//   &.visible
-//     opacity 0.8
-//     transform scale3d(1,1,1)
-//     transform-style preserve-3d
-//     backface-visibility hidden
-
-// input#reset-email-field
-//   border 1px solid #aaa
+.btn.tan
+  border 1px solid rgb(187, 187, 187)
+  border-bottom none

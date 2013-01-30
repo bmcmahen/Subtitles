@@ -28,7 +28,6 @@ Template.controls.events({
   },
 
   'click #play-video' : function (e, t) {
-    console.log('hello');
     var node = Subtitler.videoNode;
     if (node) {
       Session.get('videoPlaying') ? 

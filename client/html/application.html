@@ -65,6 +65,7 @@
     </div>
     <form id='external-url'>
       <a href='#' id='try-youtube'>Try Youtube</a>
+      <a href='#' id='try-vimeo'>Try Vimeo</a>
     <input type='file' class='file' style='display:none'/>
   {{/constant}}
 </template>
@@ -132,13 +133,12 @@
   <input type='file' id='import-subtitles-file' style='display: none;'/>
   <div class='row-fluid'>
     <div class='span12 toolbar'>
-        <!-- <input type='text' placeholder='Search Captions'/> -->
         <input type='button' class='btn pink pull-left' value='Insert Caption' id='insert-new-caption'/>
           {{> saving}}
 
-          <div class='btn-group'>
-            <button class='btn' id='import-subtitles'>Import</button><button class='btn' id='export-subtitles'> Export </button>
-          </div>
+          <button class='btn tan pull-right' id='import-subtitles'>Import</button>
+
+          <button class='btn tan pull-right' id='export-subtitles'> Export </button>
 
          <button class='btn pull-right' id='hints'>Hints</button>
            

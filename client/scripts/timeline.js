@@ -52,28 +52,20 @@ Template.map.rendered = function () {
       wrapper : self.find('.timeline-wrapper'),
       project : Videos.findOne(Session.get('currentVideo'))
     });
-  }
+  };
+
 
   // DRAW TIMELINE
   // if Subtitles collection changes, redraw changed captions. In effect,
   // this also runs if the selected video changes.
   if (! this.drawTimeline) {
     this.drawTimeline = Meteor.autorun(function() {
-
       var subtitles = Subtitles.find().fetch();
 
       if (!timeline)
         return;
-      
-      timeline.captions = d3.select(timeline.node)
-        .select('.caption-spans')
-        .selectAll('rect')
-        .data(subtitles, function (sub) {
-          return sub._id; 
-        });
-
-      timeline.drawTimeline(); 
-
+    
+      timeline.appendData(subtitles).drawTimeline();
     });
   }
 

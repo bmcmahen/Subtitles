@@ -42,7 +42,7 @@
         // Build the iframe
         self.isYoutube = true;
         self.videoNode = new YT.Player(self.target, {
-          width: '400',
+          width: '100%',
           videoId: src,
           playerVars: {
             controls: 0
@@ -64,20 +64,22 @@
       el.src = src;
     }
 
-    // XXX Vimeo embed code
+    // Vimeo embed. 
     if (this.type === 'vimeo') {
       this.isVimeo = true; 
-
-      // Construct the iFrame and append it to the DOM.
-      // Then this.videoNode = $f(iframe);
-      // 
-      // Import froogaloop.js first
-      //<iframe src="http://player.vimeo.com/video/VIDEO_ID?api=1" width="WIDTH" 
-      // height="HEIGHT" frameborder="0" webkitAllowFullScreen 
-      // mozallowfullscreen allowFullScreen></iframe>
-      // 
-      // https://developer.vimeo.com/player/embedding
+      var iframe = document.createElement('iframe');
+      $(iframe).attr({
+          src: 'http://player.vimeo.com/video/'+ src +'?api=1',
+          frameborder: 0,
+          width: '100%',
+          height: '350px'
+        });
+      $(this.target).html(iframe);
+      this.videoNode = $f(iframe);
+      this.bindReady(); 
     }
+
+    Subtitler.videoNode = this; 
 
   };
 
@@ -89,15 +91,16 @@
     // Loop the video if need be. 
     // Will this be triggered during 'seeking' with vimeo
     // and youtube?
-    onTimeUpdate: function(){
+    onTimeUpdate: function(data){
 
       if (Subtitler.draggingCursor)
         return;
 
-      var currentTime = this.getCurrentTime()
-        , end = Session.get('endTime')
+      var end = Session.get('endTime')
         , duration = Session.get('loopDuration')
         , start = Session.get('startTime');
+
+      var currentTime = data && data.seconds ? +data.seconds : this.getCurrentTime(); 
 
       Session.set('currentTime', currentTime);
 
@@ -113,14 +116,12 @@
     },
 
     onPlayback: function(){
-      console.log('on playback called');
       Session.set('videoPlaying', true);
       if (this.isYoutube)
         this.youtubeTimeUpdate();
     },
 
     onPauseOrError: function(){
-      console.log('pause or error');
       Session.set('videoPlaying', false);
       if (this.isYoutube && this.youtubeInterval)
         Meteor.clearInterval(this.youtubeInterval);
@@ -166,10 +167,11 @@
  
       // Vimeo Events     
       } else if (this.isVimeo) {
-        vid.addEventListener('playProgress, seek', _.bind(this.onTimeUpdate, this));
-        vid.addEventListener('play', _.bind(this.onPlayback, this));
-        vid.addEventListener('pause', _.bind(this.onPauseOrError, this));
-        vid.addEventListener('finish', _.bind(this.onPauseOrError, this));
+        vid.addEvent('playProgress', _.bind(this.onTimeUpdate, this));
+        vid.addEvent('seek', _.bind(this.onTimeUpdate, this));
+        vid.addEvent('play', _.bind(this.onPlayback, this));
+        vid.addEvent('pause', _.bind(this.onPauseOrError, this));
+        vid.addEvent('finish', _.bind(this.onPauseOrError, this));
       }
     },
 
@@ -184,39 +186,41 @@
         vid.addEventListener('loadedmetadata', _.bind(this.onReady, this));
       
       else if (this.isVimeo)
-        vid.addEventListener('ready', _.bind(this.onReady, this));
+        vid.addEvent('ready', _.bind(this.onReady, this));
     },
 
     // Playback Control / State
     getCurrentTime: function(){
-      return this.isHTML
-        ? this.videoNode.currentTime
-        : this.videoNode.getCurrentTime(); 
+      if (this.isYoutube) return this.videoNode.getCurrentTime();
+      else if (this.isVimeo) {
+        console.log(this.videoNode);
+        return this.videoNode.api('getCurrentTime');
+      }
+      else if (this.isHTML) returnthis.videoNode.currentTime; 
     },
 
     pauseVideo: function(){
-      this.isYoutube 
-        ? this.videoNode.pauseVideo() 
-        : this.videoNode.pause();  
+      if (this.isYoutube) this.videoNode.pauseVideo();
+      else if (this.isVimeo) this.videoNode.api('pause');
+      else if (this.isHTML) this.videoNode.pause(); 
     },
 
     playVideo: function(){
-      this.isYoutube
-        ? this.videoNode.playVideo()
-        : this.videoNode.play(); 
+      if (this.isYoutube) this.videoNode.playVideo();
+      else if (this.isVimeo) this.videoNode.api('play');
+      else if (this.isHTML) this.videoNode.play(); 
     },
 
     getVideoDuration: function(){
-      return this.isHTML
-        ? this.videoNode.duration
-        : this.videoNode.getDuration(); 
+      if (this.isYoutube) return this.videoNode.getDuration();
+      else if (this.isVimeo) return this.videoNode.api('getDuration');
+      else if (this.isHTML) return this.videoNode.duration; 
     },
 
     seekTo: function(number){
-      console.log('player seeking');
-      this.isHTML
-        ? this.videoNode.currentTime = number
-        : this.videoNode.seekTo(number); 
+      if (this.isYoutube) this.videoNode.seekTo(number);
+      else if (this.isVimeo) this.videoNode.api('seekTo', number);
+      else if (this.isHTML) this.videoNode.currentTime = number; 
     },
 
     // Vimeo doesn't support it. Firefox doesn't support
@@ -236,8 +240,6 @@
     embedVideo: function(target) {
       target && this.setTarget(target);
       $(this.target).html(this.videoNode);
-
-      // XXX Only call this once video is onReady?
       this.bindReady(); 
       return this;
     },

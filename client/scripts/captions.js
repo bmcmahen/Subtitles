@@ -25,7 +25,7 @@ Template.beginProcess.helpers({
     if (count === 0) 
       return true
   }
-})
+});
 
 var setSessions = function(start, end, time, sub) {
   Session.set('startTime', start)
@@ -49,7 +49,7 @@ Template.beginProcess.events({
 
     Subtitler.videoNode.play(); 
   }
-})
+});
 
 // Set height of Div to maximum screen size
 Template.captions.rendered = function() {
@@ -82,7 +82,7 @@ Template.captions.events({
     if (Session.get('currentVideo')) {
     
       var currentTime = Session.get('currentTime')
-        , endTime = currentTime + Session.get('loopDuration')
+        , endTime = currentTime + Session.get('loopDuration');
 
       var newSub = Subtitles.insert({
         startTime : currentTime,
@@ -90,7 +90,7 @@ Template.captions.events({
         videoId : Session.get('currentVideo'),
         saved : true,
         user : Meteor.userId()
-      })
+      });
 
    }
   },
@@ -138,7 +138,7 @@ Template.captions.events({
     $tip.css('top', offset.top + $(e.currentTarget).height() + 20 + 'px');
     $tip.toggleClass('in');
   }
-})
+});
 
 
 // Each individual Caption node
@@ -146,7 +146,7 @@ Template.caption.helpers({
   currentClass: function(){
     return Session.equals('currentSub', this._id) ?  'selected' : ''
   }
-})
+});
 
 var updateForm = function(t){
   var subsToSave = Subtitles.find({ saved : false }).fetch(); 
@@ -166,12 +166,11 @@ Template.caption.events({
   'focus textarea' : function(e, t){
 
     var self = this;
-    Session.set('startTime', self.startTime)
-    Session.set('endTime', self.endTime)
+    Session.set('startTime', self.startTime);
+    Session.set('endTime', self.endTime);
 
     //XXX This is a bit of a hack
     if (Session.get('silentFocus')) {
-
       Session.set('silentFocus', false);
 
       if (Session.get('videoPlaying')) {
@@ -180,6 +179,9 @@ Template.caption.events({
 
       return;
     };
+
+    if (!Session.get('videoPlaying'))
+      Subtitler.timeline.updateMarkerPosition(Session.get('startTime'));
 
     if (Subtitler.videoNode)
       Subtitler.videoNode.seekTo(self.startTime);
@@ -220,7 +222,7 @@ Template.caption.events({
               videoId : Session.get('currentVideo'),
               saved : true,
               user : Meteor.userId()
-            })
+            });
 
         setSessions(newStart, newEnd, newStart, sub)
 
