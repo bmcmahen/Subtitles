@@ -1,0 +1,113 @@
+<template name='overlay'>
+  {{#if overlay}}
+    <div id='overlay' class='overlay'>
+      <div class='cover'></div>
+      <div class='panel wrapper'>
+
+        {{#if newVideo}}
+          {{>newVideo}}
+        {{/if}}
+
+        {{#if viewLibrary}}
+          {{>viewLibrary}}
+        {{/if}}
+      </div>
+    </div>
+  {{/if}}
+</template>
+
+<template name='newVideo'>
+  {{#unless videoSource}}
+  <header>
+    <h5>Select a Video Source</h5>
+    <button class='close'>×</button>
+  </header>
+  <div class='panel-body'>
+      <ul class='video-source'>
+        <li class='html'>
+          <a href='#' class='local'> 
+            <p>Local File</p>
+          </a>
+        </li>
+        <li class='youtube'>
+          <a href='#' class='youtube'> 
+            <p>YouTube</p>
+          </a>
+        </li>
+        <li class='vimeo'>
+          <a href='#' class='vimeo'> 
+            <p>Vimeo</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+    {{/unless}}
+
+    {{#if local}}
+      {{>localVideo}}
+    {{/if}}
+
+    {{#if youtube}}
+      <header>
+        <h5>Choose a YouTube Video</h5>
+        <button class='close'>×</button>
+      </header>
+      <div class='panel-body'>
+        <form id='youtube-project' class='combined'>
+          <input type='text' class='large url' placeholder='YouTube Video URL'><input type='submit' class='large btn pink' value='Create Project'>
+        </form>
+      </div>
+    {{/if}}
+
+    {{#if vimeo}}
+      <header>
+        <h5>Choose a Vimeo Video</h5>
+        <button class='close'>×</button>
+      </header>
+      <div class='panel-body'>
+        <form id='vimeo-project' class='combined'>
+          <input type='text' class='large url' placeholder='Vimeo Video URL'><input type='submit' class='large btn pink' value='Create Project'>
+        </form>
+      </div>
+    {{/if}}
+
+</template>
+
+<template name='localVideo'>
+  <header>
+    <h5>Choose a Local Video File</h5>
+    <button class='close'>×</button>
+  </header>
+  <div class='panel-body'>
+    <div id='new-video-dropzone' class='select-video-file'>
+      {{#if videoSelected}}
+        {{#with videoSelected}}
+          <video class='pull-left' src='{{fileURL}}'></video>
+          <dl class='dl-horizontal pull-left'>
+            <dt> Name </dt> <dd> {{name}} </dd>
+            <dt> File Type </dt> <dd> {{type}} </dd>
+          </dl>
+        {{/with}}
+      {{else}}
+      <p>
+        <strong>Drop video</strong> or <strong> click </strong> to select video source.
+      </p>
+      {{/if}}
+    </div>
+    <input type='file' class='hidden'>
+    <button id='create-project' class='btn pink large pull-right'>Create Project</button>
+  </div>
+</template>
+
+<template name='viewLibrary'>
+  <header>
+    <h5>Select a Project</h5>
+    <button class='close'>×</button>
+  </header>
+  <div class='panel-body'>
+    <p> Project Listing </p>
+  </div>
+</template>
+
+
+

@@ -1,0 +1,244 @@
+@import 'nib'
+
+.overlay
+  position fixed
+  left 0
+  top 0
+  width 100%
+  height 100%
+  overflow hidden
+  z-index 5000
+  user-select none
+
+  & header
+    padding 25px 0 0 0
+    position relative
+
+  & .panel-body
+    padding 20px
+    *zoom: 1
+
+    &:before,
+    &:after
+      display: table
+      content: ""
+
+    &:after
+      clear: both
+
+    & video
+      float left
+      width 125px
+      margin 8px
+
+.overlay.active .cover
+  opacity 1
+
+.overlay .cover
+  position absolute
+  left 0
+  top 0
+  bottom 0
+  right 0
+  background -webkit-radial-gradient(50% 50%, ellipse closest-corner, rgba(0,0,0,0.45) 1%, rgba(0,0,0,0.8) 100%)
+  background: -moz-radial-gradient(50% 50%, ellipse closest-corner, rgba(0,0,0,0.45) 1%, rgba(0,0,0,0.8) 100%)
+  background: -ms-radial-gradient(50% 50%, ellipse closest-corner, rgba(0,0,0,0.45) 1%, rgba(0,0,0,0.8) 100%)
+  background: radial-gradient(50% 50%, ellipse closest-corner, rgba(0,0,0,0.45) 1%, rgba(0,0,0,0.8) 100%)
+  opacity 0
+  transition 400ms opacity ease
+  transform translate3d(0,0,0)
+
+.overlay .panel
+  box-shadow 0 0 1px 1px rgba(0,0,0,0.2), 0 10px 27px rgba(0,0,0,0.7)
+  border-radius 4px
+  box-sizing border-box
+  width 500px
+  position absolute
+  left 50%
+  top 50%
+  margin -240px 0 0 -250px
+  opacity 0
+  transform scale(0.85) translate3d(0, 100%, 0)
+  transition-property translate3d
+  transition-duration 400ms
+
+.overlay .panel h5
+  margin 0
+  text-align center
+  color #666
+  font-size 18px
+  text-shadow 0 1px 1px rgba(255,255,255,0.5)
+
+.overlay.active .panel
+  transform scale(1) translate3d(0,0,0)
+  opacity 1
+
+button.close
+  position absolute
+  top 1px
+  right 8px
+  font-family 'Helvetica Neue', Helvetica, Arial, sans-serif
+
+button.pull-right
+  margin-right 0
+  margin-top 15px
+
+input.hidden
+  display none
+
+.select-video-file.dragover
+  background rgb(201, 201, 201)
+  border-color #555
+
+.select-video-file
+  transition all .3s
+  display: block;
+  background: #fafafc;
+  -webkit-border-radius: 5px;
+  width 100%
+  box-sizing border-box
+  min-width 460px
+  min-height 100px
+  float left
+  border-radius: 5px;
+  font: 400 12px 'Helvetica Neue', Helvetica, arial, sans-serif;
+  border: 2px dashed #b4b4b4;
+  color: #999;
+  text-align: center;
+
+  &:hover
+    cursor pointer
+
+  & dl
+    float left
+
+    & dd
+      text-align left
+      width 230px
+      overflow hidden
+      text-overflow ellipsis
+
+  & p
+    margin 40px 0
+
+form.combined
+  
+  & input[type=text]
+    margin-right 0
+    width 335px
+
+  & input[type=submit]
+    margin-left 0 
+
+ul.video-source 
+  padding-left 0
+  text-align center
+  width 100%
+  box-sizing border-box
+
+  & li
+    display inline-block
+    list-style-type none
+    margin 15px
+    height 100px
+    width 100px
+    box-sizing border-box
+    vertical-align top
+    border-radius 3px
+    text-align center
+    background: white
+    transition background 300ms
+    box-shadow inset 0 2px 1px rgba(49, 77, 94, 0.15), 0 2px 0 rgba(12, 12, 12, 0)
+
+    &.vimeo
+      background #8ac9ef
+
+    &.youtube
+      background #ee3637
+
+    &.html
+      background #959595
+
+    & a
+      display block
+      width 100%
+      height 100%
+      color: #444
+      padding-top 65px
+      box-sizing border-box
+
+      &:hover
+        text-decoration none
+
+    & p
+      font-size: 13px
+      font-weight: bold
+      margin-top: 0px
+      text-shadow 0 1px 1px rgba(255,255,255,0.5)
+      padding: 4px 4px
+      background: rgba(255,255,255,0.7)
+
+    &:hover
+      background-color rgb(121, 121, 121)
+
+    & img
+      display block
+      margin 0 auto
+
+// .carousel
+//   -webkit-backface-visibility: hidden
+//   overflow hidden
+//   width 490px
+//   height 200px
+//   box-sizing border-box
+
+//   & .cell-content
+//     display border-box
+//     width 500px
+//     height 200px
+
+//   & input[type='text']
+//     background white
+//     box-shadow inset 1px 1px 2px #bbb
+//     font-size 16px
+//     width 300px
+//     display block
+//     padding 10px
+//     width 100%
+//     margin 10px 0
+//     box-sizing border-box
+
+//   & input[type='submit']
+//     font-size 16px
+//     float right
+
+//   & form
+//     width 460px
+
+ul.carousel-inner
+  margin: 0
+  padding: 0
+  height: 400px
+  width: 100%
+  box-sizing border-box
+  position relative
+
+ul.carousel-inner li.item
+  position absolute top left
+  width 100%
+  height 100%
+  display none
+  transition opacity 
+
+  &.active
+    display block
+    opacity 1
+
+    &.left
+      opacity 0
+
+  &.prev
+    opacity 0
+
+  &.next
+    opacity 1

@@ -142,25 +142,6 @@ Template.body.preserve['.intro', '.library', '.app']
 /**
  * video
  */
-  
-Subtitler.syncCaptions = function(time, options) {
-
-  var options = options || {}; 
-  options.silence = options.silent || false; 
-
-// Only run the search if its not playing on the same caption.
-
-if (time > Session.get('endTime') || time < Session.get('startTime')) {
-  var result = Subtitles.findOne({startTime: {$lte : time}, endTime: {$gte: time}})
-  if (result) {
-    if (options.silent)
-      Session.set('silentFocus', true)
-    document.getElementById(result._id).focus(); 
-    Session.set('currentSub', result)
-  }
-}
-
-}
 
 Template.mainPlayerView.events({
 
@@ -183,7 +164,6 @@ Template.mainPlayerView.events({
         this.videoNode = new Subtitler.VideoElement(url, {
           target: '#main-player-drop'
         }).embedVideo();
-        Subtitler.videoNode = this.videoNode;
       }
 
 
@@ -221,7 +201,7 @@ Template.video.helpers({
 });
 
 Template.mainPlayerView.rendered = function(){
-  if (Subtitler.videoNode)
+  if (Subtitler.videoNode && Subtitler.videoNode.isHTML)
     Subtitler.videoNode.embedVideo('#main-player-drop'); 
 };
 

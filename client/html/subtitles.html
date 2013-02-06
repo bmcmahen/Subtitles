@@ -19,53 +19,12 @@
 </head>
 
 <body>
+    {{> overlay}}
     {{> navigation}}
     {{> body}}
   </div>
 </body>
 
-<template name='navigation'>
-    <div class='navbar navbar-fixed-top'>
-    <div class='navbar-inner'>
-      <div class='container-fluid'>
-      <a class='brand'> <span class='light'>fiddleware</span> Subtitles </a>
-      <ul class='nav pull-right'>
-
-
-
-      {{#if loading}}
-        {{> loading}}
-      {{/if}}
-        <li>
-          <a href='#' class='view-help'>Help</a>
-        </li>
-      {{#if currentUser}}
-         {{#unless loggingIn}}
-          <li><a href='#' class='view-library'>Library</a></li>
-          <li class='dropdown'>
-            <a href='#' class='dropdown-toggle' data-toggle='dropdown'>{{displayName}}<b class='caret'></b></a>
-            <ul class='dropdown-menu' role='dropdown' aria-labelledby='dropdownMenu' >
-              <li><a class='logout' href='#' tabindex='-1'>Logout... </a></li>
-            </ul>
-          </li>
-          {{/unless}}
-      {{/if}}
-
-      {{#if loggingIn}}
-        {{> loading}}
-      {{/if}}
-
-
-    
-      </ul>
-    </div>
-  </div>
-  </div>
-</template>
-
-<template name='loading'>
-       <li id='loading-wrapper'> </li>
-</template>
 
 <template name='body'>
   <div id='content'>

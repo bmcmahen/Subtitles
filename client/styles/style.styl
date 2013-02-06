@@ -68,11 +68,8 @@ video
 
 .wrapper
   background rgba(255,255,255,0.60)
-  padding 10px
-  background linear-gradient(#FAFAFA, #DDD)
+  background linear-gradient(#fff, #eee)
   box-shadow 0 1px 15px rgba(0, 0, 0, 0.15), inset 0 1px 0px white
-  border: 1px solid #CCC
-  border-bottom 1px solid #bbb
   border-radius 5px
 
 .wrapper-inset
@@ -98,7 +95,8 @@ textarea
   line-height 0
 
 .dropzone
-  min-height 170px
+  height 100px
+  width 460px
   background white
   box-shadow inset 1px 1px 2px #bbb
   overflow-y auto
@@ -106,14 +104,12 @@ textarea
   color #999
   line-height 0
   margin-bottom 8px
+  display table-cell
+  vertical-align middle
 
   &:hover
     cursor pointer
-    background #F8F5FF
-
-  & p
-    display inline-block
-    margin-top 80px
+    background rgb(234, 226, 252)
 
   &.target
     background #F8F5FF
@@ -349,3 +345,4 @@ span.madeby
 
 .dropzone
   overflow hidden
+  box-sizing border-box
