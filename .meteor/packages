@@ -14,3 +14,6 @@ accounts-urls
 underscore
 jquery
 spiderable
+accounts-google
+accounts-facebook
+accounts-twitter

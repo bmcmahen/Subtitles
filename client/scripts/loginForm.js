@@ -1,17 +1,5 @@
-(function () {
-
-// Universal Messaging system using & as split between title and body
-Meteor.autorun(function() {
-  var message = Session.get('displayMessage');
-  if (message) {
-    var stringArray = message.split('&');
-    ui.notify(stringArray[0], stringArray[1])
-      .effect('slide')
-      .closable();
-
-    Session.set('displayMessage', null);
-  }
-});
+// Validators, helpers
+// 
 
 // trim helper
 var trimInput = function(val) {
@@ -49,28 +37,33 @@ var isNotEmpty = function(val, field) {
     return true; 
 }
 
+// Login Form Helpers
+Template.loginForm.helpers({
 
-
-Template.intro.rendered = function() {
-  var self = this; 
-  self.wrapper = self.find('.intro');
-}
-
-Template.intro.events({
-
-  'click .create-project' : function(e, t){
-    Session.set('overlay', 'newVideo');
+  loginForm: function(){
+    if (!Session.get('formView'))
+      return true
   },
 
-	'click .watch-video' : function(e, t){
-		$(e.currentTarget).parent().html('<iframe src="http://player.vimeo.com/video/53719196?badge=0&autoplay=1" width="620" height="349" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>');
-		return false; 
-	},
-  
+  createAccount: function(){
+    return Session.equals('formView', 'createAccountForm');
+  },
+
+  passwordRecovery: function(){
+    return Session.equals('formView', 'passwordRecoveryForm');
+  }
+
+});
+
+
+// Login Form Events
+Template.loginForm.events({
   'submit #login-form' : function(e, t) {
 
-    var email = trimInput(t.find('#login-email').value.toLowerCase())
-    var password = t.find('#login-password').value
+    e.preventDefault();
+
+    var email = trimInput(t.find('#login-email').value.toLowerCase());
+    var password = t.find('#login-password').value;
 
     if (isNotEmpty(email, 'loginError') && isNotEmpty(password, 'loginError')) {
 
@@ -79,10 +72,14 @@ Template.intro.events({
         if(err && err.error === 403) {
           Session.set('displayMessage', 'Login Error &' + err.reason);
         } else {
-          Session.set('currentView', 'library')
-          Router.navigate('library');
-        }
 
+          // if we are in a new project flow, create the new project.
+          if (Session.get('videoSource')){
+            console.log('videosource', Session.get('videoSource'));
+          }
+
+          Session.set('overlay', null);
+        }
 
       });
 
@@ -91,6 +88,43 @@ Template.intro.events({
     return false
   },
 
+  'click #forgot-password' : function(e, t) {
+    Session.set('formView', 'passwordRecoveryForm');
+  },
+
+  'click #create-account' : function(e, t) {
+    Session.set('formView', 'createAccountForm');
+  },
+
+  'click button.google' : function(e, t){
+    Meteor.loginWithGoogle(function(err){
+      if (!err)
+        console.log('success, u logged in w/ google!');
+    });
+  },
+
+  'click button.facebook' : function(e, t){
+    Meteor.loginWithFacebook(function(err){
+     console.log(err);
+    });
+  },
+
+  'click button.twitter' : function(e, t){
+    Meteor.loginWithTwitter(function(err){
+      console.log(err);
+    });
+  }
+
+});
+
+// Reset our Session variables when the template
+// is destroyed.
+Template.loginForm.destroyed = function(){
+  Session.set('formView', null);
+};
+
+// Create an account and login the user. 
+Template.createAccountForm.events({
   'submit #register-form' : function(e, t) {
     var email = trimInput(t.find('#account-email').value.toLowerCase())
     var password = t.find('#account-password').value
@@ -114,24 +148,17 @@ Template.intro.events({
       })
     }
     return false
-  },
-
-  'click #forgot-password' : function(e, t) {
-    Session.set('passwordView', 'password')
-    Router.navigate('reset-password');
   }
-  
-})
+});
 
-Template.passwordRecovery.helpers({
-  resetPassword : function(t) {
+Template.passwordRecoveryForm.helpers({
+  resetToken: function(){
     return Session.get('resetPassword');
   }
-})
+});
 
-Template.passwordRecovery.events({
-
-    'submit #recovery-form' : function(e, t) {
+Template.passwordRecoveryForm.events({
+  'submit #recovery-form' : function(e, t) {
       var email = trimInput(t.find('#recovery-email').value)
 
       if (isNotEmpty(email, 'recoveryError') && isEmail(email, 'recoveryError')) {
@@ -175,14 +202,4 @@ Template.passwordRecovery.events({
       }
     return false; 
     }
-});
-
-Template.intro.preserve(['#intro-login-form', '#intro-password-form', '#intro-register-form'])
-
-Template.intro.helpers({
-  passwordView : function(){
-    return Session.get('passwordView');
-  }
 })
-
-})();

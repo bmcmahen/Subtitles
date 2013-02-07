@@ -59,14 +59,14 @@
   margin -240px 0 0 -250px
   opacity 0
   transform scale(0.85) translate3d(0, 100%, 0)
-  transition-property translate3d
   transition-duration 400ms
 
 .overlay .panel h5
   margin 0
   text-align center
   color #666
-  font-size 18px
+  font-size 20px
+  font-family 'open sans condensed', 'helvetica neue', arial, sans-serif
   text-shadow 0 1px 1px rgba(255,255,255,0.5)
 
 .overlay.active .panel
@@ -171,9 +171,10 @@ ul.video-source
         text-decoration none
 
     & p
-      font-size: 13px
+      font-size: 14px
       font-weight: bold
       margin-top: 0px
+      font-family 'open sans condensed', 'helvetica neue', arial, sans-serif
       text-shadow 0 1px 1px rgba(255,255,255,0.5)
       padding: 4px 4px
       background: rgba(255,255,255,0.7)
@@ -185,60 +186,41 @@ ul.video-source
       display block
       margin 0 auto
 
-// .carousel
-//   -webkit-backface-visibility: hidden
-//   overflow hidden
-//   width 490px
-//   height 200px
-//   box-sizing border-box
-
-//   & .cell-content
-//     display border-box
-//     width 500px
-//     height 200px
-
-//   & input[type='text']
-//     background white
-//     box-shadow inset 1px 1px 2px #bbb
-//     font-size 16px
-//     width 300px
-//     display block
-//     padding 10px
-//     width 100%
-//     margin 10px 0
-//     box-sizing border-box
-
-//   & input[type='submit']
-//     font-size 16px
-//     float right
-
-//   & form
-//     width 460px
-
-ul.carousel-inner
-  margin: 0
-  padding: 0
-  height: 400px
-  width: 100%
-  box-sizing border-box
-  position relative
-
-ul.carousel-inner li.item
-  position absolute top left
+.form-wrapper
   width 100%
-  height 100%
-  display none
-  transition opacity 
+  margin 20px 0
 
-  &.active
-    display block
-    opacity 1
+.intro-form-wrapper
+  width 300px
+  margin 0 auto
 
-    &.left
-      opacity 0
+.intro-form.services
+  margin-top 30px
 
-  &.prev
-    opacity 0
+.loginWith
+  width 100%
+  padding 9px
+  margin 4px 0
+  font-family 'open sans condensed', 'helvetica neue', arial, sans-serif
+  text-transform: uppercase;
+  font-weight: bold;
 
-  &.next
-    opacity 1
+  &.twitter
+    background-color #00aced
+
+  &.facebook
+    background-color #3b5b99
+
+  &.google
+    background-color #b73223
+
+span.divider
+  color #ccc
+  display inline-block
+  margin 0 4px
+
+p.empty
+  text-align center
+  margin-top 80px
+  font-weight bold
+  color #666

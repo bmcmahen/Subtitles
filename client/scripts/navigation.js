@@ -3,7 +3,7 @@
 Template.navigation.helpers({
   displayName: function(){
     var user = Meteor.user();
-    return user.username || (user.emails && user.emails[0] && user.emails[0].address)
+    return (user.profile && user.profile.name) || user.username || (user.emails && user.emails[0] && user.emails[0].address)
   },
 
   loading : function() {
@@ -49,6 +49,11 @@ Template.navigation.events({
   'click .new-project' : function(){
     Session.set('overlay', 'newVideo');
     return false;
+  },
+
+  'click .login' : function(){
+    Session.set('overlay', 'loginForm');
+    return false; 
   }
 });
 
@@ -66,6 +71,10 @@ Template.overlay.helpers({
 
   viewLibrary: function(){
     return Session.equals('overlay', 'viewLibrary');
+  },
+
+  loginForm: function(){
+    return Session.equals('overlay', 'loginForm');
   }
 
 });
@@ -82,6 +91,8 @@ Template.overlay.events({
   },
 
 });
+
+Template.overlay.preserve['#panel'];
 
 // New Video Events
 Template.newVideo.events({
@@ -195,12 +206,24 @@ Template.localVideo.events({
     e.currentTarget.currentTime = e.currentTarget.duration / 3; 
   },
 
-  'click #create-project' : function(e){
-    // Create a new project, embed the video, and switch views. 
+  'click #create-project' : function(e, t){
+
+    if (!Meteor.user()) {
+      promptUserLogin(t.vid);
+    }
+
     return false;
   }
 
 });
+
+// Prompt User Login if the user isn't logged in. 
+function promptUserLogin(videoObject){
+  // We need to store the current VideoObject, and remember
+  // that we are in the 'create video' flow. 
+  Session.set('overlay', 'loginForm');
+  Session.set('videoSource', videoObject);
+}
 
 Template.localVideo.destroyed = function(){
   Session.set('videoSelected', null);
@@ -214,6 +237,12 @@ Template.localVideo.helpers({
 
 });
 
+
+Template.viewLibrary.helpers({
+  project : function(){
+    return Videos.find({}, { sort: ['name', 'asc' ]});
+  }
+});
 
 
 

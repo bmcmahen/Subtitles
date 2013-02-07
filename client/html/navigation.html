@@ -24,6 +24,12 @@
             </ul>
           </li>
           {{/unless}}
+      {{else}}
+        {{#unless loggingIn}}
+          <li>
+            <a href='#' class='login'>Login</a>
+          </li>
+        {{/unless}}
       {{/if}}
 
       {{#if loggingIn}}

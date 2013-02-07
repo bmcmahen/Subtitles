@@ -18,10 +18,10 @@
   padding-left:  20px
   padding-right: 20px
   background: $navbarBackground
-  border-bottom 1px solid #bbb
+  $gradient-vertical(rgb(78, 88, 102), rgb(50, 56, 65))
   $border-radius(4px)
+  $box-shadow(0 1px 10px rgba(0,0,0,0.1))
   $shadow = 0 1px 3px rgba(255,255,255,1)
-  $box-shadow($shadow)
 
 
 // Navbar button for toggling navbar items in responsive layouts
@@ -66,10 +66,10 @@
     padding: 13px 20px 11px
     margin-left: -20px // negative indent to left-align the text down the page
     font-size: 20px
-    font-weight: 200
+    font-weight: 600
     line-height: 1
-    color: $grayDarker
-    font-family: $baseFontFamily
+    color: $white
+    font-family: "Open Sans Condensed", Helvetica, Arial, sans-serif
 
   // Plain text in topbar
   .navbar-text
@@ -204,15 +204,13 @@
   float: left
   padding: 13px 20px 13px
   line-height: 19px
-  color: $navbarLinkColor
+  color: #eee
   text-decoration: none
-  border-right 1px dotted #EEE
 
 // Hover
 .navbar .nav > li > a:hover
   background-color: $navbarLinkBackgroundHover // "transparent" is default to differentiate :hover from .active
-  color: $navbarLinkColorHover
-  text-decoration: underline
+  color: $white
 
 
 // Active nav items
@@ -274,7 +272,7 @@
 // Dropdown toggle caret
 .navbar .nav .dropdown-toggle .caret,
 .navbar .nav .open.dropdown .caret
-  border-top-color: $gray
+  border-top-color: $white
   margin-left 5px
 
 .navbar .nav .active .caret

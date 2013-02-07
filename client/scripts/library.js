@@ -110,7 +110,7 @@ Template.library.preserve(['.menu', '.submenu']);
 Template.library.helpers({
 
   project : function(){
-    return Videos.find({});
+    return Videos.find({}, { sort: ['name', 'asc' ]});
   },
 
   supportedFormats : function() {

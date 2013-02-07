@@ -2,7 +2,7 @@
   {{#if overlay}}
     <div id='overlay' class='overlay'>
       <div class='cover'></div>
-      <div class='panel wrapper'>
+      <div id='panel' class='panel wrapper'>
 
         {{#if newVideo}}
           {{>newVideo}}
@@ -11,6 +11,11 @@
         {{#if viewLibrary}}
           {{>viewLibrary}}
         {{/if}}
+
+        {{#if loginForm}}
+          {{>loginForm}}
+        {{/if}}
+
       </div>
     </div>
   {{/if}}
@@ -54,7 +59,7 @@
       </header>
       <div class='panel-body'>
         <form id='youtube-project' class='combined'>
-          <input type='text' class='large url' placeholder='YouTube Video URL'><input type='submit' class='large btn pink' value='Create Project'>
+          <input type='text' class='large url' placeholder='YouTube Video URL'><input type='submit' class='large btn btn-green' value='Create Project'>
         </form>
       </div>
     {{/if}}
@@ -66,7 +71,7 @@
       </header>
       <div class='panel-body'>
         <form id='vimeo-project' class='combined'>
-          <input type='text' class='large url' placeholder='Vimeo Video URL'><input type='submit' class='large btn pink' value='Create Project'>
+          <input type='text' class='large url' placeholder='Vimeo Video URL'><input type='submit' class='large btn btn-green' value='Create Project'>
         </form>
       </div>
     {{/if}}
@@ -95,7 +100,7 @@
       {{/if}}
     </div>
     <input type='file' class='hidden'>
-    <button id='create-project' class='btn pink large pull-right'>Create Project</button>
+    <button id='create-project' class='btn btn-green large pull-right'>Create Project</button>
   </div>
 </template>
 
@@ -105,9 +110,119 @@
     <button class='close'>×</button>
   </header>
   <div class='panel-body'>
-    <p> Project Listing </p>
+    <div class='wrapper-inset'>
+      <ul class='nav nav-list'>
+        {{#each project}}
+          {{> projectList}}
+        {{else}}
+        <p class='empty'> Your library is empty. </p>
+        {{/each}}
+      </ul>
+    </div>
   </div>
 </template>
 
 
+<template name='projectList'>
+  <li class='caption'>
+      <a href='#' class='project-name'>{{name}}</a>
+      <i class='icon-chevron-right'></i>
+   </li>
+</template>
 
+<template name='createAccountForm'>
+  <header>
+    <h5>Create Account</h5>
+    <button class='close'>×</button>
+  </header>
+  <div class='panel-body'>
+    <div class='form-wrapper'>
+      <div class='intro-form-wrapper'>
+        <form id='register-form' class='intro-form'>
+          <input type='email' id='account-email' class='large wide' placeholder='Email'/>
+          <input type='password' id='account-password' class='large wide' placeholder='Password' />
+          <input type='submit' id='create-account' class='btn btn-pink large wide' value='Create an Account' />
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name='passwordRecoveryForm'>
+  <header>
+
+    {{#if resetToken}}
+    <h5>Enter New Password</h5>
+    {{else}}
+    <h5>Reset Password</h5>
+    {{/if}}
+
+    <button class='close'>×</button>
+  </header>
+  <div class='panel-body'>
+    <div class='form-wrapper'>
+      <div class='intro-form-wrapper'>
+        <div class='intro-form'>
+
+          {{#if resetToken}}
+            <form id='new-password'>
+              <input type='text' id='new-password-password' class='large wide' placeholder='New Password' />
+              <input type='submit' class='btn btn-pink large wide' value='Change Password'/>
+            </form>
+          {{else}}
+            <form id='recovery-form'>
+              <input type='text' id='recovery-email' class='large wide' placeholder='Your Email Address'/>              
+              <input type='submit' class='btn btn-pink large wide' value='Send Reset Instructions' />
+            </form>
+          {{/if}}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name='loginForm'>
+
+  {{#if loginForm}}
+
+  <header>
+    <h5>Login</h5>
+    <button class='close'>×</button>
+  </header>
+  <div class='panel-body'>
+    <div class='form-wrapper'>
+      <div class='intro-form-wrapper'>
+        <div id='intro-login-form' class='intro-form login'>
+          <form id='login-form'>
+            <input type='email' id='login-email' class='wide large' style='margin-top: 0;' placeholder='Email'/>
+            <input type='password' id='login-password' class='large' placeholder='Password'/>
+            <input type='submit' class='btn btn-green large pull-right'  id='login-button' value='Sign in'/>
+          </form> 
+          <a href='#forgotPassword' data-toggle='modal' id='forgot-password'>Forgot password?</a>
+          <span class='divider'> / </span>
+          <a href='#' id='create-account'>Create account</a>
+        </div>
+
+        <div class='intro-form services'>
+          <h6>Or Login Using:</h6>
+          <button class='btn google'>Google</button>
+          <button class='btn facebook'>Facebook </button>
+          <button class='btn twitter'>Twitter</button>
+        </div>
+   
+      </div>
+    </div>
+  </div>
+
+  {{/if}}
+
+  {{#if passwordRecovery}}
+    {{> passwordRecoveryForm}}
+  {{/if}}
+
+  {{#if createAccount}}
+    {{> createAccountForm}}
+  {{/if}}
+
+</template>

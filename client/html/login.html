@@ -4,8 +4,8 @@
       <div class='container'>
         <div class='row'>
           <div class='span8'>
-            <h1 class='header'> Subtitles </h1> <span class='madeby'>by fiddleware</span>
-            <h3> Easily create subtitles for your videos directly in your web browser. For a quick demo, watch the video below. </h3>
+            <h1 class='header'> Subtitles </h1>
+            <h3> Easily create subtitles for your videos directly in your web browser. For a quick demonstration, watch the video below. </h3>
           </div>
         </div>
 
@@ -14,42 +14,26 @@
 
         {{#constant}}
           <div class='subtitler-video'>
-              	<a href='#' class='watch-video'>
-              		<img src='./images/intro2.jpg' style='border: 4px solid white; box-sizing: border-box;'>
-              	</a>
+          	<a href='#' class='watch-video'>
+          		<img src='./images/intro2.jpg' style='border: 4px solid white; box-sizing: border-box;'>
+          	</a>
           </div>
         {{/constant}}
 
         </div>
-        <div class='span4 {{passwordView}}'>
 
-         <div class='intro-form-wrapper'>
-            <div id='intro-login-form' class='intro-form login'>
-                <form id='login-form'>
-                  <input type='email' id='login-email' class='large wide' style='margin-top: 0;' placeholder='Email'/>
-                  <input type='password' id='login-password' class='large' placeholder='Password'/>
-                  <input type='submit' class='btn tan pull-right large'  id='login-button' value='Sign in'/>
-                </form> 
-                <a href='#forgotPassword' data-toggle='modal' id='forgot-password'>Forgot password?</a>
-            </div>
-
-          <div id='intro-register-form' class='intro-form register'>
-           <h2>Not Registered? <light>Sign Up.</light> </h2>
-              <form id='register-form'>
-                <input type='email' id='account-email' class='large wide' placeholder='Email'/>
-                <input type='password' id='account-password' class='large wide' placeholder='Password' />
-                <input type='submit' id='create-account' class='btn pink pull-right large wide' value='Create an Account' />
-              </form>
-          </div>
-
-          <div id='intro-password-form' class='intro-form password-form'>
-
-              {{> passwordRecovery}}
-
-          </div>
+        <div class='span4'>
+          <button class='btn btn-green huge wide create-project'>Create a Project</button>
+          <p class='intro-title'> YouTube, Vimeo, and HTML 5 </p>
+          <p class='intro'> Fiddleware Subtitles allows you to quickly caption YouTube and Vimeo videos, or even local videos on your computer.</p>
+          <p class='intro-title'> Import and Export </p>
+          <p class='intro'> Easily import and export your captions directly from your web browser, allowing you to use them during video playback. </p>
+          <p class='intro-title'> Entirely Free </p>
+          <p class='intro'>
+            Fiddleware Subtitles is completely free for you to use. 
+          </p> 
         </div>
-
-      </div>
+        
     </div>
     <div class='row'>
       <div class='span12'>

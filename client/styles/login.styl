@@ -3,46 +3,34 @@
 
 
 
-.intro-form-wrapper
-  position relative
-
 .intro-form
   transition 0.2s opacity ease-out, 0.2s top ease-out
 
-  & h2
-    font-size 16px
-    font-weight 700
-
-  & form
-    float left
-  
   & input[type='submit']
-    margin 3px 0
+    margin 5px 0
 
   & input[type='text']
   & input[type='password']
   & input[type='email']
-    margin 4px 0
+    margin 5px 0
 
     &#login-password
       width 75%
+      margin-right 0px
 
   &.login
-    absolute top left
 
     & a
       padding-top 8px
       padding-left 2px
       font-size 10px
-      display block
+      display inline-block
       clear both
       color #888
 
   &.register
-    absolute top 150px left 0px
 
   &.password-form
-    absolute top 130px left 0px
     transition 0.2s opacity ease-out, 0.2s -webkit-transform ease-out
     pointer-events none
     opacity 0
@@ -111,3 +99,7 @@ ul.footer
 
 #loading-wrapper canvas
   margin-top 3px
+
+.intro-form.services button
+  margin 4px 0
+  width 32%
