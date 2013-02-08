@@ -1,16 +1,16 @@
 /**
  * Subtitle Player Class abstracts video playback for
- * different formats, including embedded HTML 5, Youtube, Vimeo(?)
+ * different formats, including embedded HTML 5, Youtube, Vimeo
  * etc.,
  *
- * Vimeo doesn't even support subtitles yet, so I doubt I'll include it
- * just yet. 
- *
+ * Best with HTML 5 > YouTube > Vimeo... 
+ * 
  */
 
 
 (function(Subtitler, window){
 
+  var Emitter = require('component-emitter');
 
   // Constructor
   // 
@@ -20,7 +20,7 @@
     var options = options || {};
 
     this.type = options.type || 'html';
-    this.target = options.target || '#player';
+    this.target = options.target ? '#' + options.target : '#player';
     this.isReady = false; 
 
     // If we're embedding a youtube video, use the 
@@ -41,15 +41,15 @@
       window.onYouTubeIframeAPIReady = function(){
         // Build the iframe
         self.isYoutube = true;
-        self.videoNode = new YT.Player(self.target, {
+        self.videoNode = new YT.Player(self.options.target, {
           width: '100%',
-          videoId: src,
+          videoId: this.getId(src),
           playerVars: {
             controls: 0
           }
         });
         self.bindReady(); 
-      }
+      };
     }
 
     // If we're embedding an HTML video, use the 
@@ -62,6 +62,7 @@
       var el = this.videoNode = document.createElement('video');
       el.setAttribute('id', 'video-display');
       el.src = src;
+      this.embedVideo(); 
     }
 
     // Vimeo embed. 
@@ -82,6 +83,9 @@
     Subtitler.videoNode = this; 
 
   };
+
+  VideoElement.prototype = new Emitter(); 
+
 
   // Functions
   _.extend(VideoElement.prototype, {
@@ -130,6 +134,8 @@
     onReady: function(){
       this.isReady = true; 
       this.bindEvents(); 
+      console.log('it should emit ready');
+      this.emit('ready');
     },
 
     // The youtube api (unfortunately) doesn't have a time update
@@ -193,10 +199,9 @@
     getCurrentTime: function(){
       if (this.isYoutube) return this.videoNode.getCurrentTime();
       else if (this.isVimeo) {
-        console.log(this.videoNode);
         return this.videoNode.api('getCurrentTime');
       }
-      else if (this.isHTML) returnthis.videoNode.currentTime; 
+      else if (this.isHTML) return this.videoNode.currentTime; 
     },
 
     pauseVideo: function(){
@@ -226,10 +231,8 @@
     // Vimeo doesn't support it. Firefox doesn't support
     // html5 playback rate. 
     setPlaybackRate: function(rate){
-      if (this.isYoutube)
-        this.videoNode.setPlaybackRate(rate)
-      else if (this.isHTML)
-        this.videoNode.playbackRate = rate; 
+      if (this.isYoutube) this.videoNode.setPlaybackRate(rate);
+      else if (this.isHTML) this.videoNode.playbackRate = rate; 
     },
 
     setTarget: function(target){
@@ -237,6 +240,16 @@
       return this;
     },
 
+    // Thanks to: http://stackoverflow.com/a/9102270/1198166
+    getId: function(url){
+      var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
+      var match = url.match(regExp);
+      if (match && match[2].length==11){
+        return match[2];
+      }
+    },
+
+    // Embeds an HTML Video into a target DOM element.
     embedVideo: function(target) {
       target && this.setTarget(target);
       $(this.target).html(this.videoNode);
@@ -246,7 +259,7 @@
 
     // Sync our video with our captions
     // XXX Do I even use this??
-    syncCaptions: function(time, options){
+    syncCaptions: function(time, options) {
       var end = Session.get('endTime')
         , start = Session.get('startTime')
         , options = options || {};
@@ -257,10 +270,10 @@
         var result = Subtitles.findOne({startTime: {$lte : time}, endTime: {$gte: time}})
         if (result) {
           if (options.silent)
-            Session.set('silentFocus', true)
+            Session.set('silentFocus', true);
           document.getElementById(result._id).focus(); 
           Session.set('currentSub', result)
-        }
+        };
       }
     }
 

@@ -47,7 +47,7 @@ Template.beginProcess.events({
 
     setSessions(0, Session.get('loopDuration'), 0, newSub)
 
-    Subtitler.videoNode.play(); 
+    Subtitler.videoNode.playVideo(); 
   }
 });
 

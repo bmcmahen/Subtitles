@@ -41,9 +41,9 @@ h3
   color: rgb(89, 118, 141);
 
 h4
-  font: 800 26px 'Helvetica Neue', Helvetica, arial, sans-serif
-  margin: 8px 0px
-  color: #5A5A5A
+  font: 800 17px 'Open Sans Condensed', 'Helvetica Neue', Helvetica, arial, sans-serif
+  margin: 7px 0px
+  color: #424b57
   width 100%
   text-overflow ellipsis
   overflow hidden
@@ -82,6 +82,8 @@ video
   padding-left 1px
   padding-top 1px
   border-radius 3px
+  max-height 350px
+  overflow auto
   background white
   border 1px solid #e5e5e5
 
@@ -126,8 +128,10 @@ textarea
 #captions
   overflow-y auto
   background white
+  border 1px solid #cdd0d3
+  border-top-color #bfc1c4
   padding-top 2px
-  box-shadow inset 0px 1px 2px #BBB
+  box-shadow inset 0px 1px 0px rgba(0,0,0,0.1)
 
 table.captions
   padding 0
@@ -209,7 +213,7 @@ td.start-captioning
     padding-bottom 20px
     background #FAFAFC
     border-radius 5px
-    font 600 20px 'Helvetica Neue', Helvetica, arial, sans-serif
+    font 600 15px 'Open Sans Condensed', 'Helvetica Neue', Helvetica, arial, sans-serif
     border 2px dashed #B4B4B4
     color #C7C7C7
     border-bottom 2px dashed #B4B4B4 !important
@@ -275,8 +279,8 @@ pre
 
 .toolbar
   margin-bottom 0px
-  margin-top 15px 
-  height 32px
+  margin-top 0
+  height 37px
 
   & span
     display: inline-block
@@ -354,11 +358,11 @@ span.madeby
   box-sizing border-box
 
 .navbar .nav >li > a
-  color: rgb(209, 209, 209);
-  font-family: 'open sans condensed';
-  font-size: 14px;
-  text-transform: uppercase;
-  font-weight: 600;
+  color: rgb(203, 212, 219)
+  font-family: 'helvetica neue', helvetica, arial, sans-serif
+  font-size: 12px
+  font-weight: 600
+  text-shadow 0 1px 1px rgba(0,0,0,0.5)
 
 h6
   font-size: 14px;
@@ -385,3 +389,54 @@ span.light-bold
 
 .pull-right
   float right
+
+.toolbar .pull-left
+  margin-left 0
+
+a.video-controls
+  background-repeat no-repeat
+  display inline-block
+  cursor pointer
+  transition none
+  box-shadow 0 1px 1px rgba(0, 0, 0, 0.05), inset 0 1px 0px white  
+  border 1px solid #999
+  border-bottom 1px solid #888
+
+  &#play-video
+    border-radius 30px
+    width 20px
+    height 30px
+    background-image url('/images/controls/play_dark.png')
+    background-position -2px 1px
+   
+    &.paused
+      background-position -39px 1px
+
+#import-subtitles
+  margin-right 0
+
+.controls
+  margin-top 12px
+  text-align center
+
+.video-buttons
+  margin-top 8px
+  text-align center
+
+ fieldset
+  padding 5px 10px
+  border none
+  border-radius 3px
+  vertical-align top
+  font-size 11px
+  display inline-block
+  background rgba(180, 180, 180, 0.36)
+
+  & span
+    font-size 12px
+    margin 2px 4px
+    font-family 'open sans'
+    display inline-block
+
+  & input
+    margin 2px

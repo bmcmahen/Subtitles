@@ -1,0 +1,210 @@
+
+
+<template name='application'>
+  {{#if currentUser}}
+    {{#if currentVideo}}
+      {{> map}}
+      <div class='container-fluid'>
+      <div class='row-fluid'>
+        <div class='span5'>
+          {{> video}}
+        </div>
+        <div class='span7'>
+          {{> captions}}
+        </div>
+      </div>
+    </div>
+    {{/if}}
+  {{/if}}
+</template>
+
+<template name='map'>
+  <div class='timeline-wrapper'>
+    {{#if videoDuration}}
+      {{#constant}}
+        <svg id='video-map' width='100%' height='60'>    
+          <g class='map-wrap' transform = 'translate(0,60)'>
+              <rect class='timeline-click-zone' y='-60' height='60'></rect>
+              <g class='caption-spans'></g>
+              <line id='current-position' y1='0' y2='-60'></line>
+          </g>
+        </svg>
+      {{/constant}}
+    {{/if}}
+</div>
+</template>
+
+<!-- VIDEO --> 
+
+<template name="video">
+  <div class='row-fluid'>
+    <div class='span12'>
+      <h4>{{projectName}}</h4>
+    </div>
+  </div>
+  <div class='row-fluid'>
+    <div class='span12'>
+        <div class='video-dropzone'>
+          {{#constant}}
+            {{> mainPlayerView}}
+          {{/constant}}
+        </div>
+      </div>
+      {{> controls}}
+    </div>
+</template>
+
+<template name='mainPlayerView'>
+    <div id='main-player-drop' class='dropzone'>
+      <p> 
+        <strong>Drop video</strong> or <strong> Click </strong> to select video source.
+      </p>
+    </div>
+    <input type='file' class='file' style='display:none'/>
+</template>
+
+<template name='controls'>
+  <div class='row-fluid'>
+    <div class='span4 controls'>
+
+    {{#isolate}}
+      <fieldset>
+        <input type='checkbox' id='loop-checked' {{#if looping}} checked = 'checked' {{/if}}>
+        <span>Loop</span> 
+        <select id='loop-duration' {{#unless looping}} disabled {{/unless}}>
+          <option value='1'> 1s </option>
+          <option value='2'> 2s </option>
+          <option value='3'> 3s </option>
+          <option value='4'> 4s </option>
+          <option value='5' selected> 5s </option>
+          <option value='6'> 6s </option>
+          <option value='7'> 7s </option>
+          <option value='8'> 8s </option>
+          <option value='9'> 9s </option>
+          <option value='10'> 10s </option>
+        </select>
+    </fieldset>
+    {{/isolate}}
+
+  </div>
+  <div class='span4 video-buttons'>
+
+    <div class='video-button-group'>
+    {{#isolate}}
+      <a class='btn video-controls {{playing}}' id='play-video'></a>
+    {{/isolate}}
+    </div>
+
+  </div>
+  <div class='span4 controls'>
+    {{#isolate}}
+      <fieldset>
+        <span>Rate </span>
+        <select id='playback-rate' {{#unless supported}} disabled {{/unless}}>
+          <option value='1.5'> 1.5x </option>
+          <option value='1.4'> 1.4x </option>
+          <option value='1.3'> 1.3x </option>
+          <option value='1.2'> 1.2x </option>
+          <option value='1.1'> 1.1x </option>
+          <option value='1' selected> 1x </option>
+          <option value='0.9'> 0.9x </option>
+          <option value='0.8'> 0.8x </option>
+          <option value='0.7'> 0.7x </option>
+          <option value='0.6'> 0.6x </option>
+          <option value='0.5'> 0.5x </option>
+        </select>
+      </fieldset>
+    {{/isolate}}
+  </div>
+</template>
+
+<!-- CAPTIONS -->
+
+<template name='captions'>
+  <input type='file' id='import-subtitles-file' style='display: none;'/>
+  <div class='row-fluid'>
+    <div class='span12 toolbar'>
+        <input type='button' class='btn small pull-left' value='Insert Caption' id='insert-new-caption'/>
+          {{> saving}}
+
+          <button class='btn small pull-right' id='import-subtitles'>Import</button>
+
+          <button class='btn small pull-right' id='export-subtitles'> Export </button>
+
+         <button class='btn small pull-right' id='hints'>Hints</button>
+           
+        <div class='popover bottom'>
+          <div class='arrow'></div>
+           <dl class='dl-horizontal'>
+          <dt>Cmd P</dt> <dd>Increment caption end time</dd>
+          <dt>Cmd O</dt> <dd>Decrement caption end time </dd>
+          <dt>Cmd I</dt> <dd>Increment caption start time </dd>
+          <dt>Cmd U</dt> <dd>Decrement caption start time </dd>
+          <dt>Cmd Enter</dt> <dd>Create a new line in the same caption</dd>
+          <dt>Enter</dt><dd>Create a new caption directly after the current caption.</dd>
+          <dt>Delete</dt><dd>If the caption is empty, delete it and return to the previous caption.</dd>
+        </dl>
+        </div>
+
+    
+    </div>
+  </div>
+<div class='row-fluid'>
+  <div id='captions'>
+    <table class='captions'>
+      <tbody>
+        {{> beginProcess}}
+        {{> captionList}}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+</div>
+</template>
+
+<template name='captionList'>
+  {{#each caption}}
+    {{> caption}}
+  {{/each}}
+</template>
+
+<template name='beginProcess'>
+  {{#if new}}
+    <tr>
+      <td class='start-captioning'>
+        <a href='#'>Click to Start Captioning</a>
+      </td>
+    </tr>
+  {{/if}}
+</template>
+
+<template name='saving'>
+  {{#if saveState}}
+  <span>{{saveState}}</span>
+  {{/if}}
+</template>
+
+<template name='caption'>
+  <tr class='caption'>
+    <td class='times left-fixed-width'>
+      <p>
+      {{#with formatTime this}}
+        {{start}} - {{end}}
+      {{/with}}
+    </p>
+    <div class='time-slider'></div>
+    </td>
+    <td class='maintext'>
+  <div class="expandingArea active">
+      <pre><span></span><br></pre>
+      {{#isolate}}
+        <textarea class='caption-text' id='{{_id}}'>{{text}}</textarea>
+      {{/isolate}}
+  </div>
+</td>
+  <td class='delete-sub right-fixed-width'>
+    <i class='icon-trash'></i>
+  </td>
+  </tr>
+</template>

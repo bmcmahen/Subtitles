@@ -14,9 +14,12 @@
     this.marker = attr.marker;
     this.wrapper = attr.wrapper;
     this.project = attr.project;
+    this.duration = attr.duration;
 
+    // Keep track of when we are dragging our
+    // cursor to ensure better performance in some
+    // circumstances.
     this.draggingCursor = false; 
-    this.duration = this.project.duration; 
 
     this.setYScale().setXScale(); 
     this.bindEvents(); 
