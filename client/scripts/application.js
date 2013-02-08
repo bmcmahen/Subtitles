@@ -182,17 +182,29 @@ Template.video.helpers({
 // append it to the DOM. 
 Template.mainPlayerView.rendered = function(){
 
-  // XXX. This renders twice, when it should only render once.
-  // XXX. When VideoDuration is set, we should render our timeline.
   var vidSource = Videos.findOne(Session.get('currentVideo'))
     , self = this;
   
-  if (vidSource) {
+  if (vidSource && !Session.get('videoDuration')) {
     var videoNode = new Subtitler.VideoElement(vidSource.url, {
       target: 'main-player-drop',
       type: vidSource.type
     }).on('ready', function(){
-      Session.set('videoDuration', this.getVideoDuration());
+
+      // With YouTube, we need to retrieve metaData either
+      // by playing the video (and repeatedly checking for
+      // the metadata), or by using the gData api. This calls
+      // the gData api and retreives the necessary info.
+      if (this.isYoutube) {
+        this.getYoutubeMetadata(function(json){
+          Videos.update(Session.get('currentVideo'), {$set: {
+            name : json.data.title
+          }});
+          Session.set('videoDuration', json.data.duration);
+        });
+      } else {
+        Session.set('videoDuration', this.getVideoDuration());
+      }
     });
   }
 };

@@ -7,6 +7,8 @@
 
 /*jshint laxcomma:true */
 
+Session.set('videoDuration', null);
+
 (function(Subtitler, d3){
 
 Template.map.events({
@@ -36,27 +38,37 @@ Template.map.events({
 
 });
 
+Template.map.helpers({
+  // Only render our timeline once we have a video duration.
+  // This is necessary for our xScale.
+  videoDuration: function(){
+    return Session.get('videoDuration');
+  }
+});
+
 // Instantiate our d3 powered timeline and setup
 // a reactive context for the data sources that will
 // alter our timeline, including captions, current time,
 // and current video. 
 Template.map.rendered = function () {
-
   var self = this
-    , timeline;
+    , timeline
+    , videoDuration = Session.get('videoDuration');
 
+  console.log('map rendered');
   // We need to ensure that we have a video duration before
   // constructing the timeline.
-  
-  var project = Videos.findOne(Session.get('currentVideo'));
-  if (project && project.duration) {
+  if (videoDuration) {
    
+   console.log('timeline now rendered');
+
     var constructTimeline = function(){
      timeline = self.timeline = new Subtitler.Timeline({
         node : self.find('#video-map'),
         marker : self.find('#current-position'),
         wrapper : self.find('.timeline-wrapper'),
-        project : project
+        project : Videos.findOne(Session.get('currentVideo')),
+        duration: videoDuration
       });
     };
 
@@ -85,7 +97,6 @@ Template.map.rendered = function () {
           if (!timeline) constructTimeline(); 
 
           timeline
-            .setDuration(video.duration)
             .setXScale()
             .drawClickZone();
         }

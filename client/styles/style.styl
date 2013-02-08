@@ -78,14 +78,15 @@ video
   border-radius 5px
 
 .wrapper-inset
-  box-shadow inset 0 2px 1px rgba(49,77,94,0.15), 0 2px 0 rgba(12,12,12,0)
+  box-shadow inset 0 1px 1px rgba(49,77,94,0.06),0 1px 0 rgba(255,255,255,0.33)  
   padding-left 1px
   padding-top 1px
-  border-radius 3px
+  border-radius 2px
   max-height 350px
   overflow auto
   background white
-  border 1px solid #e5e5e5
+  border 1px solid #cdd0d3
+  border-top-color #bfc1c4
 
 .wrapper-video
   background-image linear-gradient(#eee, #ddd)
@@ -103,7 +104,7 @@ textarea
   line-height 0
 
 .dropzone
-  height 100px
+  height 350px
   width 460px
   background white
   box-shadow inset 1px 1px 2px #bbb
@@ -285,6 +286,9 @@ pre
   & span
     display: inline-block
     padding: 12px
+    font-family 'open sans'
+    font-size 11px
+    font-weight bold
     padding-bottom: 0px
 
 img#loader
@@ -440,3 +444,9 @@ a.video-controls
 
   & input
     margin 2px
+
+#hints
+  margin-right 15px
+
+#insert-new-caption
+  margin-bottom 7px

@@ -14,7 +14,8 @@
     this.marker = attr.marker;
     this.wrapper = attr.wrapper;
     this.project = attr.project;
-    this.duration = attr.duration;
+
+    this.setDuration(attr.duration);
 
     // Keep track of when we are dragging our
     // cursor to ensure better performance in some
@@ -23,6 +24,7 @@
 
     this.setYScale().setXScale(); 
     this.bindEvents(); 
+    console.log('is this being called?');
 
     Subtitler.timeline = this; 
   };
@@ -49,6 +51,7 @@
 
     setDuration: function(time){
       this.duration = time; 
+      console.log(this.duration);
       return this;
     },
 

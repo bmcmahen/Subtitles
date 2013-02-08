@@ -7,6 +7,7 @@
  * 
  */
 
+/*jshint laxcomma:true */
 
 (function(Subtitler, window){
 
@@ -19,6 +20,7 @@
   var VideoElement = function(src, options){
     var options = options || {};
 
+    this.src = src; 
     this.type = options.type || 'html';
     this.target = options.target ? '#' + options.target : '#player';
     this.isReady = false; 
@@ -41,9 +43,10 @@
       window.onYouTubeIframeAPIReady = function(){
         // Build the iframe
         self.isYoutube = true;
-        self.videoNode = new YT.Player(self.options.target, {
-          width: '100%',
-          videoId: this.getId(src),
+        self.videoNode = new YT.Player(options.target, {
+          width: $('.video-dropzone').width(),
+          height: '500',
+          videoId: self.getId(src),
           playerVars: {
             controls: 0
           }
@@ -134,7 +137,6 @@
     onReady: function(){
       this.isReady = true; 
       this.bindEvents(); 
-      console.log('it should emit ready');
       this.emit('ready');
     },
 
@@ -220,6 +222,20 @@
       if (this.isYoutube) return this.videoNode.getDuration();
       else if (this.isVimeo) return this.videoNode.api('getDuration');
       else if (this.isHTML) return this.videoNode.duration; 
+    },
+
+    // If we want to get the video duration without playing the
+    // video (for YouTube) then we need to run this. Sucks.
+    getYoutubeMetadata: function(callback){
+      var tag = document.createElement('script');
+      tag.src = 'http://gdata.youtube.com/feeds/api/videos/'+ this.getId(this.src) + '?v=2&alt=jsonc&callback=youtubeFeedCallback&prettyprint=true';
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      
+      window.youtubeFeedCallback = function(json){
+        console.log(json);
+        callback(json); 
+      }
     },
 
     seekTo: function(number){
