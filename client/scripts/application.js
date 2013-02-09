@@ -185,27 +185,34 @@ Template.mainPlayerView.rendered = function(){
   var vidSource = Videos.findOne(Session.get('currentVideo'))
     , self = this;
   
-  if (vidSource && !Session.get('videoDuration')) {
-    var videoNode = new Subtitler.VideoElement(vidSource.url, {
+  // Check to see if the second condition is necessary.
+  if (vidSource && !Subtitler.videoNode) {
+
+    var videoNode = Subtitler.videoNode = new Subtitler.VideoElement(vidSource.url, {
       target: 'main-player-drop',
       type: vidSource.type
-    }).on('ready', function(){
+    });
 
-      // With YouTube, we need to retrieve metaData either
-      // by playing the video (and repeatedly checking for
-      // the metadata), or by using the gData api. This calls
-      // the gData api and retreives the necessary info.
-      if (this.isYoutube) {
-        this.getYoutubeMetadata(function(json){
-          Videos.update(Session.get('currentVideo'), {$set: {
-            name : json.data.title
-          }});
-          Session.set('videoDuration', json.data.duration);
-        });
+    videoNode.on('metaDataReceived', function(){
+      console.log('metaDataReceived');
+
+      if (this.isYoutube || this.isVimeo) {
+        Videos.update(Session.get('currentVideo'), {$set: {
+          name : this.name,
+          duration: this.duration
+        }});
+      }
+
+      if (this.duration) {
+        Session.set('videoDuration', this.duration);
       } else {
-        Session.set('videoDuration', this.getVideoDuration());
+        this.getVideoDuration(function(duration){
+          Session.set('videoDuration', duration);
+        });
       }
     });
+
+
   }
 };
 

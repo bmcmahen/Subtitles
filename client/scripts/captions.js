@@ -36,7 +36,7 @@ var setSessions = function(start, end, time, sub) {
 
 Template.beginProcess.events({
   
-  'click .start-captioning a' : function () {
+  'click #start-captioning' : function () {
     var newSub = Subtitles.insert({
       startTime : 0,
       endTime : Session.get('loopDuration'),
@@ -48,6 +48,7 @@ Template.beginProcess.events({
     setSessions(0, Session.get('loopDuration'), 0, newSub)
 
     Subtitler.videoNode.playVideo(); 
+    return false;
   }
 });
 

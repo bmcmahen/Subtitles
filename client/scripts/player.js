@@ -14,9 +14,6 @@
   var Emitter = require('component-emitter');
 
   // Constructor
-  // 
-  // src = either a video URL, or Blob URL (if embedding locally)
-  // type = either 'youtube' or 'html'
   var VideoElement = function(src, options){
     var options = options || {};
 
@@ -25,41 +22,24 @@
     this.target = options.target ? '#' + options.target : '#player';
     this.isReady = false; 
 
-    // If we're embedding a youtube video, use the 
-    // following constructor.
-    // 
-    // NOTE: This actually embeds the youtube video. So if
-    // we go to another page, we'll have to use this constructor
-    // again. Embeds should be in a separate function.
+    // YOUTUBE
     if (this.type === 'youtube') {
-      // Async load the required script for youtube
-      var tag = document.createElement('script');
-      tag.src = "//www.youtube.com/iframe_api";
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-      // The async callback provided by YouTube
+      this.isYoutube = true;
+      this.target = options.target; 
       var self = this; 
-      window.onYouTubeIframeAPIReady = function(){
-        // Build the iframe
-        self.isYoutube = true;
-        self.videoNode = new YT.Player(options.target, {
-          width: $('.video-dropzone').width(),
-          height: '500',
-          videoId: self.getId(src),
-          playerVars: {
-            controls: 0
-          }
-        });
-        self.bindReady(); 
-      };
-    }
 
-    // If we're embedding an HTML video, use the 
-    // following constructor.
-    // 
-    // Will this work if we supply a regular HTML5 URL
-    // instead of constructing the blob url?
+      if (typeof(YT) === 'undefined') {
+        window.onYouTubeIframeAPIReady = function() {
+          self.buildYouTubeVideo();
+        }
+        $.getScript('//www.youtube.com/iframe_api');
+      } else {
+        this.buildYouTubeVideo();
+      }
+    };
+
+
+    // REGULAR HTML
     if (this.type === 'html') {
       this.isHTML = true; 
       var el = this.videoNode = document.createElement('video');
@@ -68,27 +48,14 @@
       this.embedVideo(); 
     }
 
-    // Vimeo embed. 
+    // VIMEO
     if (this.type === 'vimeo') {
       this.isVimeo = true; 
-      var iframe = document.createElement('iframe');
-      $(iframe).attr({
-          src: 'http://player.vimeo.com/video/'+ src +'?api=1',
-          frameborder: 0,
-          width: '100%',
-          height: '350px'
-        });
-      $(this.target).html(iframe);
-      this.videoNode = $f(iframe);
-      this.bindReady(); 
+      this.buildVimeoVideo();
     }
-
-    Subtitler.videoNode = this; 
-
   };
 
   VideoElement.prototype = new Emitter(); 
-
 
   // Functions
   _.extend(VideoElement.prototype, {
@@ -138,15 +105,12 @@
       this.isReady = true; 
       this.bindEvents(); 
       this.emit('ready');
+      if (this.isHTML){
+        this.emit('metaDataReceived');
+      }
     },
 
-    // The youtube api (unfortunately) doesn't have a time update
-    // event like the HTML 5 player does. But we can emulate
-    // it. When the video is playing, set an interval that calls
-    // onTimeUpdate every 300 ms or so. If the video is
-    // paused, stopped, or ended, stop the interval. Typically the
-    // timeupdate interval fires (i think) at different rates 
-    // depending on system load. We'll just stick with a conservative(?) 250. 
+    // A YouTube polyfill for timeUpdate.  
     youtubeTimeUpdate: function(stop){
       var update = _.bind(this.onTimeUpdate, this);
       this.youtubeInterval && Meteor.clearInterval(this.youtubeInterval);
@@ -218,24 +182,16 @@
       else if (this.isHTML) this.videoNode.play(); 
     },
 
-    getVideoDuration: function(){
-      if (this.isYoutube) return this.videoNode.getDuration();
-      else if (this.isVimeo) return this.videoNode.api('getDuration');
-      else if (this.isHTML) return this.videoNode.duration; 
-    },
-
-    // If we want to get the video duration without playing the
-    // video (for YouTube) then we need to run this. Sucks.
-    getYoutubeMetadata: function(callback){
-      var tag = document.createElement('script');
-      tag.src = 'http://gdata.youtube.com/feeds/api/videos/'+ this.getId(this.src) + '?v=2&alt=jsonc&callback=youtubeFeedCallback&prettyprint=true';
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      
-      window.youtubeFeedCallback = function(json){
-        console.log(json);
-        callback(json); 
+    // Vimeo's function is async, so for consistency we'll
+    // make each function return via callback. 
+    getVideoDuration: function(callback){
+      if (this.isYoutube) callback(this.videoNode.getDuration());
+      else if (this.isVimeo) {
+        this.videoNode.api('getDuration', function(time){
+          callback(time);
+        });
       }
+      else if (this.isHTML) callback(this.videoNode.duration); 
     },
 
     seekTo: function(number){
@@ -258,11 +214,66 @@
 
     // Thanks to: http://stackoverflow.com/a/9102270/1198166
     getId: function(url){
-      var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
-      var match = url.match(regExp);
-      if (match && match[2].length==11){
-        return match[2];
+      if (this.isYoutube) {
+        var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        if (match && match[2].length==11){
+          return match[2];
+        }
       }
+      if (this.isVimeo) {
+        return _.last(url.split('/'));
+      }
+    },
+
+    buildYouTubeVideo: function(){
+      var self = this; 
+
+      // Build the iframe
+      this.videoNode = new YT.Player(this.target, {
+        width: $('.video-dropzone').width(),
+        height: '500',
+        videoId: this.getId(this.src),
+        playerVars: {
+          controls: 0
+        }
+      });
+
+      this.bindReady();
+
+      window.youtubeFeedCallback = function(json){
+        self.name = json.data.title;
+        self.duration = json.data.duration;
+        self.emit('metaDataReceived', json);
+      };
+
+      $.getScript('http://gdata.youtube.com/feeds/api/videos/'+ this.getId(this.src) + '?v=2&alt=jsonc&callback=youtubeFeedCallback&prettyprint=true');   
+    },
+
+    buildVimeoVideo: function(){
+      var self = this; 
+      var iframe = document.createElement('iframe');
+      $(iframe).attr({
+          src: 'http://player.vimeo.com/video/'+ this.getId(this.src) +'?api=1&player_id=vimeoPlayer',
+          frameborder: 0,
+          width: '100%',
+          height: '350px',
+          id: 'vimeoPlayer'
+        });
+      $(this.target).html(iframe);
+      this.videoNode = $f(iframe);
+      this.bindReady(); 
+
+      window.vimeoFeedCallback = function(json){
+        console.log(json, self);
+        self.name = json[0].title;
+        self.duration = json[0].duration; 
+        self.emit('metaDataReceived', json);
+      };
+
+      var id = this.getId(this.src);
+      $.getScript('http://vimeo.com/api/v2/video/'+ id +'.json?callback=vimeoFeedCallback');
+    
     },
 
     // Embeds an HTML Video into a target DOM element.

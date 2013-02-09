@@ -24,7 +24,6 @@
 
     this.setYScale().setXScale(); 
     this.bindEvents(); 
-    console.log('is this being called?');
 
     Subtitler.timeline = this; 
   };
@@ -51,7 +50,6 @@
 
     setDuration: function(time){
       this.duration = time; 
-      console.log(this.duration);
       return this;
     },
 

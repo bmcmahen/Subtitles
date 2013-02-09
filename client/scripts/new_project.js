@@ -26,7 +26,7 @@
         url: url,
         type: 'youtube'
       };
-      createOrDeferToLogin(vid);
+      createOrDeferToLogin(vid, 'youtube');
       return false;
     },
 
@@ -37,7 +37,7 @@
         url: url,
         type: 'vimeo'
       };
-      createOrDeferToLogin(vid);
+      createOrDeferToLogin(vid, 'vimeo');
       return false;
     }
   });
@@ -94,7 +94,6 @@
       if (url) {
         t.videoURL = url; 
         t.vid = vid; 
-        vid.type = 'html';
         vid.url = url; 
         Session.set('videoSelected', vid);
       }
@@ -110,7 +109,7 @@
     },
 
     'click #create-project' : function(e, t){
-      createOrDeferToLogin(t.vid);
+      createOrDeferToLogin(t.vid, 'html');
       return false;
     }
 
@@ -119,7 +118,7 @@
   // Either create our app view, or continue to login
   // or registration if not logged in. Add option to caption
   // without being logged in? 
-  function createOrDeferToLogin(videoObject){
+  function createOrDeferToLogin(videoObject, type){
     // We need to store the current VideoObject, and remember
     // that we are in the 'create video' flow. 
     if (!Meteor.user()) {
@@ -128,14 +127,19 @@
       return;
     }
 
-    // actually insert new object into database
-    var newVideo = Videos.insert({
-      user : Meteor.userId(),
-      name: videoObject.name,
+    var newProject = {
+      user: Meteor.userId(),
       created: new Date(),
-      type: videoObject.type,
-      url: videoObject.url 
-    });
+      type: type,
+      url : videoObject.url
+    };
+
+    if (type === 'html') {
+      newProject.name = videoObject.name;
+    } 
+
+    // actually insert new object into database
+    var newVideo = Videos.insert(newProject);
 
     Session.set('currentVideo', newVideo);
     Session.set('currentView', 'app');
