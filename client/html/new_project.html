@@ -81,28 +81,5 @@
   </div>
 </template>
 
-<template name='viewLibrary'>
-  <header>
-    <h5>Select a Project</h5>
-    <button class='close'>×</button>
-  </header>
-  <div class='panel-body'>
-    <div class='wrapper-inset'>
-      <ul class='nav nav-list'>
-        {{#each project}}
-          {{> projectList}}
-        {{else}}
-        <p class='empty'> Your library is empty. </p>
-        {{/each}}
-      </ul>
-    </div>
-  </div>
-</template>
 
 
-<template name='projectList'>
-  <li class='caption'>
-      <a href='#' class='project-name'>{{name}}</a>
-      <i class='icon-chevron-right'></i>
-   </li>
-</template>

@@ -141,6 +141,7 @@
     // actually insert new object into database
     var newVideo = Videos.insert(newProject);
 
+    delete Subtitler.videoNode; 
     Session.set('currentVideo', newVideo);
     Session.set('currentView', 'app');
     Session.set('overlay', null);

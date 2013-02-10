@@ -1,84 +1,26 @@
-<template name='library'>
-    <div class='container'>
-      <div class='row'>
 
-        <div class='span5 offset1'>
-          <h2> NEW PROJECT </h2>
-          <div class='wrapper'>
-            <div id='dropzone' class='dropzone'>
-              <p> <strong>Drop video</strong> or <strong>click</strong> to select video source.</p>
-            </div>
-            <form id='new-project'>
-              <input type='file' id='video-file'/>
-              <input type='text' id='project-name' class='newproject large' placeholder='Project Name'/><input type='submit' class='btn pink large' id='create-project' value='Create Project' />
-            </form>
-          </div>
-        </div>
-
-        <div class='span5'>
-          <h2> LIBRARY </h2>
-          <div class='wrapper-inset'>
-          	<div class='columns {{#if columnClass}} {{columnClass}} {{/if}}'>
-          		<div class='columns-inner'>
-		          	<div class='menu item'>
-			          	<ul class='nav nav-list'>
-			          		{{#each project}}
-			          			{{> projectList}}
-			          		{{/each}}
-			          	</ul>
-			          </div>
-			            <div class='submenu item'> 
-			          		{{> projectSubmenu}}
-			          	</div>
-			         </div>
-	       		</div>
-	       	</div>
-
-      </div>
+<template name='viewLibrary'>
+  <header>
+    <h5>Select a Project</h5>
+    <button class='close'>×</button>
+  </header>
+  <div class='panel-body'>
+    <div class='wrapper-inset'>
+      <ul class='nav nav-list'>
+        {{#each project}}
+          {{> projectList}}
+        {{else}}
+        <p class='empty'> Your library is empty. </p>
+        {{/each}}
+      </ul>
     </div>
   </div>
-
-  <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Video Format not Supported</h3>
-  </div>
-  <div class="modal-body">
-    <p>Unfortunately, the video format that you have selected is not supported by your web browser. We recommend that you use <a href='http://www.mirovideoconverter.com/'>Miro Video Converter</a> to convert your video into a format supported by your web browser.</p>
-    <p>Your web browser supports playback of <strong>{{supportedFormats}}.</strong></p>
-    <p>Once you have converted your file to a supported format, try selecting it again for use.</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn blue dismiss">Okay</button>
-  </div>
-</div>
-
 </template>
 
 
-
-<template name='projectSubmenu'>
-	    {{#with project}}
-      <div class='submenu-header'>
-        <button class='btn go-back circle'> <i class='icon-chevron-left'></i></button>
-          <button class='btn delete-project pull-right'> Delete </button>
-        <button class='btn export-subs pull-right'>Export</button>
-      </div>
-
-      <div class='submenu-content'>
-
-        	<h5>{{name}}</h5>
-          
-        <div id='drop' class='select-video-file'>
-          <a class='select'> <strong>Drop video</strong> or <strong> click </strong> to select video source. </a>
-        </div>
-      <button class='btn pink pull-right large open-project'>Open Project</button>
-      </div>
-     {{/with}}
-
-
-      <input type='file' class='video-select'>
+<template name='projectList'>
+  <li class='caption'>
+      <a href='#' class='project-name'>{{name}}</a>
+      <i class='icon-chevron-right'></i>
+   </li>
 </template>
-
-
-

@@ -9,7 +9,6 @@ accounts-base
 accounts-password
 email
 backbone
-http
 accounts-urls
 underscore
 jquery

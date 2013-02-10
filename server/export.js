@@ -1,3 +1,10 @@
+// XXX if window.saveAs() and web worker and blob builder,
+// then do it all on the client. Chrome, IE10, Firefox(?). 
+// 
+// otherwise, send the json to an express server. Express will
+// build string, and respond with a file. IE9, Safari, Firefox.
+// 
+
 (function(){
 
 Meteor.methods({

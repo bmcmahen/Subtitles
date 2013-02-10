@@ -232,7 +232,7 @@
       // Build the iframe
       this.videoNode = new YT.Player(this.target, {
         width: $('.video-dropzone').width(),
-        height: '500',
+        height: '300',
         videoId: this.getId(this.src),
         playerVars: {
           controls: 0
@@ -257,7 +257,7 @@
           src: 'http://player.vimeo.com/video/'+ this.getId(this.src) +'?api=1&player_id=vimeoPlayer',
           frameborder: 0,
           width: '100%',
-          height: '350px',
+          height: '300px',
           id: 'vimeoPlayer'
         });
       $(this.target).html(iframe);
@@ -265,7 +265,6 @@
       this.bindReady(); 
 
       window.vimeoFeedCallback = function(json){
-        console.log(json, self);
         self.name = json[0].title;
         self.duration = json[0].duration; 
         self.emit('metaDataReceived', json);
