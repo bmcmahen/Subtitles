@@ -9,6 +9,7 @@
 
     'click .create-project': function(e, t){
       Session.set('overlay', 'newVideo');
+      Router.navigate('new-project');
       return false; 
     }
 

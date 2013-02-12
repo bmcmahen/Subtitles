@@ -44,21 +44,21 @@
   </div>
   <div class='row-fluid'>
     <div class='span12'>
-        <div class='video-dropzone'>
-          {{#constant}}
-            {{> mainPlayerView}}
-          {{/constant}}
-        </div>
+      <div class='video-dropzone'>
+        {{#constant}}
+          {{> mainPlayerView}}
+         {{/constant}}
       </div>
-      {{> controls}}
     </div>
+  </div>
+  {{> controls}}
 </template>
 
 <template name='mainPlayerView'>
     <div id='main-player-drop' class='dropzone'>
-      <p> 
-        <strong>Drop video</strong> or <strong> Click </strong> to select video source.
-      </p>
+        <p> 
+          <strong>Drop video</strong> or <strong> Click </strong> to select video source.
+        </p>
     </div>
     <input type='file' class='file' style='display:none'/>
 </template>
@@ -131,7 +131,10 @@
 
           <button class='btn small pull-right' id='export-subtitles'> Export </button>
 
-         <button class='btn small pull-right' id='hints'>Hints</button>
+         <button class='btn small pull-right' id='hints'>
+          Hints
+          <b class='caret'></b>
+         </button>
            
         <div class='popover bottom'>
           <div class='arrow'></div>

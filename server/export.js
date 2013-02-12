@@ -9,7 +9,6 @@
 
 Meteor.methods({
 	export : function(subs, options){
-		console.log('am i being called?');
 		var file = new Exports(subs, options);
 		return file.toSRT(); 
 	}

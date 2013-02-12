@@ -31,6 +31,7 @@ Subtitles = new Meteor.Collection('subtitles');
 
     home : function() {
       Session.set('currentView', null);
+      Session.set('overlay', null);
     },
 
     login: function(){
@@ -93,7 +94,7 @@ Subtitles = new Meteor.Collection('subtitles');
   Session.set('isLooping', null)
   Session.set('saving', null)
   Session.set('videoURL', null)
-  Session.set('currentView', 'introduction');
+  Session.set('currentView', null);
   Session.set('loading', null)
 
   // Subscriptions.
@@ -183,18 +184,27 @@ Template.video.helpers({
 Template.mainPlayerView.rendered = function(){
 
   var vidSource = Videos.findOne(Session.get('currentVideo'))
-    , self = this;
+    , self = this, target;
   
   // Check to see if the second condition is necessary.
   if (vidSource && !Subtitler.videoNode) {
+    Session.set('loading', true);
+
+    if (vidSource.type === 'youtube'){
+      $('#main-player-drop').html('<div id="youtube-player-drop"></div>');
+      target = 'youtube-player-drop';
+    } else {
+      target = 'main-player-drop';
+    }
 
     var videoNode = Subtitler.videoNode = new Subtitler.VideoElement(vidSource.url, {
-      target: 'main-player-drop',
+      target: target,
       type: vidSource.type
     });
 
+    // When our metaData is received, we can draw the timeline
+    // and update the video name.
     videoNode.on('metaDataReceived', function(){
-      console.log('metaDataReceived');
 
       if (this.isYoutube || this.isVimeo) {
         Videos.update(Session.get('currentVideo'), {$set: {
@@ -210,6 +220,8 @@ Template.mainPlayerView.rendered = function(){
           Session.set('videoDuration', duration);
         });
       }
+
+      Session.set('loading', null);
     });
 
 
@@ -220,6 +232,7 @@ Template.mainPlayerView.rendered = function(){
 Template.loading.rendered = function(){
   var loading = require('bmcmahen-canvas-loading-animation')
     , spinner = new loading({
+        color: '220, 220, 220',
         width: 40,
         height: 40,
         radius: 9,
@@ -227,7 +240,6 @@ Template.loading.rendered = function(){
       });
 
   var wrapper = this.find('#loading-wrapper');
-
   wrapper.appendChild(spinner.canvas);
 }
 

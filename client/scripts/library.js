@@ -12,6 +12,7 @@ Template.projectList.events({
     Session.set('currentVideo', this._id);
     Session.set('currentView', 'app');
     Session.set('overlay', null);
+    Router.navigate('project/'+ this._id);
     return false;
   }
 });

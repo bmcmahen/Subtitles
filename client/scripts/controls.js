@@ -69,16 +69,14 @@ Template.controls.helpers({
 })
 
 Template.controls.rendered = function() {
-  var self = this;
-  var loop = self.find('#loop-duration');
+  var loop = this.find('#loop-duration');
   loop.value = Session.get('loopDuration');
 
-  var pRate = self.find('#playback-rate');
+  var pRate = this.find('#playback-rate');
   pRate.value = Session.get('playbackRate');
 
   var vid = document.getElementById('video-display');
-  self.node = vid; 
-
+  this.node = vid; 
 }
 
 })(Subtitler);

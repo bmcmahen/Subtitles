@@ -55,12 +55,9 @@ Template.map.rendered = function () {
     , timeline
     , videoDuration = Session.get('videoDuration');
 
-  console.log('map rendered');
   // We need to ensure that we have a video duration before
   // constructing the timeline.
   if (videoDuration) {
-   
-   console.log('timeline now rendered');
 
     var constructTimeline = function(){
      timeline = self.timeline = new Subtitler.Timeline({
@@ -80,8 +77,8 @@ Template.map.rendered = function () {
       this.drawTimeline = Meteor.autorun(function() {
         var subtitles = Subtitles.find().fetch();
 
-        if (!timeline)
-          return;
+        if (!timeline) 
+          constructTimeline();
       
         timeline.appendData(subtitles).drawTimeline();
       });
@@ -94,7 +91,8 @@ Template.map.rendered = function () {
         var video = Videos.findOne(Session.get('currentVideo'));
         if (video) {
 
-          if (!timeline) constructTimeline(); 
+          if (!timeline) 
+            constructTimeline(); 
 
           timeline
             .setXScale()
@@ -117,6 +115,20 @@ Template.map.rendered = function () {
 
           timeline.updateMarkerPosition(currentTime);
         });
+    }
+
+    // Update xScale if Duration Changes
+    if (! this.videoDuration) {
+      this.videoDuration = Meteor.autorun(function () {
+        var duration = Session.get('videoDuration');
+
+        if (!timeline)
+          return
+
+        timeline
+          .setDuration(Session.get('videoDuration'))
+          .setXScale();
+      });
     }
 
   }

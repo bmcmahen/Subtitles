@@ -25,10 +25,19 @@ Template.overlay.helpers({
 Template.overlay.events({
 
   'click .close' : function(e, t){
+
+    if (!Session.get('currentView')) {
+      Router.navigate('');
+    } else {
+      var currentId = Session.get('currentVideo');
+      Router.navigate('project/'+currentId);
+    }
+
     $('#overlay').removeClass('active');
     Meteor.setTimeout(function(){
       Session.set('overlay', null);
     }, 400);
+    
     return false; 
   },
 

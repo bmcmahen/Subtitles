@@ -64,12 +64,34 @@ function onLogin(err){
     return;
   }
 
-  if (Session.get('videoSource')) {
-    console.log('videoSource');
-  }
+  if (Session.get('createProjectFlow'))
+    createProject();
 
   Session.set('overlay', null);
 };
+
+function createProject(){
+  var videoObject = Session.get('createProjectFlow');
+
+  var newProject = {
+    user: Meteor.userId(),
+    created: new Date(),
+    type: videoObject.type,
+    url : videoObject.url
+  };
+
+  if (videoObject.type === 'html') {
+    newProject.name = videoObject.name;
+  } 
+
+  // actually insert new object into database
+  var newVideo = Videos.insert(newProject);
+  Router.navigate('project/' + newVideo);
+
+  delete Subtitler.videoNode; 
+  Session.set('currentVideo', newVideo);
+  Session.set('currentView', 'app');
+}
 
 
 // Login Form Events

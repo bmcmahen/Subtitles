@@ -123,7 +123,9 @@
     // that we are in the 'create video' flow. 
     if (!Meteor.user()) {
       Session.set('overlay', 'loginForm');
-      Session.set('videoSource', videoObject);
+      videoObject.type = type; 
+      Session.set('createProjectFlow', videoObject);
+      Router.navigate('login');
       return;
     }
 
@@ -140,6 +142,7 @@
 
     // actually insert new object into database
     var newVideo = Videos.insert(newProject);
+    Router.navigate('project/' + newVideo);
 
     delete Subtitler.videoNode; 
     Session.set('currentVideo', newVideo);

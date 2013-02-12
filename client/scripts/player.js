@@ -20,6 +20,7 @@
     this.src = src; 
     this.type = options.type || 'html';
     this.target = options.target ? '#' + options.target : '#player';
+    $('.dropzone').toggleClass('active');
     this.isReady = false; 
 
     // YOUTUBE
@@ -31,20 +32,18 @@
       if (typeof(YT) === 'undefined') {
         window.onYouTubeIframeAPIReady = function() {
           self.buildYouTubeVideo();
-        }
+        };
         $.getScript('//www.youtube.com/iframe_api');
       } else {
         this.buildYouTubeVideo();
       }
     };
 
-
-    // REGULAR HTML
+    // HTML 5
     if (this.type === 'html') {
       this.isHTML = true; 
       var el = this.videoNode = document.createElement('video');
-      el.setAttribute('id', 'video-display');
-      el.src = src;
+      $(el).attr({ id: 'video-display', src: src });
       this.embedVideo(); 
     }
 
@@ -305,7 +304,7 @@
 
   });
 
-  // Expose this class to the world.
+  // Expose this class to THE WORLD.
   Subtitler.VideoElement = VideoElement; 
 
 })(Subtitler, window);

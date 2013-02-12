@@ -207,7 +207,7 @@ Template.caption.events({
         var target = e.currentTarget
           , next = Subtitles.findOne({ 
             startTime :{ $gt : self.endTime, $lt : self.endTime + 1} 
-          })
+          });
 
         if (next) {
           setSessions(next.startTime, next.endTime, next.startTime, next._id)
@@ -225,12 +225,12 @@ Template.caption.events({
               user : Meteor.userId()
             });
 
-        setSessions(newStart, newEnd, newStart, sub)
+        setSessions(newStart, newEnd, newStart, sub);
 
 
         // Empty? Remove. Else, save.
         if (target.value === '') 
-          Subtitles.remove(t.data._id)
+          Subtitles.remove(t.data._id);
         else {
           Subtitles.update(t.data._id, {
             $set : {

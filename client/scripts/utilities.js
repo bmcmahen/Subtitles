@@ -9,7 +9,7 @@
     // Converts seconds into HMS string
     secondsToHms : function(num, decimals) {
 
-      var decimals = decimals || 3; 
+      var decimals = decimals || 2; 
 
       // Convert seconds into hours, minutes, seconds (rounded to three decimals)
       var h = Math.floor(num / 3600)
@@ -26,8 +26,8 @@
             return '0' + n + sep
         } else if (n === 0) {
             return '00' + sep
-        } else if (n === '0.000') {
-            return '00.000'
+        } else if (n === '0.00') {
+            return '00.00'
         }
       }
 
@@ -62,9 +62,27 @@
 		} else {
 			return false; 
 		}
- 	 }
+ 	 },
 
- 	};
+   supportsBlobBuilder: function(){
+    var prefixedBB = window.MSBlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+    if (typeof Blob !== "undefined") {
+      return true;
+    } else if (prefixedBB) {
+      return true; 
+    } else {
+      return false; 
+    }
+  },
+
+  supportsWebWorker: function(){
+    return typeof Worker === 'undefined' ? false : true; 
+  }
+ 	
+
+
+  };
 
 
 })(); 

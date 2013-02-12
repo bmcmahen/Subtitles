@@ -87,40 +87,39 @@
         .attr('height', function (cap) {
           return self.yScale(self.getWPMRatio(cap)); 
         });
+      return this; 
     },
 
     // Ensures that we have an invisible click-zone, allowing seeking
     // on the timeline.
     drawClickZone : function(){
-      var self = this;
-
-      d3.select(self.node).select('rect.timeline-click-zone')
-        .attr('width', $(self.wrapper).width());
+      d3.select(this.node)
+        .select('rect.timeline-click-zone')
+        .attr('width', $(this.wrapper).width());
+      return this; 
     },
 
     // Our basic drawing logic. 
     drawTimeline : function(){
-      var self = this;
-
-      self.drawSubtitles(self.captions.enter().append('rect'));
-      self.drawSubtitles(self.captions.transition().duration(400));
-      self.captions
+      this.drawSubtitles(this.captions.enter().append('rect'));
+      this.drawSubtitles(this.captions.transition().duration(400));
+      this.captions
         .exit()
         .transition()
         .duration(400)
         .style('opacity', 0)
         .remove(); 
+      return this; 
     },
 
     updateMarkerPosition : function(currentTime){
-      var self = this
-        , xAxis = self.xScale ? self.xScale(currentTime) : 0; 
-
-      d3.select(self.marker)
+      var xAxis = this.xScale ? this.xScale(currentTime) : 0; 
+      d3.select(this.marker)
         .transition()
         .duration(200)
         .attr('x1', xAxis)
         .attr('x2', xAxis);
+      return this;
     },
 
     // Appends our subtitles reactive data source to our
@@ -168,6 +167,7 @@
           Subtitler.videoNode.syncCaptions(self.xScale.invert(xPosition));
         }
       }
+      return this;
     },
 
     onMouseUp: function(){
@@ -188,7 +188,8 @@
     onWindowResize: function(){
       this.setXScale();
       this.drawClickZone();
-      this.drawSubtitles(this.captions.transition().duration(400));
+      if (this.captions)
+        this.drawSubtitles(this.captions.transition().duration(400));
       this.updateMarkerPosition(Session.get('currentTime'));
     },
 

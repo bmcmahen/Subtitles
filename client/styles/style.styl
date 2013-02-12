@@ -2,7 +2,7 @@
 
 body
   padding-top 55px
-  font 12px 'Helvetica Neue', Helvetica, arial, sans-serif
+  font 12px 'open sans', 'Helvetica Neue', Helvetica, arial, sans-serif
   height 100%
   background-image url("/images/backgrounds/satinweave.png")
 
@@ -43,6 +43,7 @@ h3
 h4
   font: 800 17px 'Open Sans Condensed', 'Helvetica Neue', Helvetica, arial, sans-serif
   margin: 7px 0px
+  height 23px
   color: #424b57
   width 100%
   text-overflow ellipsis
@@ -103,7 +104,7 @@ textarea
   line-height 0
 
 .dropzone
-  height 300px
+  min-height 275px
   width 560px
   background white
   box-shadow inset 1px 1px 2px #bbb
@@ -170,7 +171,7 @@ table.captions
       border-bottom 1px dotted #eee
 
     & td.left-fixed-width
-      width 170px
+      width 155px
 
     & td.right-fixed-width
       width 30px
@@ -229,7 +230,7 @@ td.start-captioning
   & a
     display inline-block
   & i
-    opacity 0.1
+    opacity 0.05
   &:hover i
     opacity 1
 
@@ -253,7 +254,7 @@ pre
   background transparent
   white-space pre-wrap
   word-wrap break-word
-  font 12px "Helvetica Neue", Helvetica, arial, sans-serif
+  font 12px 'open sans', "Helvetica Neue", Helvetica, arial, sans-serif
 
 .expandingArea > textarea
   box-sizing border-box
@@ -414,13 +415,13 @@ a.video-controls
     background-position -2px 1px
    
     &.paused
-      background-position -39px 1px
+      background-position -35px 1px
 
 #import-subtitles
   margin-right 0
 
 .controls
-  margin-top 12px
+  margin-top 16px
   text-align center
 
 .video-buttons
@@ -450,3 +451,20 @@ a.video-controls
 
 #insert-new-caption
   margin-bottom 7px
+
+button .caret
+  vertical-align middle
+  margin-left 3px
+
+#loading-wrapper
+  position: absolute
+  left: 50%
+  margin-left: -20px
+
+.navbar .nav .container-fluid
+  position relative
+
+.dropzone.active
+  border none
+  background none
+  box-shadow none

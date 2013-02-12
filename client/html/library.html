@@ -20,7 +20,13 @@
 
 <template name='projectList'>
   <li class='caption'>
-      <a href='#' class='project-name'>{{name}}</a>
+      <a href='#' class='project-name'>
+        {{#if name }}
+          {{name}}
+        {{else}}
+          Untitled Project
+        {{/if}}
+      </a>
       <i class='icon-chevron-right'></i>
    </li>
 </template>
