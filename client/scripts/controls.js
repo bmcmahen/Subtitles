@@ -66,17 +66,16 @@ Template.controls.helpers({
     if (!_.isUndefined(playbackRate))
       return true 
   }
-})
+});
 
 Template.controls.rendered = function() {
-  var loop = this.find('#loop-duration');
+  var loop = this.find('#loop-duration')
+    , pRate = this.find('#playback-rate')
+    , vid = document.getElementById('video-display');
+ 
   loop.value = Session.get('loopDuration');
-
-  var pRate = this.find('#playback-rate');
-  pRate.value = Session.get('playbackRate');
-
-  var vid = document.getElementById('video-display');
+  pRate.value = Session.get('playbackRate');  
   this.node = vid; 
-}
+};
 
 })(Subtitler);

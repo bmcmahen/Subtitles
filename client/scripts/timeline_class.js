@@ -1,5 +1,6 @@
 /**
- * A new Timeline Class
+ * Timeline Class for rendering captions w/ d3. 
+ * 
  */
 
 /*jshint laxcomma:true */
@@ -17,9 +18,8 @@
 
     this.setDuration(attr.duration);
 
-    // Keep track of when we are dragging our
-    // cursor to ensure better performance in some
-    // circumstances.
+    // Keep track of when we are dragging our cursor 
+    // to ensure better performance in some circumstances.
     this.draggingCursor = false; 
 
     this.setYScale().setXScale(); 
@@ -87,6 +87,7 @@
         .attr('height', function (cap) {
           return self.yScale(self.getWPMRatio(cap)); 
         });
+        
       return this; 
     },
 
@@ -126,7 +127,7 @@
     // d3 captions.
     appendData : function(subtitles){
       this.captions = d3.select(this.node)
-        .select('.caption-spans')
+        .select('#caption-spans')
         .selectAll('rect')
         .data(subtitles, function(sub){
           return sub._id;

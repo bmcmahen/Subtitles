@@ -30,6 +30,7 @@
       var self = this; 
 
       if (typeof(YT) === 'undefined') {
+        // Async load our youtube api js
         window.onYouTubeIframeAPIReady = function() {
           self.buildYouTubeVideo();
         };
@@ -42,9 +43,7 @@
     // HTML 5
     if (this.type === 'html') {
       this.isHTML = true; 
-      var el = this.videoNode = document.createElement('video');
-      $(el).attr({ id: 'video-display', src: src });
-      this.embedVideo(); 
+      this.buildHTMLVideo();
     }
 
     // VIMEO
@@ -52,6 +51,8 @@
       this.isVimeo = true; 
       this.buildVimeoVideo();
     }
+
+    Subtitler.videoNode = this; 
   };
 
   VideoElement.prototype = new Emitter(); 
@@ -59,21 +60,83 @@
   // Functions
   _.extend(VideoElement.prototype, {
 
-    // Events
-    
-    // Loop the video if need be. 
-    // Will this be triggered during 'seeking' with vimeo
-    // and youtube?
-    onTimeUpdate: function(data){
+     buildYouTubeVideo: function(){
+      var self = this; 
 
+      // Build the iframe
+      this.videoNode = new YT.Player(this.target, {
+        width: $('.video-dropzone').width(),
+        height: '300',
+        videoId: this.getId(this.src),
+        playerVars: {
+          controls: 0
+        }
+      });
+
+      this.bindReady();
+
+      window.youtubeFeedCallback = function(json){
+        self.name = json.data.title;
+        self.duration = json.data.duration;
+        self.emit('metaDataReceived', json);
+      };
+
+      $.getScript('http://gdata.youtube.com/feeds/api/videos/'+ this.getId(this.src) + '?v=2&alt=jsonc&callback=youtubeFeedCallback&prettyprint=true');   
+      return this; 
+    },
+
+    buildVimeoVideo: function(){
+      var self = this
+        , iframe = document.createElement('iframe')
+        , id = this.getId(this.src);
+
+      $(iframe).attr({
+          src: 'http://player.vimeo.com/video/'+ id +'?api=1&player_id=vimeoPlayer',
+          frameborder: 0,
+          width: '100%',
+          height: '300px',
+          id: 'vimeoPlayer'
+        });
+      $(this.target).html(iframe);
+      this.videoNode = $f(iframe);
+      this.bindReady(); 
+
+      window.vimeoFeedCallback = function(json){
+        self.name = json[0].title;
+        self.duration = json[0].duration; 
+        self.emit('metaDataReceived', json);
+      };
+
+      $.getScript('http://vimeo.com/api/v2/video/'+ id +'.json?callback=vimeoFeedCallback');
+      return this; 
+    },
+
+    buildHTMLVideo: function() {
+      var el = this.videoNode = document.createElement('video');
+
+      $(el)
+        .attr({ id: 'video-display', src: this.src })
+        .on('error', _.bind(this.onLoadingError, this));
+
+      $(this.target).html(el);
+      this.bindReady(); 
+      return this;
+    },
+
+
+    // Events
+    //
+    // Determine if we should loop.
+    onTimeUpdate: function(data){
       if (Subtitler.draggingCursor)
         return;
 
       var end = Session.get('endTime')
         , duration = Session.get('loopDuration')
-        , start = Session.get('startTime');
-
-      var currentTime = data && data.seconds ? +data.seconds : this.getCurrentTime(); 
+        , start = Session.get('startTime')
+        , currentTime = data && data.seconds 
+          ? +data.seconds 
+          : this.getCurrentTime(); 
 
       Session.set('currentTime', currentTime);
 
@@ -85,13 +148,16 @@
           && currentTime > end) {
         this.seekTo(start);
       }
-      
     },
 
     onPlayback: function(){
       Session.set('videoPlaying', true);
       if (this.isYoutube)
         this.youtubeTimeUpdate();
+    },
+
+    onLoadingError: function(){
+      this.emit('loadingError');
     },
 
     onPauseOrError: function(){
@@ -149,13 +215,10 @@
     // Bind onReady events with unified onReady function
     bindReady: function(){
       var vid = this.videoNode;
-
       if (this.isYoutube)
         vid.addEventListener('onReady', _.bind(this.onReady, this));
-      
       else if (this.isHTML)
-        vid.addEventListener('loadedmetadata', _.bind(this.onReady, this));
-      
+        vid.addEventListener('loadedmetadata', _.bind(this.onReady, this)); 
       else if (this.isVimeo)
         vid.addEvent('ready', _.bind(this.onReady, this));
     },
@@ -163,9 +226,7 @@
     // Playback Control / State
     getCurrentTime: function(){
       if (this.isYoutube) return this.videoNode.getCurrentTime();
-      else if (this.isVimeo) {
-        return this.videoNode.api('getCurrentTime');
-      }
+      else if (this.isVimeo) return this.videoNode.api('getCurrentTime');
       else if (this.isHTML) return this.videoNode.currentTime; 
     },
 
@@ -211,11 +272,11 @@
       return this;
     },
 
-    // Thanks to: http://stackoverflow.com/a/9102270/1198166
     getId: function(url){
+      // Thanks to: http://stackoverflow.com/a/9102270/1198166
       if (this.isYoutube) {
-        var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
-        var match = url.match(regExp);
+        var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/
+          , match = url.match(regExp);
         if (match && match[2].length==11){
           return match[2];
         }
@@ -225,65 +286,7 @@
       }
     },
 
-    buildYouTubeVideo: function(){
-      var self = this; 
-
-      // Build the iframe
-      this.videoNode = new YT.Player(this.target, {
-        width: $('.video-dropzone').width(),
-        height: '300',
-        videoId: this.getId(this.src),
-        playerVars: {
-          controls: 0
-        }
-      });
-
-      this.bindReady();
-
-      window.youtubeFeedCallback = function(json){
-        self.name = json.data.title;
-        self.duration = json.data.duration;
-        self.emit('metaDataReceived', json);
-      };
-
-      $.getScript('http://gdata.youtube.com/feeds/api/videos/'+ this.getId(this.src) + '?v=2&alt=jsonc&callback=youtubeFeedCallback&prettyprint=true');   
-    },
-
-    buildVimeoVideo: function(){
-      var self = this; 
-      var iframe = document.createElement('iframe');
-      $(iframe).attr({
-          src: 'http://player.vimeo.com/video/'+ this.getId(this.src) +'?api=1&player_id=vimeoPlayer',
-          frameborder: 0,
-          width: '100%',
-          height: '300px',
-          id: 'vimeoPlayer'
-        });
-      $(this.target).html(iframe);
-      this.videoNode = $f(iframe);
-      this.bindReady(); 
-
-      window.vimeoFeedCallback = function(json){
-        self.name = json[0].title;
-        self.duration = json[0].duration; 
-        self.emit('metaDataReceived', json);
-      };
-
-      var id = this.getId(this.src);
-      $.getScript('http://vimeo.com/api/v2/video/'+ id +'.json?callback=vimeoFeedCallback');
-    
-    },
-
-    // Embeds an HTML Video into a target DOM element.
-    embedVideo: function(target) {
-      target && this.setTarget(target);
-      $(this.target).html(this.videoNode);
-      this.bindReady(); 
-      return this;
-    },
-
     // Sync our video with our captions
-    // XXX Do I even use this??
     syncCaptions: function(time, options) {
       var end = Session.get('endTime')
         , start = Session.get('startTime')

@@ -70,6 +70,7 @@ function onLogin(err){
   Session.set('overlay', null);
 };
 
+// Create a project if we are in 'createProjectFlow'. 
 function createProject(){
   var videoObject = Session.get('createProjectFlow');
 
@@ -91,7 +92,8 @@ function createProject(){
   delete Subtitler.videoNode; 
   Session.set('currentVideo', newVideo);
   Session.set('currentView', 'app');
-}
+  Session.set('createProjectFlow', null);
+};
 
 
 // Login Form Events

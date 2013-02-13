@@ -73,29 +73,30 @@ Subtitles = new Meteor.Collection('subtitles');
     Backbone.history.start({ pushState : true });
   });
 
+  // The HUGE LIST of Session Variables. There should be a better
+  // way to do this. Consider making a local, reactive model? 
+  Session.set('looping', true);
+  Session.set('loopDuration', 5);
+  Session.set('playbackRate', 1);
+  Session.set('videoPlaying', false);
+  Session.set('currentTime', null);
+  Session.set('startTime', 0);
+  Session.set('endTime', null);
+  Session.set('currentVideo', null);
+  Session.set('currentSub', null);
+  Session.set('isLooping', null);
+  Session.set('saving', null);
+  Session.set('currentView', null);
+  Session.set('overlay', null);
+  Session.set('loading', null);
+  Session.set('createProjectFlow', null);
+
   // Handle the presence of a resetToken separately, since
   // this doesn't work well with Backbone's router. 
   if (Accounts._resetPasswordToken) {
     Session.set('overlay', 'loginView')
     Session.set('resetPassword', Accounts._resetPasswordToken);
   }
-
-  // The HUGE LIST of Session Variables. There should be a better
-  // way to do this. Consider making a local, reactive model? 
-  Session.set('looping', true)
-  Session.set('loopDuration', 5)
-  Session.set('playbackRate', 1)
-  Session.set('videoPlaying', false)
-  Session.set('currentTime', null)
-  Session.set('startTime', 0)
-  Session.set('endTime', null)
-  Session.set('currentVideo', null)
-  Session.set('currentSub', null)
-  Session.set('isLooping', null)
-  Session.set('saving', null)
-  Session.set('videoURL', null)
-  Session.set('currentView', null);
-  Session.set('loading', null)
 
   // Subscriptions.
   // 
@@ -115,131 +116,4 @@ Subtitles = new Meteor.Collection('subtitles');
 }).call(this);
 
 
-/**
- * video
- */
-
-Template.mainPlayerView.events({
-
-  'click #main-player-drop' : function(e, t) {
-    $('input.file').trigger('click');
-  },
-
-  'change input.file, drop #main-player-drop' : function(e, t) {
-    e.preventDefault(); 
-
-    // Assume it's an HTML video if we're dragging in a file. Then
-    // create a videoURL, and pass this to the videoElement 
-    // constructor. 
-    var fileList = e.currentTarget.files || e.dataTransfer.files
-      , vid = new Subtitler.Video(fileList)
-      , url = vid.createVideoUrl();
-
-      if (url) {
-        Session.set('videoURL', url)
-        this.videoNode = new Subtitler.VideoElement(url, {
-          target: '#main-player-drop'
-        }).embedVideo();
-      }
-
-
-  },
-
-  'dragover #main-player-drop' : function(e, t){
-    e.preventDefault(); 
-  },
-
-  'click #try-youtube' : function(e, t){
-    this.videoNode = new Subtitler.VideoElement('jNwXsTJddVo', {
-      target: 'main-player-drop',
-      type: 'youtube'
-    });
-  },
-
-  'click #try-vimeo' : function(e, t){
-    this.videoNode = new Subtitler.VideoElement('58179312', {
-      target: '#main-player-drop',
-      type: 'vimeo'
-    });
-  }
-
-
-});
-
-Template.video.helpers({
-
-  projectName : function() {
-    var vid = Videos.findOne(Session.get('currentVideo'))
-    if (vid)
-      return vid.name
-  }
-
-});
-
-// We check to see if we have a videoSource object here,
-// and if we do, we construct our video. Vimeo and YouTube seem
-// to require that the DOM element is present in order to
-// construct the iFrame. With HTML5, we can build it and then
-// append it to the DOM. 
-Template.mainPlayerView.rendered = function(){
-
-  var vidSource = Videos.findOne(Session.get('currentVideo'))
-    , self = this, target;
-  
-  // Check to see if the second condition is necessary.
-  if (vidSource && !Subtitler.videoNode) {
-    Session.set('loading', true);
-
-    if (vidSource.type === 'youtube'){
-      $('#main-player-drop').html('<div id="youtube-player-drop"></div>');
-      target = 'youtube-player-drop';
-    } else {
-      target = 'main-player-drop';
-    }
-
-    var videoNode = Subtitler.videoNode = new Subtitler.VideoElement(vidSource.url, {
-      target: target,
-      type: vidSource.type
-    });
-
-    // When our metaData is received, we can draw the timeline
-    // and update the video name.
-    videoNode.on('metaDataReceived', function(){
-
-      if (this.isYoutube || this.isVimeo) {
-        Videos.update(Session.get('currentVideo'), {$set: {
-          name : this.name,
-          duration: this.duration
-        }});
-      }
-
-      if (this.duration) {
-        Session.set('videoDuration', this.duration);
-      } else {
-        this.getVideoDuration(function(duration){
-          Session.set('videoDuration', duration);
-        });
-      }
-
-      Session.set('loading', null);
-    });
-
-
-  }
-};
-
-// Canvas Loading Animation
-Template.loading.rendered = function(){
-  var loading = require('bmcmahen-canvas-loading-animation')
-    , spinner = new loading({
-        color: '220, 220, 220',
-        width: 40,
-        height: 40,
-        radius: 9,
-        dotRadius: 1.8
-      });
-
-  var wrapper = this.find('#loading-wrapper');
-  wrapper.appendChild(spinner.canvas);
-}
 

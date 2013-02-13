@@ -32,7 +32,7 @@ var setSessions = function(start, end, time, sub) {
   Session.set('endTime', end)
   Session.set('currentTime', time)
   Session.set('currentSub', sub)
-}
+};
 
 Template.beginProcess.events({
   
@@ -52,47 +52,61 @@ Template.beginProcess.events({
   }
 });
 
-// Set height of Div to maximum screen size
+
+Template.captions.created = function(){
+  this.firstRender = true; 
+};
+
+// Set our caption height and cache our dom elements
+// upon first render. 
 Template.captions.rendered = function() {
-  var captionList = this.find('#captions');
-  var setCaptionHeight = function(){
-    captionList.style.height = (window.innerHeight - 210) + 'px'   
-  }
-  setCaptionHeight(); 
+  if (this.firstRender) {
+    var $list = this.$node = $(this.find('#captions'));
+  
+    function setCaptionHeight(){
+      this.height = $(window).height() - 200;
+      $list.height(this.height);
+    };
 
-  $(window).on('resize', function() {
+    // On resize, reset our caption box height. 
+    $(window).on('resize', _.debounce(_.bind(setCaptionHeight, this), 50));
     setCaptionHeight(); 
-  });
-}
+    this.firstRender = false; 
+  } else {
+    this.$node.height(this.height);
+  }
+};
 
+Template.captions.destroyed = function() {
+  $(window).off('resize');
+};
+
+Template.captions.preserve(['#captions']);
 
 // Helper to set cursor at the end of a textarea's content
 function moveCaretToEnd(el) {
-   var value =  $(el).val(); //store the value of the element
-      $(el).focus().val("");
-      $(el).focus().val(value);
-      $(el).unbind();
-}
+  var $el = $(el)
+    , value =  $el.val(); //store the value of the element
+  $el.focus().val("");
+  $el.focus().val(value);
+  $el.unbind();
+};
 
 Template.captions.preserve(['.captions']);
 
 Template.captions.events({
 
   'click #insert-new-caption' : function ( e, t ) {
-    
     if (Session.get('currentVideo')) {
-    
       var currentTime = Session.get('currentTime')
-        , endTime = currentTime + Session.get('loopDuration');
-
-      var newSub = Subtitles.insert({
-        startTime : currentTime,
-        endTime : endTime,
-        videoId : Session.get('currentVideo'),
-        saved : true,
-        user : Meteor.userId()
-      });
-
+        , endTime = currentTime + Session.get('loopDuration')
+        , newSub = Subtitles.insert({
+            startTime : currentTime,
+            endTime : endTime,
+            videoId : Session.get('currentVideo'),
+            saved : true,
+            user : Meteor.userId()
+          });
    }
   },
 
@@ -133,21 +147,15 @@ Template.captions.events({
   },
 
   'click #hints' : function(e, t) {
-    var offset = $(e.currentTarget).offset();
-    var $tip = $(t.find('.popover'));
-    $tip.css('left', offset.left - ($tip.width() / 2) + ($(e.currentTarget).width() / 2)  + 'px');
-    $tip.css('top', offset.top + $(e.currentTarget).height() + 20 + 'px');
-    $tip.toggleClass('in');
+    var offset = $(e.currentTarget).offset()
+      , $tip = $(t.find('.popover'));
+    $tip.css({
+      left : offset.left - ($tip.width() / 2) + ($(e.currentTarget).width() / 2)  + 'px',
+      top : offset.top + $(e.currentTarget).height() + 20 + 'px'
+    }).toggleClass('in');
   }
 });
 
-
-// Each individual Caption node
-Template.caption.helpers({
-  currentClass: function(){
-    return Session.equals('currentSub', this._id) ?  'selected' : ''
-  }
-});
 
 var updateForm = function(t){
   var subsToSave = Subtitles.find({ saved : false }).fetch(); 
@@ -165,10 +173,8 @@ var updateForm = function(t){
 Template.caption.events({
 
   'focus textarea' : function(e, t){
-
-    var self = this;
-    Session.set('startTime', self.startTime);
-    Session.set('endTime', self.endTime);
+    Session.set('startTime', this.startTime);
+    Session.set('endTime', this.endTime);
 
     //XXX This is a bit of a hack
     if (Session.get('silentFocus')) {
@@ -185,7 +191,7 @@ Template.caption.events({
       Subtitler.timeline.updateMarkerPosition(Session.get('startTime'));
 
     if (Subtitler.videoNode)
-      Subtitler.videoNode.seekTo(self.startTime);
+      Subtitler.videoNode.seekTo(this.startTime);
   },
 
   'keydown textarea' : function(e, t){
@@ -252,18 +258,17 @@ Template.caption.events({
         if (e.currentTarget.value === '') {
 
           var textareas = document.querySelectorAll('textarea.caption-text')
-            , index = $('#' + t.data._id).closest('tr').index()
+            , index = $('#' + t.data._id).closest('tr').index();
 
            // In IE10, the cursor gets screwed up if there arent any other textareas
            // to focus on. So we need to manually blur it before removing it.
-          if (index === 0) {
+          if (index === 0)
           	$(e.currentTarget).blur(); 
-          }
           
           Subtitles.remove(t.data._id, function(err){
             if (! err)
               Session.set('saving','All Changes Saved.')
-          })
+          });
 
           if (index > 0) {
             moveCaretToEnd(textareas[index -1])
@@ -275,16 +280,17 @@ Template.caption.events({
 
     if (e.metaKey) {
 
-    	e.preventDefault();
-
       switch(key) {
 
         // Cmd P : Lengthen end time
         case 80:
+          e.preventDefault();
           var endTime = Session.get('endTime')
+            , newEnd = endTime + 0.5;
+
           // This should probably be on a timer, like auto-save
-          Subtitles.update({_id: this._id}, {$set: {endTime: endTime + 0.5}})
-          Session.set('endTime', endTime + 0.5)
+          Subtitles.update({_id: this._id}, {$set: {endTime: newEnd}})
+          Session.set('endTime', newEnd);
 
           // sync video 1 seconds before new endTime
           var node = Subtitler.videoNode; 
@@ -296,7 +302,8 @@ Template.caption.events({
     
         // Cmd O : shorten end time
         case 79:
-          var endTime = Session.get('endTime')
+          e.preventDefault();
+          var endTime = Session.get('endTime');
 
           if (endTime > Session.get('startTime')) {
             // This should probably be on a timer, too
@@ -308,24 +315,22 @@ Template.caption.events({
               node.seekTo(endTime - 1.5);          
             }
           }
-
           return false;
 
         // cmd + i : lengthen beginning time
         case 73:
+          e.preventDefault();
           var startTime = Session.get('startTime')
+            , newStart = startTime + 0.5
 
-          Subtitles.update({_id: this._id}, {$set: {startTime: startTime + 0.5}})
-          Session.set('startTime', startTime + 0.5)
-
-          var node = Subtitler.videoNode;
-          if (node)
-            node.seekTo(startTime + 0.5);
-
+          Subtitles.update({_id: this._id}, {$set: {startTime: newStart}})
+          Session.set('startTime', newStart)
+          Subtitler.videoNode && Subtitler.videoNode.seekTo(newStart);
           return false;
 
         // cmd + u : shorten beginning time
         case 85:
+          e.preventDefault();
           var startTime = Session.get('startTime')
             , newStart = startTime - 0.5; 
 
@@ -334,24 +339,20 @@ Template.caption.events({
             return false; 
           }
 
-          Subtitles.update({_id: this._id}, {$set: {startTime: newStart}})
-          Session.set('startTime', newStart)
-
-          var node = Subtitler.videoNode;
-          if (node)
-            node.seekTo(newStart);
-
-          return false
+          Subtitles.update({_id: this._id}, {$set: {startTime: newStart}});
+          Session.set('startTime', newStart);
+          Subtitler.videoNode && Subtitler.videoNode.seekTo(newStart);
+          return false;
   
         // cmd + return/enter : insert newline 
         case 13:
-
+          e.preventDefault();
           var target = e.currentTarget
-            , val = target.value
+            , val = target.value;
 
-          target.value = val + '\n'
-          t.find('span').textContent = target.value
-          return false
+          target.value = val + '\n';
+          t.find('span').textContent = target.value;
+          return false;
       }
     }; 
 

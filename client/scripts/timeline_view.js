@@ -79,8 +79,10 @@ Template.map.rendered = function () {
 
         if (!timeline) 
           constructTimeline();
-      
-        timeline.appendData(subtitles).drawTimeline();
+
+        timeline
+          .appendData(subtitles)
+          .drawTimeline();
       });
     }
 
@@ -123,7 +125,7 @@ Template.map.rendered = function () {
         var duration = Session.get('videoDuration');
 
         if (!timeline)
-          return
+          return;
 
         timeline
           .setDuration(Session.get('videoDuration'))
