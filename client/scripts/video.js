@@ -4,6 +4,7 @@
 
 Template.mainPlayerView.destroyed = function(){
   Session.set('videoPlaying', false);
+  delete Subtitler.videoNode; 
 };
 
 Template.mainPlayerView.events({

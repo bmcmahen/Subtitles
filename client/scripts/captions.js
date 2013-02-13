@@ -156,18 +156,18 @@ Template.captions.events({
   }
 });
 
-
-var updateForm = function(t){
-  var subsToSave = Subtitles.find({ saved : false }).fetch(); 
-  _.each(subsToSave, function(sub) {
-    var content = document.getElementById(sub._id)
-    Subtitles.update(sub._id, {$set : {text : content.value, saved : true }}, function(err){
-      if (!err) 
-        Session.set('saving', 'All Changes Saved.')
-      else
-        Session.set('saving', 'Error Saving.')
-    })
-  })
+// Save our form by finding documents that are unsaved,
+// and then retrieving their values. 
+function updateForm(){
+  Subtitles.find({ saved : false }).forEach(function(sub){
+    Subtitles.update(sub._id, {
+      $set : { text : $('#'+ sub._id).val(), saved : true }}, 
+      function(err){
+        return err 
+          ? Session.set('saving', 'Error Saving')
+          : Session.set('saving', 'All Changes Saved.');
+      });
+  }); 
 }
 
 Template.caption.events({

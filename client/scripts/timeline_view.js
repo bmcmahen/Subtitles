@@ -70,23 +70,28 @@ Template.map.rendered = function () {
     };
 
 
+    function drawTimeline(subtitles){
+      subtitles = subtitles || Subtitles.find().fetch();
+      timeline
+        .appendData(subtitles)
+        .drawTimeline();
+    };
+
     // DRAW TIMELINE
+    // 
     // if Subtitles collection changes, redraw changed captions. In effect,
     // this also runs if the selected video changes.
     if (! this.drawTimeline) {
       this.drawTimeline = Meteor.autorun(function() {
         var subtitles = Subtitles.find().fetch();
-
         if (!timeline) 
           constructTimeline();
-
-        timeline
-          .appendData(subtitles)
-          .drawTimeline();
+        drawTimeline(subtitles);
       });
     }
 
     // DRAW CAPTIONS
+    // 
     // if the selected video file changes, redraw the entire timeline
     if (! this.drawCaptions) {
       this.drawCaptions = Meteor.autorun(function() {
@@ -104,6 +109,7 @@ Template.map.rendered = function () {
     }
 
     // PLAYBACK POSITION
+    // 
     // if Session.get('currentTime') changes, redraw the playback position marker
     if (! this.playbackPosition) {
         this.playbackPosition = Meteor.autorun(function () {
@@ -119,7 +125,12 @@ Template.map.rendered = function () {
         });
     }
 
-    // Update xScale if Duration Changes
+    // DURATION CHANGE / VIDEO CHANGE
+    // 
+    // in effect, this also does what video change does,
+    // but it does it after the metadata returns for the video.
+    // The contents of the timeline must be redrawn once the
+    // duration changes. 
     if (! this.videoDuration) {
       this.videoDuration = Meteor.autorun(function () {
         var duration = Session.get('videoDuration');
@@ -130,13 +141,15 @@ Template.map.rendered = function () {
         timeline
           .setDuration(Session.get('videoDuration'))
           .setXScale();
+        
+        drawTimeline(); 
       });
     }
 
   }
   
 
-}; // End of Template Rendered
+};
 
 Template.map.destroyed = function () {
   this.handle && this.handle.stop();

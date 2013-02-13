@@ -16,6 +16,7 @@
     this.wrapper = attr.wrapper;
     this.project = attr.project;
 
+    this.d3captions = d3.select(this.node).select('#caption-spans');
     this.setDuration(attr.duration);
 
     // Keep track of when we are dragging our cursor 
@@ -65,10 +66,19 @@
     drawSubtitles : function(caption){
       var self = this;
 
+      console.log('draw', caption);
+
       caption
         .attr('data-id', function (cap) { return cap._id; })
         .attr('class', 'timelineEvent')
+        .attr('opacity', function (cap) {
+          // Low opacity if not saved. 
+          return cap.saved ? 1 : 0.3; 
+        })
         .attr('fill', function (cap) { 
+          // If not saved, make it white.
+          if (!cap.saved)
+            return 'white'
 
           // Provide colour warnings if too fast rate / second
           var rate = self.getWPMRatio(cap);
@@ -102,12 +112,13 @@
 
     // Our basic drawing logic. 
     drawTimeline : function(){
+      console.log(this.captions.enter());
       this.drawSubtitles(this.captions.enter().append('rect'));
-      this.drawSubtitles(this.captions.transition().duration(400));
+      this.drawSubtitles(this.captions.transition().duration(300));
       this.captions
         .exit()
         .transition()
-        .duration(400)
+        .duration(300)
         .style('opacity', 0)
         .remove(); 
       return this; 
@@ -126,8 +137,7 @@
     // Appends our subtitles reactive data source to our
     // d3 captions.
     appendData : function(subtitles){
-      this.captions = d3.select(this.node)
-        .select('#caption-spans')
+      this.captions = this.d3captions
         .selectAll('rect')
         .data(subtitles, function(sub){
           return sub._id;
