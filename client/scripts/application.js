@@ -101,12 +101,12 @@ Subtitles = new Meteor.Collection('subtitles');
   // Subscriptions.
   // 
   // Videos.
-  Meteor.autosubscribe(function() {
+  Meteor.autorun(function() {
     Meteor.user() && Meteor.subscribe('videos', Meteor.user()._id);
   });
 
   // Subtitles.
-  Meteor.autosubscribe(function () {
+  Meteor.autorun(function () {
     var selectedVideo = Session.get('currentVideo')
     selectedVideo && Meteor.subscribe('subtitles', selectedVideo);
   });
