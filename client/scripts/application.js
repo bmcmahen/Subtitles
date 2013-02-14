@@ -24,6 +24,9 @@ Subtitles = new Meteor.Collection('subtitles');
       'reset-password' : 'resetPassword',
       'library' : 'library',
       'new-project': 'newProject',
+      'new-project/vimeo' : 'newVimeoProject',
+      'new-project/html' : 'newHTMLProject',
+      'new-project/youtube' : 'newYoutubeProject',
       'project/:id' : 'project',
       'help' : 'help',
       'login' : 'login'
@@ -44,6 +47,22 @@ Subtitles = new Meteor.Collection('subtitles');
 
     newProject : function() {
       Session.set('overlay', 'newVideo');
+      Session.set('videoSource', null);
+    },
+
+    newVimeoProject: function(){
+      Session.set('overlay', 'newVideo');
+      Session.set('videoSource', 'vimeo');
+    },
+
+    newYoutubeProject: function(){ 
+      Session.set('overlay', 'newVideo');
+      Session.set('videoSource', 'youtube');
+    },
+
+    newHTMLProject: function(){
+      Session.set('overlay', 'newVideo');
+      Session.set('videoSource', 'local');
     },
 
     library : function() {

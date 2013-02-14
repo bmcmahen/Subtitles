@@ -5,16 +5,19 @@
 
     'click a.local': function(){
       Session.set('videoSource', 'local');
+      Router.navigate('new-project/html');
       return false;
     },
 
     'click a.youtube': function(){
       Session.set('videoSource', 'youtube');
+      Router.navigate('new-project/youtube');
       return false;
     },
 
     'click a.vimeo' : function(){
       Session.set('videoSource', 'vimeo');
+      Router.navigate('new-project/vimeo');
       return false;
     },
 
@@ -129,6 +132,8 @@
       return;
     }
 
+    console.log(videoObject.url);
+    
     var newProject = {
       user: Meteor.userId(),
       created: new Date(),
@@ -146,6 +151,7 @@
 
     delete Subtitler.videoNode; 
     Session.set('currentVideo', newVideo);
+    Session.set('loadingError', null);
     Session.set('currentView', 'app');
     Session.set('overlay', null);
   };

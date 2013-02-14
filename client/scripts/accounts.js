@@ -91,6 +91,7 @@ function createProject(){
 
   delete Subtitler.videoNode; 
   Session.set('currentVideo', newVideo);
+  Session.set('loadingError', null);
   Session.set('currentView', 'app');
   Session.set('createProjectFlow', null);
 };
@@ -124,19 +125,19 @@ Template.loginForm.events({
     Session.set('formView', 'createAccountForm');
   },
 
-  'click button.google' : function(e, t){
+  'click a.google' : function(e, t){
     Meteor.loginWithGoogle(function(err){
       onLogin(err);
     });
   },
 
-  'click button.facebook' : function(e, t){
+  'click a.facebook' : function(e, t){
     Meteor.loginWithFacebook(function(err){
      onLogin(err);
     });
   },
 
-  'click button.twitter' : function(e, t){
+  'click a.twitter' : function(e, t){
     Meteor.loginWithTwitter(function(err){
       onLogin(err);
     });

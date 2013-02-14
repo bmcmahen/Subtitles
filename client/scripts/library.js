@@ -9,6 +9,7 @@ Template.viewLibrary.helpers({
 Template.projectList.events({
   'click a.project-name' : function(e,t){
     delete Subtitler.videoNode; 
+    Session.set('loadingError', null);
     Session.set('currentVideo', this._id);
     Session.set('currentView', 'app');
     Session.set('overlay', null);
