@@ -1,0 +1,192 @@
+@import 'fiddleware_variables'
+@import 'fiddleware_mixins'
+@import 'nib'
+
+// NAVBAR (FIXED AND STATIC)
+// -------------------------
+
+
+// COMMON STYLES
+// -------------
+
+.navbar
+  overflow: visible
+  margin-bottom: $baseLineHeight
+
+
+// Gradient is applied to it's own element because overflow visible is not honored by IE when filter is present
+.navbar-inner
+  padding-left:  20px
+  padding-right: 20px
+  background: $navbarBackground
+  background-image linear-gradient(rgb(78, 88, 102), rgb(50, 56, 65))
+  border-radius 4px
+  box-shadow 0 1px 10px rgba(0,0,0,0.1)
+
+// Brand, links, text, and buttons
+.navbar
+  // Hover and active states
+  .brand:hover
+    text-decoration: none
+    cursor pointer
+
+  // Website or project name
+  .brand
+    float: left
+    display: block
+    padding: 13px 8px 11px
+    font-size: 20px
+    font-weight: 600
+    line-height: 1
+    color: $white
+    font-family: $bold-font-family
+
+  // Buttons in navbar
+  .btn,
+  .btn-group
+    margin-top: 5px // make buttons vertically centered in navbar
+
+  .btn-group .btn
+    margin-top: 0 // then undo the margin here so we don't accidentally double it
+
+
+// FIXED NAVBAR
+// ------------
+
+.navbar-fixed-top
+  position: fixed
+  top: 0
+  right: 0
+  left: 0
+  z-index: $zindexFixedNavbar
+
+.navbar-fixed-top .navbar-inner
+  padding-left:  0
+  padding-right: 0
+  border-radius 0
+
+
+
+// NAVIGATION
+// ----------
+
+.navbar .nav
+  left: 0
+  display: block
+  float: left
+  margin: 0 10px 0 0
+  font-family: $baseFontFamily
+  font-size: 13px
+
+.navbar .nav.pull-right
+  float: right // redeclare due to specificity
+
+.navbar .nav > li
+  display: block
+  float: left
+
+
+// Links
+.navbar .nav > li > a
+  float: left
+  padding: 13px 20px 13px
+  line-height: 19px
+  color: #eee
+  text-decoration: none
+
+// Hover
+.navbar .nav > li > a:hover
+  background-color: $navbarLinkBackgroundHover // "transparent" is default to differentiate :hover from .active
+  color: $white
+
+
+// Active nav items
+.navbar .nav .active > a,
+.navbar .nav .active > a:hover
+  color: $navbarLinkColorHover
+  text-decoration: none
+  background-color: $navbarBackground
+
+
+// Dividers (basically a vertical hr)
+.navbar .divider-vertical
+  height: $navbarHeight
+  width: 1px
+  margin: 0 9px
+  overflow: hidden
+  background-color: $navbarBackground
+  border-right: 1px solid $navbarBackgroundHighlight
+
+
+// Secondary (floated right) nav in topbar
+.navbar .nav.pull-right
+  margin-left: 10px
+  margin-right: 0
+
+
+// Dropdown menus
+// --------------
+
+// Menu position and menu carets
+.navbar .dropdown-menu
+  margin-top: 1px
+  border-radius 4px
+  &:before
+    content: ''
+    display: inline-block
+    border-left:   7px solid transparent
+    border-right:  7px solid transparent
+    border-bottom: 7px solid #ccc
+    border-bottom-color: rgba(0,0,0,.2)
+    position: absolute
+    top: -7px
+    left: 9px
+
+  &:after
+    content: ''
+    display: inline-block
+    border-left:   6px solid transparent
+    border-right:  6px solid transparent
+    border-bottom: 6px solid $white
+    position: absolute
+    top: -6px
+    left: 10px
+
+
+
+// Dropdown toggle caret
+.navbar .nav .dropdown-toggle .caret,
+.navbar .nav .open.dropdown .caret
+  border-top-color: $white
+  margin-left 5px
+
+.navbar .nav .active .caret
+  opacity 100
+
+
+// Remove background color from open dropdown
+.navbar .nav .open > .dropdown-toggle,
+.navbar .nav .active > .dropdown-toggle,
+.navbar .nav .open.active > .dropdown-toggle
+  background-color: transparent
+
+
+// Dropdown link on hover
+.navbar .nav .active > .dropdown-toggle:hover
+  color: $white
+
+
+// Right aligned menus need alt position
+.navbar .nav.pull-right .dropdown-menu
+  left: auto
+  right: 0
+  &:before
+    left: auto
+    right: 12px
+
+  &:after
+    left: auto
+    right: 13px
+
+
+

@@ -119,7 +119,7 @@ function createVideo(vidSource){
 
   if (vidSource && !Session.get('loadingError')) {
     Session.set('loading', true);
-    console.log('hi');
+
     // Establish our target.
     if (vidSource.type === 'youtube'){
       $('#main-player-drop').html('<div id="youtube-player-drop"></div>');

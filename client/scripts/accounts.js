@@ -1,7 +1,7 @@
 // Validators, helpers
 // 
 
-(function(Subtitler){
+(function(){
 
 // Trim Input
 function trimInput(val) {
@@ -227,4 +227,4 @@ Template.passwordRecoveryForm.events({
 });
 
 
-})(Subtitler); 
+})(); 

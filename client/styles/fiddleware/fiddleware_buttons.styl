@@ -1,9 +1,7 @@
 @import 'nib'
+@import 'fiddleware_variables'
 
-$bold-font-family = 'Open Sans Condensed', 'Helvetica Neue', Helvetica, arial, sans-serif
-$font-family = 'Open Sans', 'Helvetica Neue', Helvetica, arial, sans-serif
-
-// Our Basic Button. Thanks Bootstrap. 
+// Our Basic Button. Thanks Bootstrap Dudes. 
 .btn
   font-family $font-family
   font-weight 600
@@ -15,7 +13,7 @@ $font-family = 'Open Sans', 'Helvetica Neue', Helvetica, arial, sans-serif
   background-repeat: repeat-x
   border-radius 2px
   margin 3px
-  color #555
+  color $gray
   padding 5px 11px
   background-size auto 40px
   text-shadow: 0 1px 1px rgba(255,255,255,0.4)
@@ -55,20 +53,20 @@ $font-family = 'Open Sans', 'Helvetica Neue', Helvetica, arial, sans-serif
 .btn-blue
 .btn-pink
   text-shadow: 0 1px 1px rgba(0,0,0,0.3)
-  color white
+  color $white
   border-color: rgb(168, 168, 168)
   border-bottom-color: rgb(126, 126, 126)
 
 .btn-blue
-  background #00aced
+  background $blue
   background-image linear-gradient(rgb(180, 174, 255), rgb(121, 114, 202))
 
 .btn-pink
-  background #DB71DA
+  background $pink
   background-image linear-gradient(rgb(240, 123, 239), rgb(207, 106, 206))
 
 .btn-green
-  background rgb(211,203, 77)
+  background $green
   background-image: linear-gradient(rgb(211, 203, 77), rgb(168, 163, 63))
 
 // Close button
