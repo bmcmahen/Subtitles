@@ -3,7 +3,7 @@
   position: fixed;
   top: 10px;
   right: 15px;
-  z-index: 1200;
+  z-index: 6000;
 }
 
 #notifications li {

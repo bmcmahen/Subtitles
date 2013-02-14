@@ -1,15 +1,15 @@
 // Validators, helpers
 // 
 
-// trim helper
-var trimInput = function(val) {
-  return val.replace(/^\s*|\s*$/g, "");
-}
+(function(Subtitler){
 
-/**
- * validations
- */
-var isEmail = function(val, field) {
+// Trim Input
+function trimInput(val) {
+  return val.replace(/^\s*|\s*$/g, "");
+};
+
+// Validations
+function isEmail(val, field) {
   if (val.indexOf('@') !== -1) {
       return true;
     } else {
@@ -18,7 +18,7 @@ var isEmail = function(val, field) {
     }
 };
 
-var isValidPassword = function(val, field) {
+function isValidPassword(val, field) {
   if (val.length >= 6) {
     return true;
   } else {
@@ -27,15 +27,14 @@ var isValidPassword = function(val, field) {
   }
 }
 
-var isNotEmpty = function(val, field) {
+function isNotEmpty(val, field) {
   // if null or empty, return false
   if (!val || val === ''){
     Session.set('displayMessage', 'Error & Please fill in all required fields.')
     return false; 
   }
-  else
-    return true; 
-}
+  return true; 
+};
 
 // Login Form Helpers
 Template.loginForm.helpers({
@@ -99,19 +98,18 @@ function createProject(){
 
 // Login Form Events
 Template.loginForm.events({
+
   'submit #login-form' : function(e, t) {
-
     e.preventDefault();
+    var email = trimInput(t.find('#login-email').value.toLowerCase())
+      , password = t.find('#login-password').value;
 
-    var email = trimInput(t.find('#login-email').value.toLowerCase());
-    var password = t.find('#login-password').value;
-
-    if (isNotEmpty(email, 'loginError') && isNotEmpty(password, 'loginError')) {
-
+    if (isNotEmpty(email, 'loginError') 
+        && isNotEmpty(password, 'loginError')) 
+    {
       Meteor.loginWithPassword(email, password, function(err){
         onLogin(err);
       });
-
     };
 
     return false
@@ -153,48 +151,48 @@ Template.loginForm.destroyed = function(){
 
 // Create an account and login the user. 
 Template.createAccountForm.events({
+
   'submit #register-form' : function(e, t) {
     var email = trimInput(t.find('#account-email').value.toLowerCase())
-    var password = t.find('#account-password').value
+      , password = t.find('#account-password').value;
 
     if (isNotEmpty(email, 'accountError')
-      && isNotEmpty(password, 'accountError')
-      && isEmail(email, 'accountError')
-      && isValidPassword(password, 'accountError')) {
-
+        && isNotEmpty(password, 'accountError')
+        && isEmail(email, 'accountError')
+        && isValidPassword(password, 'accountError')) 
+    {
       Session.set('loading', true)
-
       Accounts.createUser({email: email, password : password}, function(err){
         if (err && err.error === 403) {
           Session.set('displayMessage', 'Account Creation Error &' + err.reason)
           Session.set('loading', false);
         } else {
-          Session.set('currentView', 'library');
-          Router.navigate('library');
+          if (Session.get('createProjectFlow')) createProject();
+          Session.set('overlay', null);
         }
         Session.set('loading', false);
-      })
+      });
     }
     return false
   }
+
 });
 
 Template.passwordRecoveryForm.helpers({
+
   resetToken: function(){
     return Session.get('resetPassword');
   }
+
 });
 
 Template.passwordRecoveryForm.events({
+
   'submit #recovery-form' : function(e, t) {
       var email = trimInput(t.find('#recovery-email').value)
-
       if (isNotEmpty(email, 'recoveryError') && isEmail(email, 'recoveryError')) {
-        
         Session.set('loading', true);
-
         Accounts.forgotPassword({email: email}, function(err){
-
         if (err)
           Session.set('displayMessage', 'Password Reset Error & ' + err.reason)
         else {
@@ -202,21 +200,16 @@ Template.passwordRecoveryForm.events({
           Session.set('passwordView', null)
           Router.navigate('');
         }
-
         Session.set('loading', false);
-
       });
       }
       return false; 
     },
 
     'submit #new-password' : function(e, t) {
-
       var pw = t.find('#new-password-password').value;
-
       if (isNotEmpty(pw) && isValidPassword(pw)) {
         Session.set('loading', true);
-
         Accounts.resetPassword(Session.get('resetPassword'), pw, function(err){
           if (err)
             Session.set('displayMessage', 'Password Reset Error & '+ err.reason);
@@ -226,8 +219,12 @@ Template.passwordRecoveryForm.events({
             Router.navigate('library');
           }
           Session.set('loading', false);
-        })
+        });
       }
     return false; 
     }
-})
+
+});
+
+
+})(Subtitler); 

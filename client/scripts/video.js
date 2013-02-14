@@ -52,13 +52,10 @@ Template.mainPlayerView.events({
 });
 
 Template.video.helpers({
-
   projectName : function() {
     var vid = Videos.findOne(Session.get('currentVideo'))
-    if (vid)
-      return vid.name;
+    if (vid) return vid.name;
   }
-
 });
 
 // We check to see if we have a videoSource object here,
@@ -106,10 +103,7 @@ Template.mainPlayerView.events({
     }
 
     // update the video object with new url. 
-    Videos.update(Session.get('currentVideo'), {$set : {
-      url : url
-    }});
-
+    Videos.update(Session.get('currentVideo'), { $set : { url : url }});
     Session.set('loadingError', null);
   }
 });
@@ -123,9 +117,9 @@ Template.mainPlayerView.helpers({
 function createVideo(vidSource){
   var self = this, target; 
 
-  if (vidSource && !Subtitler.videoNode && !Session.get('loadingError')) {
+  if (vidSource && !Session.get('loadingError')) {
     Session.set('loading', true);
-
+    console.log('hi');
     // Establish our target.
     if (vidSource.type === 'youtube'){
       $('#main-player-drop').html('<div id="youtube-player-drop"></div>');

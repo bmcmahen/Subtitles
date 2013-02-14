@@ -23,18 +23,23 @@
 
     'submit #youtube-project' : function(e, t){
       var url = $(t.find('.url')).val();
-
+      // Ensure we have a URL
+      if (!url){
+        Session.set('displayMessage', 'Error Creating Project & Please Enter a Valid URL.');
+        return false;
+      }
       // Instantiate new Youtube Movie
-      var vid = {
-        url: url,
-        type: 'youtube'
-      };
+      var vid = { url: url, type: 'youtube' };
       createOrDeferToLogin(vid, 'youtube');
       return false;
     },
 
     'submit #vimeo-project' : function(e, t){
       var url = $(t.find('.url')).val();
+      if (!url){
+        Session.set('displayMessage', 'Error Creating Project & Please Enter a Valid URL.');
+        return false;
+      }
       // Instantiate new Vimeo Movie Project
       var vid = {
         url: url,
@@ -112,6 +117,10 @@
     },
 
     'click #create-project' : function(e, t){
+      if (!t.vid) {
+        Session.set('displayMessage', 'Error Creating Project & Please Select a Video File.');
+        return false;
+      }
       createOrDeferToLogin(t.vid, 'html');
       return false;
     }
@@ -131,7 +140,7 @@
       Router.navigate('login');
       return;
     }
-    
+
     var newProject = {
       user: Meteor.userId(),
       created: new Date(),
