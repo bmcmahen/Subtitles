@@ -47,7 +47,7 @@ Template.beginProcess.events({
 
     setSessions(0, Session.get('loopDuration'), 0, newSub)
 
-    Subtitler.videoNode.playVideo(); 
+    Subtitler.videoNode && Subtitler.videoNode.playVideo(); 
     return false;
   }
 });
@@ -187,7 +187,7 @@ Template.caption.events({
       return;
     };
 
-    if (!Session.get('videoPlaying'))
+    if (!Session.get('videoPlaying') && Subtitler.timeline)
       Subtitler.timeline.updateMarkerPosition(Session.get('startTime'));
 
     if (Subtitler.videoNode)
