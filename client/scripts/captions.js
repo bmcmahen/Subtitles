@@ -163,9 +163,8 @@ function updateForm(){
     Subtitles.update(sub._id, {
       $set : { text : $('#'+ sub._id).val(), saved : true }}, 
       function(err){
-        return err 
-          ? Session.set('saving', 'Error Saving')
-          : Session.set('saving', 'All Changes Saved.');
+        if (err) Session.set('saving', 'Error Saving');
+        else Session.set('saving', 'All Changes Saved.');
       });
   }); 
 }
@@ -175,6 +174,7 @@ Template.caption.events({
   'focus textarea' : function(e, t){
     Session.set('startTime', this.startTime);
     Session.set('endTime', this.endTime);
+    Session.set('currentSub', this._id);
 
     //XXX This is a bit of a hack
     if (Session.get('silentFocus')) {
@@ -212,13 +212,13 @@ Template.caption.events({
         // Threshold is for 1 second after.
         var target = e.currentTarget
           , next = Subtitles.findOne({ 
-            startTime :{ $gt : self.endTime, $lt : self.endTime + 1} 
-          });
+              startTime :{ $gt : self.endTime, $lt : self.endTime + 1} 
+            });
 
         if (next) {
-          setSessions(next.startTime, next.endTime, next.startTime, next._id)
-          document.getElementById(next._id).focus()
-          return false
+          setSessions(next.startTime, next.endTime, next.startTime, next._id);
+          document.getElementById(next._id).focus();
+          return false;
         }
 
         var newStart = self.endTime + 0.01
@@ -233,21 +233,16 @@ Template.caption.events({
 
         setSessions(newStart, newEnd, newStart, sub);
 
-
         // Empty? Remove. Else, save.
-        if (target.value === '') 
+        if (!target.value){
           Subtitles.remove(t.data._id);
-        else {
+        } else {
           Subtitles.update(t.data._id, {
-            $set : {
-              text : target.value, 
-              saved : true 
-            }}, function(err){
-              if (!err) 
-                Session.set('saving', 'All Changes Saved.')
-              else 
-                Session.set('saving', 'Error Saving.')
-          })
+            $set : { text : target.value, saved : true }}, 
+            function(err){
+              if (!err) Session.set('saving', 'All Changes Saved.')
+              else Session.set('saving', 'Error Saving.')
+          });
         }
 
         return false
@@ -400,27 +395,22 @@ var isValidStartTime = function(num, end) {
     return true;
 }
 
-var isValidEndTime = function(num, start) {
-  if (num <= start) {
-    return false
-  }
-
+function isValidEndTime(num, start) {
+  if (num <= start) return false
   return true
-}
+};
 
 
 Template.caption.rendered = function(){
 
   var self = this
-    , area = self.find('textarea')
-    , span = self.find('span')
+    , area = self.area = self.find('textarea')
+    , span = self.span = self.find('span');
 
-  span.textContent = area.value
+  // Ensure that all of our text is showing
+  span.textContent = area.value;
 
-  self.area = area
-  self.span = span
-
- // focus on current subtitle
+  // Ensure that focus is on the current subtitle
   if (Session.equals('currentSub', self.data._id))  {
     area.focus(); 
   }
@@ -469,6 +459,12 @@ Template.caption.rendered = function(){
   });
 
 }
+
+Template.caption.helpers({
+  selected: function(){
+    return Session.equals('currentSub', this._id);
+  }
+})
 
 Template.saving.helpers({
   saveState: function(){

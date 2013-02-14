@@ -130,10 +130,8 @@
         <input type='button' class='btn small pull-left' value='Insert Caption' id='insert-new-caption'/>
           {{> saving}}
 
-          <button class='btn small pull-right' id='import-subtitles'>Import</button>
-
           <button class='btn small pull-right' id='export-subtitles'> Export </button>
-
+          <button class='btn small pull-right' id='import-subtitles'>Import</button>
          <button class='btn small pull-right' id='hints'>
           Hints
           <b class='caret'></b>
@@ -192,7 +190,7 @@
 </template>
 
 <template name='caption'>
-  <tr class='caption'>
+  <tr class='caption {{#if selected}} active {{/if}}'>
     <td class='times left-fixed-width'>
       <p>
       {{#with formatTime this}}
