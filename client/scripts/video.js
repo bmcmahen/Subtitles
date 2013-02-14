@@ -123,12 +123,8 @@ Template.mainPlayerView.helpers({
 function createVideo(vidSource){
   var self = this, target; 
 
-  console.log('am i running?');
-  
   if (vidSource && !Subtitler.videoNode && !Session.get('loadingError')) {
     Session.set('loading', true);
-
-    console.log('hi?');
 
     // Establish our target.
     if (vidSource.type === 'youtube'){

@@ -114,13 +114,17 @@
     buildHTMLVideo: function() {
       var el = this.videoNode = document.createElement('video');
 
+      // For backwards compatibility
+      if (!this.src){
+        _.defer(_.bind(this.onLoadingError, this)); 
+        return; 
+      }
+
       $(el)
         .attr({ id: 'video-display', src: this.src })
         .on('error', _.bind(this.onLoadingError, this));
 
-        console.log(this.target);
       $(this.target).html(el);
-      console.log($(this.target));
       this.bindReady(); 
       return this;
     },
