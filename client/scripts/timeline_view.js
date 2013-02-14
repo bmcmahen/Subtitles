@@ -66,95 +66,68 @@ Template.map.rendered = function () {
         wrapper : self.find('.timeline-wrapper'),
         project : Videos.findOne(Session.get('currentVideo')),
         duration: videoDuration
+      }).setXScale()
+        .drawClickZone();
+    };
+
+    // UPDATE CHANGED CAPTIONS
+    // d3 doesn't have a Changed() so we, in effect, implement
+    // it here. 
+    if (! this.updateChangedCaptions) {
+      this.updateChangedCaptions = Subtitles.find().observe({
+        changed: function(changedDocument){
+          if (timeline) {
+            timeline.changeCaption(changedDocument);
+          }
+        }  
       });
-    };
-
-
-    function drawTimeline(subtitles){
-      subtitles = subtitles || Subtitles.find().fetch();
-      timeline
-        .appendData(subtitles)
-        .drawTimeline();
-    };
+    }
 
     // DRAW TIMELINE
-    // 
-    // if Subtitles collection changes, redraw changed captions. In effect,
-    // this also runs if the selected video changes.
+    // Uses Enter() and Exit() 
     if (! this.drawTimeline) {
       this.drawTimeline = Meteor.autorun(function() {
         var subtitles = Subtitles.find().fetch();
         if (!timeline) 
           constructTimeline();
-        drawTimeline(subtitles);
-      });
-    }
-
-    // DRAW CAPTIONS
-    // 
-    // if the selected video file changes, redraw the entire timeline
-    if (! this.drawCaptions) {
-      this.drawCaptions = Meteor.autorun(function() {
-        var video = Videos.findOne(Session.get('currentVideo'));
-        if (video) {
-
-          if (!timeline) 
-            constructTimeline(); 
-
-          timeline
-            .setXScale()
-            .drawClickZone();
-        }
+        timeline
+          .appendData(subtitles)
+          .drawTimeline();
       });
     }
 
     // PLAYBACK POSITION
-    // 
-    // if Session.get('currentTime') changes, redraw the playback position marker
     if (! this.playbackPosition) {
-        this.playbackPosition = Meteor.autorun(function () {
-          var currentTime = Session.get('currentTime');
-
-          if (!timeline)
-            return;
-          
-          if (timeline.draggingCursor)
-            return; 
-
-          timeline.updateMarkerPosition(currentTime);
-        });
-    }
-
-    // DURATION CHANGE / VIDEO CHANGE
-    // 
-    // in effect, this also does what video change does,
-    // but it does it after the metadata returns for the video.
-    // The contents of the timeline must be redrawn once the
-    // duration changes. 
-    if (! this.videoDuration) {
-      this.videoDuration = Meteor.autorun(function () {
-        var duration = Session.get('videoDuration');
+      this.playbackPosition = Meteor.autorun(function () {
+        var currentTime = Session.get('currentTime');
 
         if (!timeline)
           return;
-
-        timeline
-          .setDuration(Session.get('videoDuration'))
-          .setXScale();
         
-        drawTimeline(); 
+        if (timeline.draggingCursor)
+          return; 
+
+        timeline.updateMarkerPosition(currentTime);
       });
     }
 
+    // DURATION CHANGE 
+    if (! this.videoDuration) {
+      this.videoDuration = Meteor.autorun(function () {
+        timeline
+          .setDuration(Session.get('videoDuration'))
+          .setXScale()
+          .redraw(); 
+      });
+    }
   }
-  
-
 };
 
 Template.map.destroyed = function () {
-  this.handle && this.handle.stop();
-  this.drawCaptions && this.drawCaptions.stop(); 
   this.playbackPosition && this.playbackPosition.stop(); 
+  this.videoDuration && this.videoDuration.stop(); 
+  this.drawTimeline && this.drawTimeline.stop();
+  this.updateChangedCaptions && this.updateChangedCaptions.stop(); 
 };
 
 })(Subtitler, d3); 

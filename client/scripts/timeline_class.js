@@ -16,8 +16,8 @@
     this.wrapper = attr.wrapper;
     this.project = attr.project;
 
-    this.d3captions = d3.select(this.node).select('#caption-spans');
     this.setDuration(attr.duration);
+    this.d3Captions = d3.select(this.node).select('#caption-spans');
 
     // Keep track of when we are dragging our cursor 
     // to ensure better performance in some circumstances.
@@ -65,9 +65,6 @@
     // Our primary subtitle drawing logic. Pass in a caption.
     drawSubtitles : function(caption){
       var self = this;
-
-      console.log('draw', caption);
-
       caption
         .attr('data-id', function (cap) { return cap._id; })
         .attr('class', 'timelineEvent')
@@ -112,9 +109,8 @@
 
     // Our basic drawing logic. 
     drawTimeline : function(){
-      console.log(this.captions.enter());
-      this.drawSubtitles(this.captions.enter().append('rect'));
-      this.drawSubtitles(this.captions.transition().duration(300));
+      var self = this; 
+      this.drawSubtitles(this.captions.enter().append('rect'));     
       this.captions
         .exit()
         .transition()
@@ -137,12 +133,28 @@
     // Appends our subtitles reactive data source to our
     // d3 captions.
     appendData : function(subtitles){
-      this.captions = this.d3captions
+      this.captions = d3.select(this.node)
+        .select('#caption-spans')
         .selectAll('rect')
         .data(subtitles, function(sub){
           return sub._id;
         });
       return this; 
+    },
+
+    changeCaption : function(caption){
+      var filtered = this.d3Captions
+        .selectAll('rect')
+        .filter(function(node, i){
+          if (node._id === caption._id)
+            return true;
+        });
+      this.drawSubtitles(filtered.transition().duration(300));
+    },
+
+    redraw: function(){
+      if (this.captions)
+        this.drawSubtitles(this.captions.transition().duration(300));
     },
 
     // Events:
