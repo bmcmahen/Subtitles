@@ -131,8 +131,6 @@
       Router.navigate('login');
       return;
     }
-
-    console.log(videoObject.url);
     
     var newProject = {
       user: Meteor.userId(),
