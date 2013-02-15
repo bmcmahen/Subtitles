@@ -1,0 +1,27 @@
+@import 'nib'
+@import 'variables'
+
+input
+  border 0px
+  border-radius 2px
+  margin 8px
+
+  &[type='text']
+  &[type='password']
+  &[type='email']
+    padding: 4px
+    font-size: 12px
+    box-sizing border-box
+    font-family $font-family
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.3);
+
+    &.large
+      padding 7px
+      font-size 13px
+
+    &.wide
+      width 100%
+
+.combined input[type=text]
+  border-top-right-radius 0
+  border-bottom-right-radius 0

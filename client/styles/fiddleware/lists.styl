@@ -1,0 +1,35 @@
+.dl-horizontal
+  font-size 12px
+  margin-top 5px
+  margin-bottom 5px
+  
+  & dt
+    float left
+    width 70px
+    overflow hidden
+    clear left
+    text-align right
+    text-overflow ellipsis
+    font-weight 600
+    color #666
+    white-space nowrap
+    font-weight bold
+    display block
+
+  & dd
+    margin-left 80px
+    font-weight 500
+    color #999
+
+  & dt
+  & dd
+    line-height 20px
+
+.dl-horizontal:before
+.dl-horizontal:after
+  display table
+  line-height 0
+  content ""
+
+.dl-horizontal:after
+  clear both
