@@ -70,6 +70,7 @@ Template.mainPlayerView.rendered = function(){
 };
 
 Template.mainPlayerView.events({
+
   'click #main-player-drop': function(e){
     $('#video-select-input').trigger('click');
   },
@@ -119,7 +120,7 @@ function createVideo(vidSource){
 
   if (vidSource && !Session.get('loadingError')) {
     Session.set('loading', true);
-
+    
     // Establish our target.
     if (vidSource.type === 'youtube'){
       $('#main-player-drop').html('<div id="youtube-player-drop"></div>');

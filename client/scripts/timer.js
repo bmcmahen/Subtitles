@@ -10,16 +10,15 @@ var myTimer = function(){
   this.nodes = []
 
   this.set = function(saveFormCB) {
-    Session.set('saving', 'Saving...')
-    timer = setTimeout(function() {
+    timer = Meteor.setTimeout(function() {
       saveFormCB()
     }, 3000)
-  }
+  };
 
   this.clear = function() {
-    clearInterval(timer)
-  }
+    Meteor.clearInterval(timer);
+  };
 
-  return this
+  return this;
   
-}()
+}();

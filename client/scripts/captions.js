@@ -356,10 +356,9 @@ Template.caption.events({
   'input textarea' : function( e , t){
 
       t.span.textContent = t.area.value
-
+      Session.set('saving', 'Saving...');
       // Save user input after 3 seconds of not typing
-      Session.set('saving', 'Saving...')
-      myTimer.clear()
+      myTimer.clear();
 
       if (t.data.saved === true)
         Subtitles.update(t.data._id, {$set : { saved : false }})
