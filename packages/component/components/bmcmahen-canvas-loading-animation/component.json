@@ -1,0 +1,15 @@
+{
+  "name": "canvas-loading-animation",
+  "repo": "bmcmahen/canvas-loading-animation",
+  "description": "a canvas loading animation component",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "bmcmahen/request_animation_polyfill": "*"
+  },
+  "development": {},
+  "license": "MIT",
+  "scripts": [
+    "index.js"
+  ]
+}

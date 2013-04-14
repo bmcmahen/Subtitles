@@ -1,5 +1,3 @@
-(function(){
-
   /**
    * Class for creating a video element from file
    *
@@ -11,16 +9,16 @@
    */
 
   var Video = Subtitler.Video = function(filelist, options) {
-    this.filelist = filelist || null; 
+    this.filelist = filelist || null;
 
     if (filelist) {
-      this.file = filelist[0]
-      this.type = this.file.type
-      this.name = this.file.name
-      this.fileURL = null
+      this.file = filelist[0];
+      this.type = this.file.type;
+      this.name = this.file.name;
+      this.fileURL = null;
     }
-    
-  }
+
+  };
 
   _.extend(Video.prototype, {
 
@@ -30,21 +28,21 @@
         , file = self.file;
 
       if (! URL) {
-        Session.set('displayMessage', 
+        Session.set('displayMessage',
           'Error Loading File & Your web browser does not support loading local files.');
-        return false
+        return false;
       }
 
       if (typeof URL.createObjectURL === 'undefined') {
-      	Session.set('displayMessage',
-      		'Error Loading File & Your web browser does not support this feature.');
-      		return false; 
+        Session.set('displayMessage',
+          'Error Loading File & Your web browser does not support this feature.');
+          return false;
       }
 
       var fileURL = self.fileURL = URL.createObjectURL(file);
 
       if (self.canPlayVideo(self.type))
-        return fileURL
+        return fileURL;
       else {
         $('#myModal').addClass('in');
       }
@@ -54,7 +52,7 @@
       var self = this
         , type = type || this.type;
 
-      return _.contains(self.supportedFormats(), type) ? true : false
+      return _.contains(self.supportedFormats(), type) ? true : false;
 
     },
 
@@ -91,21 +89,17 @@
         , options = options || {};
 
       if (options.projectName) {
-        var pname = document.querySelector(options.projectName)
+        var pname = document.querySelector(options.projectName);
         if (pname.value === '') {
-          pname.value = self.name
+          pname.value = self.name;
         }
       }
 
       if (self.fileURL) {
-        var videoElement = document.createElement('video')
+        var videoElement = document.createElement('video');
         $(target).html(videoElement);
         videoElement.src = self.fileURL;
       }
 
-
-
     }
-  })
-
-})()
+  });

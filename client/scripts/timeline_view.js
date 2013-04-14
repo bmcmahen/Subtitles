@@ -2,14 +2,12 @@
  * Meteor Timeline events / templates
  *
  * Timeline Class is in timeline_class.js
- * 
+ *
  */
 
 /*jshint laxcomma:true */
 
 Session.set('videoDuration', null);
-
-(function(Subtitler, d3){
 
 Template.map.events({
 
@@ -25,14 +23,14 @@ Template.map.events({
 
     if (Subtitler.videoNode && Subtitler.videoNode.getCurrentTime())
       Subtitler.videoNode.seekTo(currentSub.startTime);
-    
-    document.getElementById(id).focus(); 
+
+    document.getElementById(id).focus();
     return false;
   },
 
   // Initiates a marker dragging event
   'mousedown #current-position' : function (e, t) {
-    t.timeline.draggingCursor = true; 
+    t.timeline.draggingCursor = true;
     return false;
   }
 
@@ -49,7 +47,7 @@ Template.map.helpers({
 // Instantiate our d3 powered timeline and setup
 // a reactive context for the data sources that will
 // alter our timeline, including captions, current time,
-// and current video. 
+// and current video.
 Template.map.rendered = function () {
   var self = this
     , timeline
@@ -71,25 +69,30 @@ Template.map.rendered = function () {
     };
 
     // UPDATE CHANGED CAPTIONS
+
+    // HERES THE ISSUE. WE NEED TO UPDATE OUR DATA
+    //
+
     // d3 doesn't have a Changed() so we, in effect, implement
-    // it here. 
+    // it here.
     if (! this.updateChangedCaptions) {
-      this.updateChangedCaptions = Subtitles.find().observe({
-        changed: function(changedDocument){
+      this.updateChangedCaptions = Subtitles.find().observeChanges({
+        changed: function(id){
           if (timeline) {
-            timeline.changeCaption(changedDocument);
+            timeline
+              .appendData(Subtitles.find().fetch())
+              .redraw();
           }
-        }  
+        }
       });
     }
 
     // DRAW TIMELINE
-    // Uses Enter() and Exit() 
+    // Uses Enter() and Exit()
     if (! this.drawTimeline) {
-      this.drawTimeline = Meteor.autorun(function() {
+      this.drawTimeline = Deps.autorun(function() {
         var subtitles = Subtitles.find().fetch();
-        if (!timeline) 
-          constructTimeline();
+        if (!timeline) constructTimeline();
         timeline
           .appendData(subtitles)
           .drawTimeline();
@@ -98,36 +101,34 @@ Template.map.rendered = function () {
 
     // PLAYBACK POSITION
     if (! this.playbackPosition) {
-      this.playbackPosition = Meteor.autorun(function () {
+      this.playbackPosition = Deps.autorun(function () {
         var currentTime = Session.get('currentTime');
 
         if (!timeline)
           return;
-        
+
         if (timeline.draggingCursor)
-          return; 
+          return;
 
         timeline.updateMarkerPosition(currentTime);
       });
     }
 
-    // DURATION CHANGE 
+    // DURATION CHANGE
     if (! this.videoDuration) {
-      this.videoDuration = Meteor.autorun(function () {
+      this.videoDuration = Deps.autorun(function () {
         timeline
           .setDuration(Session.get('videoDuration'))
           .setXScale()
-          .redraw(); 
+          .redraw();
       });
     }
   }
 };
 
 Template.map.destroyed = function () {
-  this.playbackPosition && this.playbackPosition.stop(); 
-  this.videoDuration && this.videoDuration.stop(); 
-  this.drawTimeline && this.drawTimeline.stop();
-  this.updateChangedCaptions && this.updateChangedCaptions.stop(); 
+  if (this.playbackPosition) this.playbackPosition.stop();
+  if (this.videoDuration) this.videoDuration.stop();
+  if (this.drawTimeline) this.drawTimeline.stop();
+  if (this.updateChangedCaptions) this.updateChangedCaptions.stop();
 };
-
-})(Subtitler, d3); 

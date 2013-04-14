@@ -1,11 +1,11 @@
 // Subtitles
-// 
+//
 // MIT. By Ben Mcmahen.
-// 
-// Enjoy. 
+//
+// Enjoy.
 
 
-// Our Collections are Global, which kinda stinks. 
+// Our Collections are Global, which kinda stinks.
 Videos = new Meteor.Collection('videos');
 Subtitles = new Meteor.Collection('subtitles');
 
@@ -16,7 +16,7 @@ Subtitles = new Meteor.Collection('subtitles');
 
   // Our Backbone Router. It'd be nice to use something
   // that didn't require backbone since I don't use Backbone
-  // anywhere els.e 
+  // anywhere els.e
   var Router = Backbone.Router.extend({
 
     routes : {
@@ -55,7 +55,7 @@ Subtitles = new Meteor.Collection('subtitles');
       Session.set('videoSource', 'vimeo');
     },
 
-    newYoutubeProject: function(){ 
+    newYoutubeProject: function(){
       Session.set('overlay', 'newVideo');
       Session.set('videoSource', 'youtube');
     },
@@ -84,53 +84,53 @@ Subtitles = new Meteor.Collection('subtitles');
     }
 
   });
-  
+
   // Create our Router. Another global....
-  root.Router = new Router; 
+  root.Router = new Router();
 
   Meteor.startup(function () {
     Backbone.history.start({ pushState : true });
   });
 
   // The HUGE LIST of Session Variables. There should be a better
-  // way to do this. Consider making a local, reactive model? 
-  Session.set('looping', true);
-  Session.set('loopDuration', 5);
-  Session.set('playbackRate', 1);
-  Session.set('videoPlaying', false);
-  Session.set('currentTime', null);
-  Session.set('startTime', 0);
-  Session.set('endTime', null);
-  Session.set('currentVideo', null);
-  Session.set('currentSub', null);
-  Session.set('isLooping', null);
-  Session.set('saving', null);
-  Session.set('currentView', null);
-  Session.set('overlay', null);
-  Session.set('loading', null);
-  Session.set('createProjectFlow', null);
+  // way to do this. Consider making a local, reactive model?
+  Session.setDefault('looping', true);
+  Session.setDefault('loopDuration', 5);
+  Session.setDefault('playbackRate', 1);
+  Session.setDefault('videoPlaying', false);
+  Session.setDefault('currentTime', null);
+  Session.setDefault('startTime', 0);
+  Session.setDefault('endTime', null);
+  Session.setDefault('currentVideo', null);
+  Session.setDefault('currentSub', null);
+  Session.setDefault('isLooping', null);
+  Session.setDefault('saving', null);
+  Session.setDefault('currentView', null);
+  Session.setDefault('overlay', null);
+  Session.setDefault('loading', null);
+  Session.setDefault('createProjectFlow', null);
 
   // Handle the presence of a resetToken separately, since
-  // this doesn't work well with Backbone's router. 
+  // this doesn't work well with Backbone's router.
   if (Accounts._resetPasswordToken) {
-    Session.set('overlay', 'loginView')
+    Session.set('overlay', 'loginView');
     Session.set('resetPassword', Accounts._resetPasswordToken);
   }
 
   // Subscriptions.
-  // 
+  //
   // Videos.
-  Meteor.autorun(function() {
-    Meteor.user() && Meteor.subscribe('videos', Meteor.user()._id);
+  Deps.autorun(function() {
+    if (Meteor.user()) Meteor.subscribe('videos', Meteor.user()._id);
   });
 
   // Subtitles.
-  Meteor.autorun(function () {
-    var selectedVideo = Session.get('currentVideo')
-    selectedVideo && Meteor.subscribe('subtitles', selectedVideo);
+  Deps.autorun(function () {
+    var selectedVideo = Session.get('currentVideo');
+    if (selectedVideo) Meteor.subscribe('subtitles', selectedVideo);
   });
 
-  root.Subtitler = Subtitler; 
+  root.Subtitler = Subtitler;
 
 }).call(this);
 

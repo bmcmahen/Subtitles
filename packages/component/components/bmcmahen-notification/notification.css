@@ -1,0 +1,104 @@
+
+#notifications {
+  position: fixed;
+  top: 10px;
+  right: 15px;
+}
+
+#notifications li {
+  margin-bottom: 5px;
+  list-style: none;
+}
+
+.notification {
+  position: relative;
+  max-width: 600px;
+  min-width: 250px;
+  border: 1px solid #eee;
+  background: white;
+  z-index: 100;
+  -webkit-transition: opacity 400ms, top 400ms;
+  -moz-transition: opacity 400ms, top 400ms;
+  -moz-animation-duration: 400ms;
+  -webkit-animation-duration: 400ms;
+  -moz-animation-name: slidein;
+  -webkit-animation-name: slidein;
+}
+
+  @-moz-keyframes slidein {
+    from {
+          top:-500px;
+    }
+
+    to {
+          top:0px;
+    }
+  }
+
+  @-webkit-keyframes slidein {
+    from {
+          top:-500px;
+    }
+
+    to {
+          top:0px;
+    }
+  }
+
+
+
+.notification .content {
+  padding: 15px 20px;
+}
+
+.notification h1 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.notification p {
+  margin: 0;
+  padding: 0;
+  font-size: .9em;
+}
+
+.notification .close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  text-decoration: none;
+  color: #888;
+  display: none;
+}
+
+.notification.closable .close {
+  display: block;
+}
+
+.notification .close:hover {
+  color: black;
+}
+
+.notification .close:active {
+  margin-top: 1px;
+}
+
+/* close */
+
+.notification .close {
+  position: absolute;
+  top: 3px;
+  right: 10px;
+  text-decoration: none;
+  color: #888;
+  font-size: 16px;
+  font-weight: bold;
+  display: none;
+}
+
+.notification.hide {
+  opacity: 0;
+  top: -500px;
+
+}

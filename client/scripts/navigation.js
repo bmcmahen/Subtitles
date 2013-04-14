@@ -1,15 +1,13 @@
-(function(){
-
 Template.navigation.helpers({
   displayName: function(){
     var user = Meteor.user();
-    return (user.profile && user.profile.name) || user.username || (user.emails && user.emails[0] && user.emails[0].address)
+    return (user.profile && user.profile.name) || user.username || (user.emails && user.emails[0] && user.emails[0].address);
   },
 
   loading : function() {
     return Session.get('loading');
   }
-})
+});
 
 Template.navigation.events({
 
@@ -17,14 +15,15 @@ Template.navigation.events({
     Session.set('currentView', null);
     Session.set('currentVideo', null);
     Router.navigate('');
-    return false; 
+    return false;
   },
+
   'click .logout' : function() {
-    Meteor.logout(); 
+    Meteor.logout();
     Session.set('currentView', null);
     Session.set('currentVideo', null);
     Router.navigate('');
-    return false; 
+    return false;
   },
 
   'click .view-library' : function() {
@@ -37,7 +36,7 @@ Template.navigation.events({
     Session.set('currentVideo', null);
     Session.set('currentView', 'help');
     Router.navigate('help');
-    return false; 
+    return false;
   },
 
   'click .new-project' : function(){
@@ -49,24 +48,20 @@ Template.navigation.events({
   'click .login' : function(){
     Session.set('overlay', 'loginForm');
     Router.navigate('login');
-    return false; 
+    return false;
   }
 });
 
 
-function addClass(){
+function addClass() {
   $('#overlay').addClass('active');
-};
+}
 
 // When rendered, add the 'active' class. This allows
 // us to animate the fade/scale. Defer forces a redraw
-// to ensure the animation happens. 
+// to ensure the animation happens.
 Template.overlay.rendered = function(){
-    
   if (Session.get('overlay')) {
     _.defer(addClass);
   }
-  
 };
-
-})();

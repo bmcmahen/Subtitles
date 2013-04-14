@@ -1,0 +1,13 @@
+{
+  "name": "request_animation_polyfill",
+  "repo": "bmcmahen/request_animation_polyfill",
+  "description": "the standard request animation polyfill in component form",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {},
+  "development": {},
+  "license": "MIT",
+  "scripts": [
+    "index.js"
+  ]
+}

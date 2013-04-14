@@ -1,7 +1,7 @@
 Subtitler = {};
 
-Videos = new Meteor.Collection('videos')
-Subtitles = new Meteor.Collection('subtitles')
+Videos = new Meteor.Collection('videos');
+Subtitles = new Meteor.Collection('subtitles');
 
 /**
  * Permissions
@@ -15,20 +15,16 @@ Videos.allow({
     return (userId && doc.user === userId);
   },
 
-  update : function(id, docs) {
-     return _.all(docs, function(doc) {
-      return doc.user === id
-     })
+  update : function(userId, doc) {
+    return doc.user === userId;
   },
 
-  remove : function(id, docs) {
-    return _.all(docs, function(doc) {
-      return doc.user === id
-    })
+  remove : function(userId, doc) {
+    return doc.user == userId;
   },
 
   fetch: ['user']
-})
+});
 
 Subtitles.allow({
 
@@ -36,39 +32,35 @@ Subtitles.allow({
     return (userId && doc.user === userId);
   },
 
-  update : function(id, docs) {
-     return _.all(docs, function(doc) {
-      return doc.user === id
-     })
+  update : function(userId, doc) {
+    return doc.user === userId;
   },
 
-  remove : function(id, docs) {
-    return _.all(docs, function(doc) {
-      return doc.user === id
-    })
+  remove : function(userId, doc) {
+    return doc.user === userId;
   },
 
   fetch: ['user']
 
-})
+});
 
 
   /**
    * PUBLISH
    */
-  
+
   Meteor.publish('subtitles', function(videoId) {
-    return Subtitles.find({ videoId: videoId }, {sort: ['startTime', 'asc']})
-  })
+    return Subtitles.find({ videoId: videoId }, {sort: ['startTime', 'asc']});
+  });
 
   Meteor.publish('videos', function(userId){
-    return Videos.find({ user: userId })
-  })
+    return Videos.find({ user: userId });
+  });
 
   /**
    * EMAIL
    */
-  
+
   Accounts.emailTemplates.siteName = "fiddleware Subtitles";
   // Accounts.emailTemplates.from = "fiddleware Subtitles <no-reply@fiddleware.com";
 

@@ -1,0 +1,102 @@
+.confirmation {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	max-height: 400px;
+	min-height: 50px;
+	overflow: auto;
+	width: 400px;
+	margin: -150px 0 0 -200px;
+	border: 1px solid #eee;
+	background-color: white;
+	z-index: 1000;
+}
+
+
+
+.confirmation .dialog-content {
+  padding: 10px 15px;
+}
+
+.confirmation h1 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.confirmation p {
+  margin: 0;
+  padding: 0;
+  font-size: .9em;
+}
+
+/* close */
+
+.confirmation .close {
+  position: absolute;
+  top: 3px;
+  right: 10px;
+  text-decoration: none;
+  color: #888;
+  font-size: 16px;
+  font-weight: bold;
+  display: none;
+}
+
+.confirmation .close em {
+  display: none;
+}
+
+.confirmation.closable .close {
+  display: block;
+}
+
+.confirmation .close:hover {
+  color: black;
+}
+
+.confirmation .close:active {
+  margin-top: 1px;
+}
+
+/* slide */
+
+.confirmation.slide {
+  -webkit-transition: opacity 300ms, top 300ms;
+  -moz-transition: opacity 300ms, top 300ms;
+}
+
+.confirmation.slide.hide {
+  opacity: 0;
+  top: -500px;
+}
+
+/* fade */
+
+.confirmation.fade {
+  -webkit-transition: opacity 300ms;
+  -moz-transition: opacity 300ms;
+}
+
+.confirmation.fade.hide {
+  opacity: 0;
+}
+
+/* scale */
+/* scale */
+
+.confirmation.scale {
+  -webkit-transition: -webkit-transform 300ms;
+  -moz-transition: -moz-transform 300ms;
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+}
+
+.confirmation.scale.hide {
+  -webkit-transform: scale(0);
+  -moz-transform: scale(0);
+}
+
+.confirmation-actions {
+	text-align: right;
+}

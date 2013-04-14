@@ -1,47 +1,45 @@
 // Validators, helpers
-// 
-
-(function(){
+//
 
 // Trim Input
 function trimInput(val) {
   return val.replace(/^\s*|\s*$/g, "");
-};
+}
 
 // Validations
 function isEmail(val, field) {
   if (val.indexOf('@') !== -1) {
       return true;
     } else {
-      Session.set('displayMessage', 'Error & Please enter a valid email address.')
+      Session.set('displayMessage', 'Error & Please enter a valid email address.');
       return false;
     }
-};
+}
 
 function isValidPassword(val, field) {
   if (val.length >= 6) {
     return true;
   } else {
-    Session.set('displayMessage', 'Error & Your password should be 6 characters or longer.')
-    return false; 
+    Session.set('displayMessage', 'Error & Your password should be 6 characters or longer.');
+    return false;
   }
 }
 
 function isNotEmpty(val, field) {
   // if null or empty, return false
   if (!val || val === ''){
-    Session.set('displayMessage', 'Error & Please fill in all required fields.')
-    return false; 
+    Session.set('displayMessage', 'Error & Please fill in all required fields.');
+    return false;
   }
-  return true; 
-};
+  return true;
+}
 
 // Login Form Helpers
 Template.loginForm.helpers({
 
   loginForm: function(){
     if (!Session.get('formView'))
-      return true
+      return true;
   },
 
   createAccount: function(){
@@ -67,9 +65,9 @@ function onLogin(err){
     createProject();
 
   Session.set('overlay', null);
-};
+}
 
-// Create a project if we are in 'createProjectFlow'. 
+// Create a project if we are in 'createProjectFlow'.
 function createProject(){
   var videoObject = Session.get('createProjectFlow');
 
@@ -82,18 +80,18 @@ function createProject(){
 
   if (videoObject.type === 'html') {
     newProject.name = videoObject.name;
-  } 
+  }
 
   // actually insert new object into database
   var newVideo = Videos.insert(newProject);
   Router.navigate('project/' + newVideo);
 
-  delete Subtitler.videoNode; 
+  delete Subtitler.videoNode;
   Session.set('currentVideo', newVideo);
   Session.set('loadingError', null);
   Session.set('currentView', 'app');
   Session.set('createProjectFlow', null);
-};
+}
 
 
 // Login Form Events
@@ -104,15 +102,15 @@ Template.loginForm.events({
     var email = trimInput(t.find('#login-email').value.toLowerCase())
       , password = t.find('#login-password').value;
 
-    if (isNotEmpty(email, 'loginError') 
-        && isNotEmpty(password, 'loginError')) 
+    if (isNotEmpty(email, 'loginError')
+        && isNotEmpty(password, 'loginError'))
     {
       Meteor.loginWithPassword(email, password, function(err){
         onLogin(err);
       });
-    };
+    }
 
-    return false
+    return false;
   },
 
   'click #forgot-password' : function(e, t) {
@@ -149,7 +147,7 @@ Template.loginForm.destroyed = function(){
   Session.set('formView', null);
 };
 
-// Create an account and login the user. 
+// Create an account and login the user.
 Template.createAccountForm.events({
 
   'submit #register-form' : function(e, t) {
@@ -159,12 +157,12 @@ Template.createAccountForm.events({
     if (isNotEmpty(email, 'accountError')
         && isNotEmpty(password, 'accountError')
         && isEmail(email, 'accountError')
-        && isValidPassword(password, 'accountError')) 
+        && isValidPassword(password, 'accountError'))
     {
-      Session.set('loading', true)
+      Session.set('loading', true);
       Accounts.createUser({email: email, password : password}, function(err){
         if (err && err.error === 403) {
-          Session.set('displayMessage', 'Account Creation Error &' + err.reason)
+          Session.set('displayMessage', 'Account Creation Error &' + err.reason);
           Session.set('loading', false);
         } else {
           if (Session.get('createProjectFlow')) createProject();
@@ -173,7 +171,7 @@ Template.createAccountForm.events({
         Session.set('loading', false);
       });
     }
-    return false
+    return false;
   }
 
 });
@@ -189,21 +187,21 @@ Template.passwordRecoveryForm.helpers({
 Template.passwordRecoveryForm.events({
 
   'submit #recovery-form' : function(e, t) {
-      var email = trimInput(t.find('#recovery-email').value)
+      var email = trimInput(t.find('#recovery-email').value);
       if (isNotEmpty(email, 'recoveryError') && isEmail(email, 'recoveryError')) {
         Session.set('loading', true);
         Accounts.forgotPassword({email: email}, function(err){
         if (err)
-          Session.set('displayMessage', 'Password Reset Error & ' + err.reason)
+          Session.set('displayMessage', 'Password Reset Error & ' + err.reason);
         else {
-          Session.set('displayMessage', 'Email Sent & Please check your email to reset your password.')
-          Session.set('passwordView', null)
+          Session.set('displayMessage', 'Email Sent & Please check your email to reset your password.');
+          Session.set('passwordView', null);
           Router.navigate('');
         }
         Session.set('loading', false);
       });
       }
-      return false; 
+      return false;
     },
 
     'submit #new-password' : function(e, t) {
@@ -221,10 +219,6 @@ Template.passwordRecoveryForm.events({
           Session.set('loading', false);
         });
       }
-    return false; 
+    return false;
     }
-
 });
-
-
-})(); 
