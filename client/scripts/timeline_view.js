@@ -81,7 +81,7 @@ Template.map.rendered = function () {
           if (timeline) {
             timeline
               .appendData(Subtitles.find().fetch())
-              .redraw();
+              .changeCaption(id);
           }
         }
       });

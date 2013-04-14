@@ -138,14 +138,9 @@ _.extend(Timeline.prototype, {
   },
 
   changeCaption : function(caption){
-    var filtered = d3.select(this.node)
-      .select('#caption-spans')
-      .selectAll('rect')
-      .filter(function(node, i){
-        if (node._id === caption._id)
-          return true;
-      });
-
+    var filtered = this.captions.filter(function(node, i){
+      return node._id === caption;
+    });
     this.drawSubtitles(filtered.transition().duration(300));
   },
 
