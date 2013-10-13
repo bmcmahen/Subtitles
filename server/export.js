@@ -1,16 +1,16 @@
 // XXX if window.saveAs() and web worker and blob builder,
-// then do it all on the client. Chrome, IE10, Firefox(?). 
-// 
+// then do it all on the client. Chrome, IE10, Firefox(?).
+//
 // otherwise, send the json to an express server. Express will
 // build string, and respond with a file. IE9, Safari, Firefox.
-// 
+//
 
 (function(){
 
 Meteor.methods({
 	export : function(subs, options){
 		var file = new Exports(subs, options);
-		return file.toSRT(); 
+		return file.toSRT();
 	}
 });
 
@@ -24,12 +24,12 @@ Meteor.methods({
    *
    * var file = new Subtitler.Exports(subtitles, {format : 'srt'})
    * file.toSRT(); // or whatever format is selected
-   * file.saveAs(); 
-   * 
+   * file.saveAs();
+   *
    */
 
 var Exports = function(subs, options) {
-  this.subs = subs; 
+  this.subs = subs;
   options || (options = {});
   this.format = options.format || 'srt';
   this.formattedString = '';
@@ -50,7 +50,7 @@ _.extend(Exports.prototype, {
       // Don't include empty boxes
       if (typeof value.text !== 'undefined' && value.text.match(/\S/)) {
         var bufLength = buf.length
-        buf[bufLength] = index + 1; 
+        buf[bufLength] = index + 1;
         buf[bufLength + 1] = secondsToHms(value.startTime) + ' --> ' + secondsToHms(value.endTime);
         buf[bufLength + 2] = value.text + '\n'
       }
@@ -58,7 +58,7 @@ _.extend(Exports.prototype, {
 
     var formatted = buf.join('\n');
     self.formattedString = formatted;
-    return formatted; 
+    return formatted;
   },
 
 // WEBVTT
@@ -82,7 +82,7 @@ _.extend(Exports.prototype, {
 
     var formatted = buf.join('\n');
     self.formattedString = formatted;
-    return formatted; 
+    return formatted;
   },
 
   saveAs : function(){
@@ -96,12 +96,12 @@ _.extend(Exports.prototype, {
 
 var secondsToHms = function(num, decimals) {
 
-    var decimals = decimals || 3; 
+    var decimals = decimals || 3;
 
     // Convert seconds into hours, minutes, seconds (rounded to three decimals)
     var h = Math.floor(num / 3600)
       , m = Math.floor(num % 3600 / 60)
-      , s = (num % 2600 % 60).toFixed(decimals);
+      , s = (num % 3600 % 60).toFixed(decimals);
 
 
     var timeStrings = function(n, seconds) {

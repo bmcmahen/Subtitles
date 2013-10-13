@@ -10,7 +10,7 @@ var utilities = Subtitler.utilities = {
     // Convert seconds into hours, minutes, seconds (rounded to three decimals)
     var h = Math.floor(num / 3600)
       , m = Math.floor(num % 3600 / 60)
-      , s = (num % 2600 % 60).toFixed(dec);
+      , s = (num % 3600 % 60).toFixed(dec);
 
 
     var timeStrings = function(n, seconds) {

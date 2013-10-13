@@ -51,37 +51,37 @@ _.extend(Imports.prototype, {
       , usr = Meteor.userId();
 
     var removeAndInsert = function(){
-      Subtitles.remove({});
-
       _.each(subs, function(sub){
-
         _.extend(sub, {
           saved : true,
           user : usr,
           videoId : Session.get('currentVideo')
         });
-
         Subtitles.insert(sub);
       });
     };
 
-    if (Subtitles.find().count() > 0) {
+    removeAndInsert();
 
-        new ui.Confirmation(
-      { title: 'Delete Current Entries?',
-        message: 'Importing captions will delete your current subtitles for this project. Are you sure you want to continue?'
-      }).ok('Continue')
-        .cancel('Cancel')
-        .effect('scale')
-        .show(function(ok){
-          if (ok) {
-            removeAndInsert();
-          }
-      });
+    // Disable removal of subtitles when importing, for now...
+    //
+    // if (Subtitles.find().count() > 0) {
 
-    } else {
-      removeAndInsert();
-    }
+    //     new ui.Confirmation(
+    //   { title: 'Delete Current Entries?',
+    //     message: 'Importing captions will delete your current subtitles for this project. Are you sure you want to continue?'
+    //   }).ok('Continue')
+    //     .cancel('Cancel')
+    //     .effect('scale')
+    //     .show(function(ok){
+    //       if (ok) {
+    //         removeAndInsert();
+    //       }
+    //   });
+
+    // } else {
+    //   removeAndInsert();
+    // }
 
 
   },

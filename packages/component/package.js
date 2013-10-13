@@ -4,4 +4,5 @@ Package.describe({
 
 Package.on_use(function(api){
 	api.add_files(['build/build.js', 'build/build.css'], 'client');
+  api.export(['require'], 'client');
 });

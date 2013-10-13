@@ -8,7 +8,6 @@ accounts-base
 accounts-password
 email
 backbone
-accounts-urls
 underscore
 jquery
 spiderable
@@ -16,3 +15,6 @@ accounts-google
 accounts-facebook
 accounts-twitter
 appcache
+standard-app-packages
+component
+d3

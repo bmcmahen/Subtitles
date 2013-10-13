@@ -70,7 +70,7 @@ Subtitles = new Meteor.Collection('subtitles');
         Session.set('overlay', 'viewLibrary');
       } else {
         Session.set('overlay', 'loginForm');
-        Router.navigate('login');
+        this.navigate('login');
       }
     },
 

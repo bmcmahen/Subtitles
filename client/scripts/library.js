@@ -42,7 +42,7 @@ Template.projectList.events({
       .show()
       .okay(function(e){
         // Remove both project and associated subtitles
-        Subtitles.remove({videoId: self._id});
+        Meteor.call('removeVideo', self._id);
         Videos.remove(self._id);
 
         if (Session.equals('currentVideo', self._id)) {
