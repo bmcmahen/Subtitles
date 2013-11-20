@@ -21,7 +21,7 @@ This generates a `build.js` file in the `build` folder. Unfortunately, as of ver
 
 	require = function(path, parent, orgin) ...
 
-Now, in your client code, you can important the components using `var emitter = require('component-emitter');`.
+Now, in your client code, you can import the components using `var emitter = require('component-emitter');`.
 
 ## License
 
