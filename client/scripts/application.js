@@ -9,7 +9,14 @@
 Videos = new Meteor.Collection('videos');
 Subtitles = new Meteor.Collection('subtitles');
 
+// for password stuff
+// Session.set('overlay', 'loginView');
+// Session.set('formView', 'passwordRecoveryForm');
+// Session.set('resetPassword', Accounts._resetPasswordToken);
+
 (function(){
+
+  var showReset = true;
 
   var root = this
     , Subtitler = {};
@@ -21,7 +28,6 @@ Subtitles = new Meteor.Collection('subtitles');
 
     routes : {
       '': 'home',
-      'reset-password' : 'resetPassword',
       'library' : 'library',
       'new-project': 'newProject',
       'new-project/vimeo' : 'newVimeoProject',
@@ -33,16 +39,16 @@ Subtitles = new Meteor.Collection('subtitles');
     },
 
     home : function() {
+      if (Accounts._resetPasswordToken && showReset) {
+        showReset = false;
+        return;
+      }
       Session.set('currentView', null);
       Session.set('overlay', null);
     },
 
     login: function(){
       Session.set('overlay', 'loginForm');
-    },
-
-    resetPassword : function() {
-      Session.set('passwordView', 'password');
     },
 
     newProject : function() {
@@ -88,10 +94,6 @@ Subtitles = new Meteor.Collection('subtitles');
   // Create our Router. Another global....
   root.Router = new Router();
 
-  Meteor.startup(function () {
-    Backbone.history.start({ pushState : true });
-  });
-
   // The HUGE LIST of Session Variables. There should be a better
   // way to do this. Consider making a local, reactive model?
   Session.setDefault('looping', true);
@@ -112,10 +114,16 @@ Subtitles = new Meteor.Collection('subtitles');
 
   // Handle the presence of a resetToken separately, since
   // this doesn't work well with Backbone's router.
+
   if (Accounts._resetPasswordToken) {
-    Session.set('overlay', 'loginView');
+    Session.set('overlay', 'loginForm');
     Session.set('resetPassword', Accounts._resetPasswordToken);
+    Session.set('formView', 'passwordRecoveryForm');
   }
+
+  Meteor.startup(function () {
+    Backbone.history.start({ pushState : true });
+  });
 
   // Subscriptions.
   //
