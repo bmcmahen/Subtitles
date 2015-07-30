@@ -68,18 +68,23 @@ _.extend(VideoElement.prototype, {
       videoId: this.getId(this.src),
       playerVars: {
         controls: 0
+      },
+      events: {
+        'onReady': onPlayerReady
       }
     });
 
+
+    function onPlayerReady(event) {
+      var data = self.videoNode.getVideoData()
+      self.name = data.title
+      self.duration = self.videoNode.getDuration()
+      data.duration = self.duration;
+      self.emit('metaDataReceived', data)
+    }
+
     this.bindReady();
 
-    window.youtubeFeedCallback = function(json){
-      self.name = json.data.title;
-      self.duration = json.data.duration;
-      self.emit('metaDataReceived', json);
-    };
-
-    $.getScript('http://gdata.youtube.com/feeds/api/videos/'+ this.getId(this.src) + '?v=2&alt=jsonc&callback=youtubeFeedCallback&prettyprint=true');
     return this;
   },
 
