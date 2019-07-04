@@ -1,6 +1,4 @@
-__Subtitles has been rewritten using Firebase and React. And it's open source.__
-
-__[View the new project](https://github.com/bmcmahen/captioner)__
+## Subtitles has been rewritten using Firebase and React. [View the new project](https://github.com/bmcmahen/captioner).
 
 Subtitles
 =========
